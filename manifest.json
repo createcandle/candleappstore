@@ -1,0 +1,59 @@
+{
+  "author": "CandleSmartHome.com",
+  "description": "Install and manage addons",
+  "content_scripts": [
+    {
+      "css": [
+        "css/extension.css"
+      ],
+      "js": [
+        "js/extension.js"
+      ]
+    }
+  ],  
+  "gateway_specific_settings": {
+    "webthings": {
+      "exec": "python3 {path}/main.py",
+	  "primary_type": "adapter",
+      "strict_max_version": "*",
+      "strict_min_version": "0.10.0"
+    }
+  },
+  "homepage_url": "https://www.candlesmarthome.com/app_store",
+  "id": "candleappstore",
+  "license": "MPL-2.0",
+  "manifest_version": 1,
+  "name": "Candle App Store",
+  "options": {
+    "default": {
+	  "App store server":"https://www.candlesmarthome.com/appstore",
+      "Debugging": false
+    },
+    "schema": {
+      "properties": {
+        "App store server": {
+            "description": "The server that controls which apps you can install.",
+            "type": "string"
+        },
+        "Debugging": {
+          "description": "Debugging allows you to diagnose any issues with the add-on. If enabled it will result in a lot more debug data in the internal log (which can be found under settings -> developer -> view internal logs).",
+          "type": "boolean"
+        }
+      },
+      "required": [
+	    "App store server"
+      ],
+      "type": "object"
+    }
+  },
+  "short_name": "candleapps",
+  "version": "0.0.1",
+  "web_accessible_resources": [
+    "css/*.css",
+    "images/*.svg",
+	"images/*.png",
+	"images/*.gif",
+    "js/*.js",
+    "views/*.html"
+  ]
+}

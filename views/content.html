@@ -1,0 +1,182 @@
+<div id="extension-candleappstore-content" class="extension-candleappstore-show-tab-timers">
+  
+    <div id="extension-candleappstore-content-container">
+        <h3 id="extension-candleappstore-title">Candle App Store</h3>
+		
+        <!--
+		<div id="extension-candleappstore-countdown" class="extension-candleappstore-hidden">
+			<h2>The candleappstore will launch in <span id="extension-candleappstore-countdown-seconds">...</span> seconds.</h2>
+            <p>If this addon is somehow causing issues, you can abort it starting (and/or disable it in your <a href="/settings/addons">addons overview</a>).</p>
+			<button id="extension-candleappstore-abort-button" class="extension-candleappstore-button">Abort launch</button> <button id="extension-candleappstore-launch-button" class="extension-candleappstore-button">Launch now</button> <span id="extension-candleappstore-abort-message"></span>
+		</div>
+		-->
+		
+		<div class="extension-candleappstore-tab-buttons">
+            <button id="extension-candleappstore-tab-button-timers" class="extension-candleappstore-main-tab-button">Shop</button>
+			<button id="extension-candleappstore-tab-button-satellites" class="extension-candleappstore-main-tab-button">Installed</button>
+            <button id="extension-candleappstore-tab-button-tutorial" class="extension-candleappstore-main-tab-button">?</button>
+        </div>
+		
+		<div id="extension-candleappstore-tabs-container">
+			
+			<div id="extension-candleappstore-tab-timers" class="extension-candleappstore-tab">
+				
+				<div id="extension-candleappstore-list">    
+				</div>
+                
+                <div class="extension-candleappstore-bottom-button-container">
+                    <button id="extension-candleappstore-refresh-button" class="extension-candleappstore-button">refresh</button>
+                </div>
+                
+                <div id="extension-candleappstore-original-item" class="extension-candleappstore-item">
+			        <div class="extension-candleappstore-basic-info">
+                        <div class="extension-candleappstore-basic-name"></div>
+                        <div class="extension-candleappstore-basic-description"></div>
+                    </div>
+                    <div class="extension-candleappstore-basic-options">
+                        <div class="extension-candleappstore-basic-permission"><button class="extension-candleappstore-more-button">More</button></div>
+                    </div>
+                </div>
+                
+                
+                <div id="extension-candleappstore-original-item-installed" class="extension-candleappstore-item-installed">
+			        <div class="extension-candleappstore-basic-info">
+                        <div class="extension-candleappstore-basic-name"></div>
+                        <div class="extension-candleappstore-basic-description"></div>
+                    </div>
+                    <div class="extension-candleappstore-basic-options">
+                        <div class="extension-candleappstore-basic-permission">
+                            <button class="extension-candleappstore-settings-button">Settings</button>
+                            <button class="extension-candleappstore-uninstall-button">Uninstall</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!--
+				<div id="extension-candleappstore-original-item" class="extension-candleappstore-item">
+
+					<div class="extension-candleappstore-item-setter">
+						<div class="extension-candleappstore-icon">
+						</div>
+
+						<div class="extension-candleappstore-nicename"></div>
+
+						<div class="extension-candleappstore-line2">
+							<div class="extension-candleappstore-ip"></div>
+							<div class="extension-candleappstore-mac"></div>
+                            <div class="extension-candleappstore-vendor"></div>
+                            
+						</div>
+                        <div class="extension-candleappstore-line3">
+                            
+                            <div class="extension-candleappstore-basics"></div>
+                            <button class="extension-candleappstore-button extension-candleappstore-item-clear-button">clear</button>
+                        </div>
+                        <div class="extension-candleappstore-line4">
+                            
+                            
+                        </div>
+
+					</div>
+
+					<div class="extension-candleappstore-item-menu">
+						<div class="extension-candleappstore-item-right">
+							<div class="extension-candleappstore-item-delete-button">&nbsp;</div>
+						</div>
+					</div>
+
+				</div>
+                -->
+			</div>
+
+			
+			<div id="extension-candleappstore-tab-satellites" class="extension-candleappstore-tab">
+				<div id="extension-candleappstore-satellites" class="extension-candleappstore-centered-page">
+                    <h2>Installed apps</h2>
+					<p>These are all the apps that you have installed so far.</p> 
+					
+					<div id="extension-candleappstore-installedlist"></div>
+					
+				</div>
+
+			</div>
+
+
+			<div id="extension-candleappstore-tab-tutorial" class="extension-candleappstore-tab">
+				<div id="extension-candleappstore-tutorial" class="extension-candleappstore-centered-page">
+					<h2>How to use Candle App Store</h2>
+					<p>Most privacy and security issues around smart homes are caused by wifi-enabled devices. These form a juicy target for hackers, since they can autonomously access the internet, and be a stepping stone to taking over other devices in your network.</p>
+                    <p>It's highly recommended to avoid using smart devices that connect via Wifi. However, in some cases you will have little choice. Security cameras, for example, need the high bandwidth that wifi provides. If you have a lot of wifi-based smart home devices it's good practice to create a separate wifi network for your wifi-enabled smart home devices.</p>
+                    
+                    <h4>Recommendations</h4>
+					<ul>
+						<li>It is highly recommended to plug in a network cable while using this addon.</li>
+                    </ul>
+                    
+                    <h4>Advantages</h4>
+					<ul>
+						<li>You can learn about all the connections that wifi devices make. You may be shocked to learn how they behave.</li>
+						<li>If someone steals your doorbell they may learn your wifi password. In this case, they'll only have the password to this separate network.</li>
+					</ul>
+                    
+                    <h4>Limitations</h4>
+                    <p>The wireless chip in your raspberry Pi is much less powerful than those found in dedicated wireless routers. Because of this there are some limitations to be aware of.</p>
+					<ul>
+						<li>If you are using Candleappstore without a network cable, then there is less bandwidth available, since what's available has to be shared in two directions (to the real router, and to the connected devices).</li>
+						<li>You can't connect as many devices. If you want to connect multiple devices that require a lot of data transmission, such as network video cameras, then you may want to setup your real router to create a secondary network instead.</li>
+					</ul>
+
+				</div>
+			</div>
+            
+            
+		</div>
+
+
+        <div id="extension-candleappstore-selected" class="">
+            <div id="extension-candleappstore-selected-close-container">X</div>
+	        <div class="extension-candleappstore-basic-info">
+                <h2 class="extension-candleappstore-selected-name"></h2>
+                <a href="#" target="_blank" class="extension-candleappstore-selected-homepage_url extension-candleappstore-selected-author"><span class="extension-candleappstore-selected-by">by </span></a>
+                <div class="extension-candleappstore-selected-description"></div>
+                <div class="extension-candleappstore-selected-details">details</div>
+                <a href="#" target="_blank" class="extension-candleappstore-selected-license_url">license</a>
+                <div class="extension-candleappstore-selected-privacy">privacy</div>
+                <a href="#" target="_blank" class="extension-candleappstore-selected-policy_url">privacy policy</a>
+            </div>
+            <div class="extension-candleappstore-basic-sidebar">
+                <div class="extension-candleappstore-selected-version-separated">
+                    Version: 
+                    <span class="extension-candleappstore-selected-mayor_version"></span>.<span 
+                          class="extension-candleappstore-selected-meso_version"></span>.<span 
+                          class="extension-candleappstore-selected-minor_version"></span>
+                </div>
+                <div class="extension-candleappstore-selected-version" style="display:none"></div>
+                <div class="extension-candleappstore-selected-rating"></div>
+                <div class="extension-candleappstore-selected-risk"></div>
+            </div>
+            <div id="extension-candleappstore-selected-options" class="extension-candleappstore-options">
+            </div>
+            <div class="extension-candleappstore-versions">
+                <p>All recent versions</p>
+                <div class="extension-candleappstore-versions-list">
+                </div>
+            </div>
+        </div>
+        
+        <br/>
+        <br/>
+
+        <div id="extension-candleappstore-response">
+            <p id="extension-candleappstore-response-data" class="extension-candleappstore-centered-error"></p>
+        </div>
+        <br/>
+
+    </div>
+    
+</div>
+
+
+
+
+
