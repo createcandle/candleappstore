@@ -38,6 +38,8 @@ class CandleappstoreAPIHandler(APIHandler):
         #self.addon_name = 'hootspot-handler'
         self.DEBUG = self.adapter.DEBUG
 
+        self.session = requests.Session()
+        self.session.headers.update({'User-Agent': "candlecontroller1,0"})
             
         # Intiate extension addon API handler
         try:
@@ -134,21 +136,27 @@ class CandleappstoreAPIHandler(APIHandler):
                 elif action == 'get_json':
                     print('ajax handling get_json')
                     
-                    json_data = {}
-                    
-                    if 'url' in request.body:
-                        url = self.adapter.app_store_url + str(request.body['url'])
+                    json_data = '{"error":"response code was not 200"}'
+                    try:
+                        if 'url' in request.body:
+                            url = self.adapter.app_store_url + str(request.body['url'])
                         
-                        if 'parameters' in request.body:
-                            parameters = request.body['parameters']
-                            json_data = requests.post(url, data = parameters)
-                            
-                        else:
-                            response = requests.get(url)
-                            print(str(response))
+                            if 'parameters' in request.body:
+                                parameters = request.body['parameters']
+                                print("parameters = " + str(parameters))
+                                response = self.session.post(url, data = parameters)
+
+                            else:
+                                response = self.session.get(url)
+                        
+                            print("response = " + str(response))
+                            print("response = " + str(response.text))
                             if response.status_code == 200:
                                 response.encoding = 'utf-8'
-                                json_data = response.text
+                                json_data = response.text #json.loads(response.text)
+                                
+                    except Exception as ex:
+                        print("error doing request: " + str(ex));
                             
                     #print("self.persistent_data = " + str(self.persistent_data))
                     
