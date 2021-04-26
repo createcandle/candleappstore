@@ -630,7 +630,7 @@
     display:flex;
     flex-wrap:wrap;
 }
-.extension-candleappstore-auth-form-group > input{
+.extension-candleappstore-auth-form-group > input[type=text]{
     flex-grow:1;
     min-width:10rem;
 }
