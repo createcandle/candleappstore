@@ -356,7 +356,6 @@
 .extension-candleappstore-info{
     display:inline-block;
     padding:2rem;
-    background-color:yellow;
 }
 
 
@@ -498,7 +497,7 @@
 
 
 .extension-candleappstore-tab-buttons{
-	margin-top: 4rem;
+	margin-top: 2rem;
 	background-color: rgba(255,255,255,.1);
 	border-radius: .7rem;
 	overflow: hidden;
@@ -543,18 +542,43 @@
 
 /*  AUTH - LOGIN AND SIGNUP  */
 
+#extension-candleappstore-check-login-button{
+    cursor:pointer;
+}
 
 #extension-candleappstore-auth{
     display:none;
     z-index:30;
 }
 
-#extension-candleappstore-logged-in{
-    display:none;
+#extension-candleappstore-auth-state-container{
+    text-align:right;
+    margin-top: 2rem;
+}
+#extension-candleappstore-auth-state-container > div{
     padding:1rem;
-    background-color:black;
-    float:right;
+    background-color:rgba(0,0,0,.1);
     border-radius:.5rem;
+    display:inline-block;
+}
+
+#extension-candleappstore-logout{
+    display:none;
+}
+
+#extension-candleappstore-logout-button{
+    cursor:pointer;
+}
+
+
+#extension-candleappstore-username{
+    display:inline-block;
+    padding-right:1rem;
+    border-right:1px solid white;
+    margin-right:1rem;
+}
+#extension-candleappstore-username:empty{
+    display:none;
 }
 
 /*
@@ -928,8 +952,14 @@
 
 
 
-/*  STARS & REVIEW */
+/*  ADD REVIEW */
 
+#extension-candleappstore-show-review-button{
+    display:none;
+}
+.extension-candleappstore-installed #extension-candleappstore-show-review-button{
+    display:inline-block;
+}
 
 .extension-candleappstore-stars-container {
   background-image: url("https://www.toptal.com/designers/subtlepatterns/patterns/concrete-texture.png");
@@ -993,9 +1023,6 @@
     box-shadow: 0 4px 30px rgba(0,0,0,.05);
 }
 
-
-/*  REVIEW  */
-
 #extension-candleappstore-review-container{
 }
 
@@ -1008,6 +1035,21 @@
 #extension-candleappstore-review-complete:empty{
     display:none;
 }
+
+
+
+
+/*  REVIEWS LIST */
+
+.extension-candleappstore-reviews-container{
+    
+}
+
+.extension-candleappstore-review-item{
+    border-bottom:1px solid rgba(255,255,255,.2);
+    margin-bottom:1rem;
+}
+
 
 
 /*  HISTOGRAM  */
@@ -1086,27 +1128,27 @@
   display: block;
 }
 
-#extension-candleappstore-histogram-bar-five {
+#extension-candleappstore-histogram-bar5 {
   width: 0;
   background-color: #9FC05A;
 }
 
-#extension-candleappstore-histogram-bar-four {
+#extension-candleappstore-histogram-bar4 {
   width: 0;
   background-color: #ADD633;
 }
 
-#extension-candleappstore-histogram-bar-three {
+#extension-candleappstore-histogram-bar3 {
   width: 0;
   background-color: #FFD834;
 }
 
-#extension-candleappstore-histogram-bar-two {
+#extension-candleappstore-histogram-bar2 {
   width: 0;
   background-color: #FFB234;
 }
 
-#extension-candleappstore-histogram-bar-one {
+#extension-candleappstore-histogram-bar1 {
   width: 0;
   background-color: #FF8B5A;
 }

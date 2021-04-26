@@ -3,8 +3,7 @@
     
     <div id="extension-candleappstore-content-container">
         <h3 id="extension-candleappstore-title">Candle App Store</h3>
-		<button id="extension-candleappstore-test">Login test</button>
-        <div id="extension-candleappstore-logged-in"><span id="extension-candleappstore-username"></span> | <span id="extension-candleappstore-logout-button">logout</span></div>
+        <div id="extension-candleappstore-auth-state-container"><div><span id="extension-candleappstore-check-login-button">login</span> <span id="extension-candleappstore-logout"><span id="extension-candleappstore-username"></span><span id="extension-candleappstore-logout-button">logout</span></span></div></div>
 
         <!--
 		<div id="extension-candleappstore-countdown" class="extension-candleappstore-hidden">
@@ -54,6 +53,25 @@
                 </div>
                 
                 
+                <div id="extension-candleappstore-original-review-item" class="extension-candleappstore-review-item">
+			        <div class="extension-candleappstore-review-item-info">
+                        <div class="extension-candleappstore-review-item-version-separated">
+                            Version: 
+                            <span class="extension-candleappstore-review-item-mayor_version"></span>.<span 
+                                  class="extension-candleappstore-review-item-meso_version"></span>.<span 
+                                  class="extension-candleappstore-review-item-minor_version"></span>
+                        </div>
+                        <div class="extension-candleappstore-review-item-username"></div>
+                        <div class="extension-candleappstore-review-item-rating">rating: </div>
+                        <div class="extension-candleappstore-review-item-risk">risk: </div>
+                        <div class="extension-candleappstore-review-item-review"></div>
+                    </div>
+                    <div class="extension-candleappstore-review-item-options">
+                        
+                    </div>
+                </div>
+                
+                <!--
                 <div id="extension-candleappstore-original-item-installed" class="extension-candleappstore-item-installed">
 			        <div class="extension-candleappstore-basic-info">
                         <div class="extension-candleappstore-basic-name"></div>
@@ -63,7 +81,7 @@
                     </div>
                 </div>
                 
-                <!--
+            
 				<div id="extension-candleappstore-original-item" class="extension-candleappstore-item">
 
 					<div class="extension-candleappstore-item-setter">
@@ -206,9 +224,9 @@
                         <div class="extension-candleappstore-histogram-container">
                           <div class="extension-candleappstore-histogram-inner">
                             <div class="extension-candleappstore-histogram-rating">
-                              <span class="extension-candleappstore-histogram-rating-num">4.0</span>
+                              <span id="extension-candleappstore-histogram-average-rating" class="extension-candleappstore-histogram-rating-num">4.0</span>
                           
-                              Stars here
+                              <div>Stars here</div>
                           
                           
                               <!--
@@ -222,7 +240,7 @@
                               -->
                               
                               <div class="extension-candleappstore-histogram-rating-users">
-                                <i class="extension-candleappstore-histogram-icon-user"></i> 1,014,004 total
+                                <i class="extension-candleappstore-histogram-icon-user"></i> <span id="extension-candleappstore-histogram-total-rating-count"></span> total
                               </div>
                             </div>
     
@@ -231,8 +249,8 @@
                                 <span class="extension-candleappstore-histogram-histo-star">
                                   <i class="extension-candleappstore-histogram-active icon-star"></i> 5           </span>
                                 <span class="extension-candleappstore-histogram-bar-block">
-                                  <span id="extension-candleappstore-histogram-bar-five" class="extension-candleappstore-histogram-bar">
-                                    <span>566,784</span>&nbsp;
+                                  <span id="extension-candleappstore-histogram-bar5" class="extension-candleappstore-histogram-bar">
+                                    <span id="extension-candleappstore-histogram-rating-count5"></span>&nbsp;
                                   </span> 
                                 </span>
                               </div>
@@ -241,8 +259,8 @@
                                 <span class="extension-candleappstore-histogram-histo-star">
                                   <i class="extension-candleappstore-histogram-active icon-star"></i> 4           </span>
                                 <span class="extension-candleappstore-histogram-bar-block">
-                                  <span id="extension-candleappstore-histogram-bar-four" class="extension-candleappstore-histogram-bar">
-                                    <span>171,298</span>&nbsp;
+                                  <span id="extension-candleappstore-histogram-bar4" class="extension-candleappstore-histogram-bar">
+                                    <span id="extension-candleappstore-histogram-rating-count4"></span>&nbsp;
                                   </span> 
                                 </span>
                               </div> 
@@ -251,8 +269,8 @@
                                 <span class="extension-candleappstore-histogram-histo-star">
                                   <i class="extension-candleappstore-histogram-active icon-star"></i> 3           </span>
                                 <span class="extension-candleappstore-histogram-bar-block">
-                                  <span id="extension-candleappstore-histogram-bar-three" class="extension-candleappstore-histogram-bar">
-                                    <span>94,940</span>&nbsp;
+                                  <span id="extension-candleappstore-histogram-bar3" class="extension-candleappstore-histogram-bar">
+                                    <span id="extension-candleappstore-histogram-rating-count3"></span>&nbsp;
                                   </span> 
                                 </span>
                               </div>
@@ -261,8 +279,8 @@
                                 <span class="extension-candleappstore-histogram-histo-star">
                                   <i class="extension-candleappstore-histogram-active extension-candleappstore-histogram-icon-star"></i> 2           </span>
                                 <span class="extension-candleappstore-histogram-bar-block">
-                                  <span id="extension-candleappstore-histogram-bar-two" class="extension-candleappstore-histogram-bar">
-                                    <span>44,525</span>&nbsp;
+                                  <span id="extension-candleappstore-histogram-bar2" class="extension-candleappstore-histogram-bar">
+                                    <span id="extension-candleappstore-histogram-rating-count2"></span>&nbsp;
                                   </span> 
                                 </span>
                               </div>
@@ -271,8 +289,8 @@
                                 <span class="extension-candleappstore-histogram-histo-star">
                                   <i class="extension-candleappstore-histogram-active icon-star"></i> 1           </span>
                                 <span class="extension-candleappstore-histogram-bar-block">
-                                  <span id="extension-candleappstore-histogram-bar-one" class="extension-candleappstore-histogram-bar">
-                                    <span>136,457</span>&nbsp;
+                                  <span id="extension-candleappstore-histogram-bar1" class="extension-candleappstore-histogram-bar">
+                                    <span id="extension-candleappstore-histogram-rating-count1"></span>&nbsp;
                                   </span> 
                                 </span>
                               </div>
@@ -338,6 +356,9 @@
                 </div>
                 <div id="extension-candleappstore-review-complete" class="extension-candleappstore-italic extension-candleappstore-vlak"></div>
                 
+                <div id="extension-candleappstore-reviews-container" class="extension-candleappstore-vlak">
+                    <div id="extension-candleappstore-reviews-list"></div>
+                </div>
                 
                 
                 <div id="extension-candleappstore-selected-options" class="extension-candleappstore-options">
