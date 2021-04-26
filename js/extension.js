@@ -303,8 +303,13 @@
                         }
                         logout_container.style.display = "inline-block";
                     }
-                    else if(response.hasOwnProperty('error')){
-                        
+                    else if(response.hasOwnProperty('action')){
+                        if(response['action'] == "login"){
+                            auth.style.display = 'block';
+                            login_form.style.display = 'block';
+                            signup_form.style.display = 'none';
+                            verify_form.style.display = 'none';
+                        }
                     }
                 })
                 .catch((e) => {
