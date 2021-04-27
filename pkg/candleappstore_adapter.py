@@ -171,9 +171,12 @@ class CandleappstoreAdapter(Adapter):
             if 'unique_id' not in self.persistent_data: # to remember what the main candleappstore server is, for satellites.
                 print("unique_id was not in persistent data, adding it now.")
                 self.persistent_data['unique_id'] = generate_random_string(20)
+                self.save_persistent_data()
             if 'addons' not in self.persistent_data:
                 print("addons was not in persistent data, adding it now.")
                 self.persistent_data['addons'] = {}
+            if 'permissions' not in self.persistent_data:
+                self.persistent_data['permissions'] = {}
         except Exception as ex:
             print("Error fixing missing values in persistent data: " + str(ex))
         

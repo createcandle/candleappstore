@@ -100,36 +100,37 @@ class CandleappstoreAPIHandler(APIHandler):
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state' : True, 'message' : 'initialisation complete', 'addons': self.adapter.persistent_data['addons'], 'app_store_url':self.adapter.app_store_url, 'installed': installed_addons }),
+                      content=json.dumps({'state' : True, 'message' : 'initialisation complete', 'addons': self.adapter.persistent_data['addons'], 'app_store_url':self.adapter.app_store_url, 'installed': installed_addons, 'permissions': self.adapter.persistent_data['permissions']}),
                     )
                     
                     
-                elif action == 'latest':
-                    print('ajax handling latest')
+                elif action == 'remember_permission':
+                    print('ajax handling permission change')
                     #print("self.persistent_data = " + str(self.persistent_data))
-                    filtered_animals = {}
+                    
+                    state = False
+                    message = "Error saving permission"
                     try:
-                        filtered_animals = self.filter_animals()
-                    except:
-                        print("Error while filtering animals")
+                        if 'addon_id' in request.body and 'permission' in request.body and 'value' in request.body:
+                            addon_id = str(request.body['addon_id']) 
+                            permission = str(request.body['permission'])
+                            value = str(request.body['value']) 
                     
-                    print("self.adapter.seconds = " + str(self.adapter.seconds))
+                            if not addon_id in self.adapter.persistent_data['permissions']:
+                                self.adapter.persistent_data['permissions'][addon_id] = {}
+                            
+                            self.adapter.persistent_data['permissions'][addon_id][permission] = value
+                            self.adapter.save_persistent_data()
+                            state = True
+                            message = "Permission preference has been saved"
+                    except Exception as ex:
+                        print("Error saving new permmission: " + str(ex))
+                    
                     
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state' : True, 'message' : 'updated data deceived', 'animals': filtered_animals, 'master_blocklist': self.adapter.persistent_data['master_blocklist'], 'seconds':self.adapter.seconds }),
-                    )
-                    
-                    
-                elif action == 'abort':
-                    print('ajax handling abort')
-                    #print("self.persistent_data = " + str(self.persistent_data))
-                    self.adapter.allow_launch = False
-                    return APIResponse(
-                      status=200,
-                      content_type='application/json',
-                      content=json.dumps({'state' : True, 'message' : 'launch has been aborted' }),
+                      content=json.dumps({'state' : state, 'message' : message, 'permissions': self.adapter.persistent_data['permissions'] }),
                     )
                     
                 
