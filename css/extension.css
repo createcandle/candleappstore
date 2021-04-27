@@ -364,6 +364,31 @@
 }
 
 
+
+/*  PERMISSIONS POPUP  */
+
+#extension-candleappstore-permissions{
+    display:none;
+    z-index:30;
+    background-color: rgb(255, 177, 0);
+    border-bottom:2px solid rgba(0,0,0,.2);
+    padding-left:9rem;
+    padding-right:9rem;
+}
+
+.extension-candleappstore-popup{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    min-height:5rem;
+    max-height:50vh;
+    overflow:auto;
+}
+
+
+
+
 /*  INFO / WARNING / ERROR  */
 
 .extension-candleappstore-error{

@@ -19,6 +19,7 @@
             this.extensions_list = [];
             this.selector = "";
             this.username = "";
+            this.permissions = {};
             
 			fetch(`/extensions/${this.id}/views/content.html`)
 	        .then((res) => res.text())
@@ -67,7 +68,7 @@
                 mutations.forEach(function(mutation) {
                     if (oldHref != document.location.href) {
                             oldHref = document.location.href;
-                            /* Changed ! your code here */
+                            
                             console.log("new location spotted via mutation observer");
                             const addons_page_url = window.origin + '/settings/addons';
                             const app_store_url = window.origin + '/extensions/candleappstore';
@@ -650,14 +651,15 @@
 				`/extensions/candleappstore/api/ajax`,
 				{'action':'init'}
 			).then((body) => { 
-				//console.log("clear item reaction: ");
-				//console.log(body);
+				console.log("INIT response: ");
+				console.log(body);
 				if( body['state'] != true ){
 					pre.innerText = body['message'];
 				}
                 else{
                     this.app_store_url = body['app_store_url'];
-                    this.installed = body['installed']
+                    this.installed = body['installed'];
+                    this.permissions = body['permissions'];
                     //this.generate_installed( body['installed'] );
                 }
 
@@ -939,6 +941,46 @@
             });
         };
         
+        
+        remember_permission = (addon_id, permission, value) =>
+        {
+            const pre = document.getElementById('extension-candleappstore-response-data');
+            //console.log(this);
+            return new Promise((myResolve, myReject) =>
+            {
+    	        window.API.postJson(
+    	            `/extensions/${this.id}/api/ajax`,
+    			    {'action':'remember_permission','addon_id':addon_id,'permission': permission, 'value':value}
+
+    	        ).then((body) => {
+    				console.log("Python API remember permission result:");
+    				console.log(body);
+                
+    				if(body['state'] == true){
+                        pre.innerText = body['message'];
+                        this.permissions = body['permissions'];
+                        
+                        if(typeof body['body'] == "string"){
+                            myResolve( JSON.parse(body['body']) );
+                        }
+                        else{
+                            myResolve(body['body']);
+                        }
+                        
+    				}
+    				else{
+                        myReject({});
+    				}
+
+    	        }).catch((e) => {
+    	  			//console.log("Error getting timer items: " + e.toString());
+    				console.log("Error: " + e);
+    				pre.innerText = "remembering permission failed - connection error?";
+    				//return {};
+                    myReject({});
+    	        });	
+            });
+        };
         
         
         
@@ -1707,6 +1749,8 @@
                 const advanced_form_container = document.getElementById("extension-candleappstore-advanced-settings-form-container");
                 const settings_options_bar = document.getElementById("extension-candleappstore-settings-options");
                 
+                const permissions_dropdown = document.getElementById("extension-candleappstore-permissions");
+                
                 form.innerHTML = "";
                 advanced_form.innerHTML = "";
                 settings_options_bar.innerHTML = "";
@@ -1734,8 +1778,10 @@
                 }
                 
                 var addon_settings_schema = {};
+                var api_data = null;
                 for(let i = 0; i < this.api_addons_data.length; i++){
                     if( this.api_addons_data[i]['id'] == addon_id ){
+                        api_data = this.api_addons_data[i];
                         if(this.api_addons_data[i].hasOwnProperty('schema')){
                             addon_settings_schema = this.api_addons_data[i]['schema'];
                         }
@@ -1745,9 +1791,10 @@
                     form.innerHTML = '<span class="extension-candleappstore-error">Error, could not load settings</span>';
                     return;
                 }
+                console.log("api_data = ");
+                console.log(api_data);
                 
-                
-                console.log("window.origin = " + window.origin);
+                //console.log("window.origin = " + window.origin);
                 
                 if(!addon_settings_schema.hasOwnProperty('properties')){
                     form.innerHTML = '<span class="extension-candleappstore-info">This addon does not have any settings.</span>';
@@ -1795,6 +1842,9 @@
                 }
                 */
                 
+                console.log("addon_settings_schema:");
+                console.log(addon_settings_schema);
+                
                 const addon_settings_props = addon_settings_schema['properties'];
                 
                 var addon_settings_required = [];
@@ -1816,15 +1866,173 @@
                 
                 settings_keys.forEach((info, index) => {
                     console.log("ADDING SETTING ITEM: " + info);
-                    console.log("addon_settings_props[info]['type'] = " + addon_settings_props[info]['type']);
                     var advanced = false;
                     var is_required = false;
                     
 
+                    const css_element_id = 'extension-candleappstore-settings-setting-' + this.makeSafeForCSS(info);
+                    var d = document.createElement("div");
+
+                    //
+                    //  ADDING EXTRA PERMISSION DROPDOWN FOR TOKEN
+                    //
+
+                    if(info.toLowerCase() == 'authorization token'){
+                        var token_state = null;
+                        if(this.permissions.hasOwnProperty(addon_id)){
+                            console.log("Info about permissions for this addon existed");
+                            if( this.permissions[addon_id].hasOwnProperty('token') ){
+                                token_state = this.permissions[addon_id]['token'];
+                            }
+                        }
+                        console.log("Authorization token input field spotted");
+                        /*
+                        if(api_data != null){
+                            document.getElementById("extension-candleappstore-permissions-title").innerText = api_data['name'];
+                        }
+                        */
+                        
+                        // If the token string is empty, that means the permission is 'none'.
+                        if(token_state == null && data[info] == ""){
+                            token_state = 'none';
+                        }
+                        
+                        var xd = document.createElement("div");
+                        xd.classList.add('extension-candleappstore-settings-permission-setting');
+                        
+                        var xl = document.createElement("label");
+                        xl.for = info + "-permission";
+                        var xt = document.createTextNode("Access to your things");
+                        xl.appendChild(xt); // append text to label
                     
+                        xd.appendChild(xl); // append label to div
+                        
+                        
+                        console.log("should create permission enum");
+                        var xs = document.createElement("select");
+                        xs.name = info + "-permission";
+                        
+						//const property_lists = this.get_property_lists(this.all_things[thing]['properties']);
+						//console.log("property lists:");
+						//console.log(property_lists);
+						
+                        //const possible_permissions = {'none':'No access', 'read':'Read only', 'full':'Read and toggle'};
+                        const possible_permissions = {'none':'No access', 'full':'Read and toggle'};
+                        
+                        const permission_keys = Object.keys(possible_permissions);
+                    
+    					permission_keys.forEach((preference, index) => {
+                        
+                        //for(let q = 0; q < possible_permissions.length; q++){
+						//for( var title in data[info]['enum'] ){
+                            //const option_name = addon_settings_props[info]['enum'][q];
+							console.log("adding permissions preference option: " + preference);
+                            const new_option_element = new Option(preference, possible_permissions[preference]);
+							
+                            if(token_state == preference){
+                                console.log("spotted selected permission dropdown option");
+                                // found the selected item
+                                //new_option_element.selected = true;
+                                new_option_element.setAttribute("selected", "selected");
+                            }
+                            xs.options[xs.options.length] = new_option_element;
+						});
+                        
+                        xs.addEventListener('change', (event) => {
+                            console.log("permission dropdown changed");
+                            console.log(event);
+                            event.stopImmediatePropagation();
+                            //this.remember_permission(addon_id,'token','none');
+                            
+                            console.log("new value: " + event.target.value);
+                            //revokeAuthorization
+                            
+                            if(event.target.value == possible_permissions['none']){
+                                console.log("permission was set to none. Revoke?");
+                                document.getElementById(css_element_id).value = "";
+                            }
+                            else if(event.target.value == possible_permissions['read']){
+                                console.log("permission was set to read only");
+                                
+                                // http://thuis.local/oauth/authorize?response_type=code&client_id=local-token&scope=/things:readwrite&state=asdf
+                            }
+                            else if(event.target.value == possible_permissions['full']){
+                                console.log("permission was set to full");
+                                console.log( localStorage.getItem('jwt') );
+                                console.log("target input el: " + css_element_id);
+                                document.getElementById(css_element_id).value = localStorage.getItem('jwt');
+                                
+                                //http://thuis.local/oauth/authorize?response_type=code&client_id=local-token&scope=/things:readwrite&state=asdf
+                            }
+                            
+                        });
+                        
+                        xd.appendChild(xs);
+                        
+                        // Add description
+                        var xp = document.createElement("p");
+                        const xpt = document.createTextNode("This app would like permission to control your devices. Is that ok?");
+                        xp.appendChild(xpt);
+                        xd.appendChild(xp); // append description to div
+                        
+                        form.appendChild(xd);
+                        
+                        /*
+                        //permissions_dropdown.style.display = 'block';
+                        var x = document.createElement("div");
+                        var xt = document.createTextNode(api_data['name'] = " would like permission to read the state of and toggle your devices. Is that ok?");
+                        x.appendChild(xt);
+                        
+                        var po = document.createElement("div");
+                        //s.id = css_element_id
+                        
+                        var none = document.createElement("button");
+                        var nonet = document.createTextNode("no");
+                        none.appendChild(not);
+                        none.classList.add('extension-candleappstore-permission-button-no');      
+                        
+                        none.addEventListener('click', (event) => {
+                            console.log("no button clicked");
+                            console.log(event);
+                            event.stopImmediatePropagation();
+                            this.remember_permission(addon_id,'token','none');
+                        });
+                        po.appendChild(none);
+                        
+                        
+                        var read = document.createElement("button");
+                        var readt = document.createTextNode("Read only");
+                        read.appendChild(readt);
+                        read.classList.add('extension-candleappstore-permission-button-read'); 
+                        
+                        read.addEventListener('click', (event) => {
+                            console.log("read button clicked");
+                            console.log(event);
+                            event.stopImmediatePropagation();
+                            this.remember_permission(addon_id,'token','read');
+                        });
+                        po.appendChild(read);
+                        
+                        var full = document.createElement("button");
+                        var fullt = document.createTextNode("Read and toggle");
+                        full.appendChild(fullt);
+                        full.classList.add('extension-candleappstore-permission-button-full'); 
+                        
+                        full.addEventListener('click', (event) => {
+                            console.log("read and write button clicked");
+                            console.log(event);
+                            event.stopImmediatePropagation();
+                            this.remember_permission(addon_id,'token','full');
+                        });
+                        po.appendChild(full);
+                        x.appendChild(po);
+                        */
+                        
+                        
+                        //return;
+                    }
                     
                     //addon_settings_props
-                    var d = document.createElement("div");
                     if( addon_settings_required != undefined){
                         if(addon_settings_required.indexOf(info) != -1){
                             console.log("-is_required");
@@ -1865,7 +2073,7 @@
                     
                     
                     
-                    const css_element_id = 'extension-candleappstore-settings-setting-' + this.makeSafeForCSS(info);
+                    
                     
                     
                     try{
@@ -2165,7 +2373,7 @@
 
             };
     
-            // Convert init to an RGBA
+            // Convert to an RGBA
             this.int_to_rgba = function(i) {
                 var color = ((i >> 24) & 0xFF).toString(16) +
                     ((i >> 16) & 0xFF).toString(16) +
