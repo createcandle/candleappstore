@@ -360,7 +360,7 @@
 }
 
 .extension-candleappstore-hidden-setting{
-    opacity:.5;
+    display:none;
 }
 
 
