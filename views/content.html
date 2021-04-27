@@ -47,8 +47,9 @@
                         <div class="extension-candleappstore-basic-name"></div>
                         <div class="extension-candleappstore-basic-description"></div>
                     </div>
-                    <div class="extension-candleappstore-basic-options">
-                        
+                    <div>
+                        <div class="extension-candleappstore-basic-options">
+                        </div>
                     </div>
                 </div>
                 
@@ -377,7 +378,7 @@
             <div id="extension-candleappstore-auth-close-container" class="back-button icon-button" data-l10n-id="back-button" aria-label="Back"></div>
             <div class="extension-candleappstore-centered-page">
             
-                <p id="extension-candleappstore-auth-intro">Login</p>
+                <p id="extension-candleappstore-auth-intro"></p>
             
                 <div id="extension-candleappstore-auth-login-form">
 
@@ -428,13 +429,25 @@
                         <input type="password" id="extension-candleappstore-signup-cpassword" name="extension-candleappstore-signup-cpassword">
                     </div>
                 
-                    <div class="extension-candleappstore-auth-form-group">
+                    <div class="extension-candleappstore-auth-form-group extension-candleappstore-auth-form-beta-group">
                         <label for="extension-candleappstore-signup-beta">Join beta program</label> 
                         <input type="checkbox" id="extension-candleappstore-signup-beta" name="extension-candleappstore-signup-beta">
+                        <p class="extension-candleappstore-italic">Joining the beta program will give you access to addons which may still be in early development, and could harm your system. By signing up you agree to the risks of being at the cutting edge.</p>
                     </div>
-                    <p class="extension-candleappstore-italic">Joining the beta program will give you access to addons which may still be in early development, and could harm your system. By signing up you agree to the risks of being at the cutting edge.</p>
+                    
 
-                    <button id="extension-candleappstore-signup-button" class="extension-candleappstore-button">Sign up</button>
+                    <div id="extension-candleappstore-github-username-container" class="extension-candleappstore-auth-form-group">
+                        <label for="extension-candleappstore-github-username">Github username</label> 
+                        <input type="text" id="extension-candleappstore-github-username" name="extension-candleappstore-github-username">
+                        <p class="extension-candleappstore-italic">If you are an app developer, sharing your Github username will allow you to take control over how they are presented.</p>
+                    </div>
+                    
+
+
+                    
+                    <div class="extension-candleappstore-align-right">
+                        <button id="extension-candleappstore-signup-button" class="extension-candleappstore-button">Sign up</button>
+                    </div>
                     
                 </div>
             
