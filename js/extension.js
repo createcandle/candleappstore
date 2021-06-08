@@ -1244,7 +1244,7 @@
                                     b.classList.add('text-button');
                                 
                                     b.setAttribute('data-enabled', 1);
-                                    t = document.createTextNode("stop");
+                                    t = document.createTextNode("Stop");
                                     b.appendChild(t);
                                 }
                                 else{
@@ -1253,7 +1253,7 @@
                                     b.classList.add('text-button');
                                     
                                     b.setAttribute('data-enabled', 0);
-                                    t = document.createTextNode("start");
+                                    t = document.createTextNode("Start");
                                     b.appendChild(t);
                                 }
                             }else{
