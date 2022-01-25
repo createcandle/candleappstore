@@ -26,7 +26,11 @@
                     <h2>Installed apps</h2>
 					<p>These are all the apps that you have installed so far.</p> 
 					
-					<div id="extension-candleappstore-installedlist"></div>
+					<div id="extension-candleappstore-installedlist">
+                        <div class="extension-candleappstore-spinner">
+                            <div></div><div></div><div></div><div></div>
+                        </div>
+					</div>
 					
 				</div>
 
@@ -35,11 +39,14 @@
             
 			<div id="extension-candleappstore-tab-timers" class="extension-candleappstore-tab">
 				
-				<div id="extension-candleappstore-list">    
+				<div id="extension-candleappstore-list">
+                    <div class="extension-candleappstore-spinner">
+                        <div></div><div></div><div></div><div></div>
+                    </div>
 				</div>
                 
                 <div class="extension-candleappstore-bottom-button-container">
-                    <button id="extension-candleappstore-refresh-button" class="extension-candleappstore-button">refresh</button>
+                    <!--<button id="extension-candleappstore-refresh-button" class="extension-candleappstore-button">refresh</button>-->
                 </div>
                 
                 <div id="extension-candleappstore-original-item" class="extension-candleappstore-item">
@@ -70,53 +77,9 @@
                     <div class="extension-candleappstore-review-item-options">
                         
                     </div>
+
                 </div>
                 
-                <!--
-                <div id="extension-candleappstore-original-item-installed" class="extension-candleappstore-item-installed">
-			        <div class="extension-candleappstore-basic-info">
-                        <div class="extension-candleappstore-basic-name"></div>
-                        <div class="extension-candleappstore-basic-description"></div>
-                    </div>
-                    <div class="extension-candleappstore-basic-options">
-                    </div>
-                </div>
-                
-            
-				<div id="extension-candleappstore-original-item" class="extension-candleappstore-item">
-
-					<div class="extension-candleappstore-item-setter">
-						<div class="extension-candleappstore-icon">
-						</div>
-
-						<div class="extension-candleappstore-nicename"></div>
-
-						<div class="extension-candleappstore-line2">
-							<div class="extension-candleappstore-ip"></div>
-							<div class="extension-candleappstore-mac"></div>
-                            <div class="extension-candleappstore-vendor"></div>
-                            
-						</div>
-                        <div class="extension-candleappstore-line3">
-                            
-                            <div class="extension-candleappstore-basics"></div>
-                            <button class="extension-candleappstore-button extension-candleappstore-item-clear-button">clear</button>
-                        </div>
-                        <div class="extension-candleappstore-line4">
-                            
-                            
-                        </div>
-
-					</div>
-
-					<div class="extension-candleappstore-item-menu">
-						<div class="extension-candleappstore-item-right">
-							<div class="extension-candleappstore-item-delete-button">&nbsp;</div>
-						</div>
-					</div>
-
-				</div>
-                -->
 			</div>
 
 			
@@ -197,8 +160,12 @@
             <div class="extension-candleappstore-centered-page">
                 
                 <h2 class="extension-candleappstore-selected-name"></h2>
+                <div class="extension-candleappstore-selected-tags"></div>
                 <div class="extension-candleappstore-selected-description"></div>
-                                        
+                
+                <div class="extension-candleappstore-selected-opinion"></div>
+                <div id="extension-candleappstore-screenshots" class="extension-candleappstore-selected-screenshots"></div>
+                
                 <div class="extension-candleappstore-two-column">
         	        <div class="extension-candleappstore-basic-info extension-candleappstore-vlak">
                         
@@ -221,7 +188,7 @@
                     
                         <div class="extension-candleappstore-selected-details">details</div>
                         <a href="#" target="_blank" class="extension-candleappstore-selected-license_url">license</a>
-                        <div class="extension-candleappstore-selected-privacy">privacy</div>
+                        <div class="extension-candleappstore-selected-privacy"></div>
                         <a href="#" target="_blank" class="extension-candleappstore-selected-policy_url">privacy policy</a>
                     </div>
                     <div class="extension-candleappstore-basic-sidebar extension-candleappstore-vlak">
@@ -377,11 +344,18 @@
                 
                 <div id="extension-candleappstore-selected-options" class="extension-candleappstore-options">
                 </div>
+                <div id="extension-candleappstore-busy-installing">
+                    <div class="extension-privacy-manager-spinner">
+                        <div></div><div></div><div></div><div></div>
+                    </div>
+                </div>
+                <!--
                 <div class="extension-candleappstore-versions">
                     <p>All recent versions</p>
                     <div class="extension-candleappstore-versions-list">
                     </div>
                 </div>
+                -->
             </div>
         </div>
         
