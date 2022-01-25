@@ -10,11 +10,11 @@
         "js/extension.js"
       ]
     }
-  ],  
+  ],
   "gateway_specific_settings": {
     "webthings": {
       "exec": "python3 {path}/main.py",
-	  "primary_type": "adapter",
+      "primary_type": "adapter",
       "strict_max_version": "*",
       "strict_min_version": "0.10.0"
     }
@@ -26,7 +26,7 @@
   "name": "Candle App Store",
   "options": {
     "default": {
-	  "App store server":"https://www.candlesmarthome.com/appstore",
+      "App store server":"https://www.candlesmarthome.com/appstore",
       "Debugging": false
     },
     "schema": {
@@ -41,18 +41,18 @@
         }
       },
       "required": [
-	    "App store server"
+        "App store server"
       ],
       "type": "object"
     }
   },
   "short_name": "candleapps",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "web_accessible_resources": [
     "css/*.css",
     "images/*.svg",
-	"images/*.png",
-	"images/*.gif",
+    "images/*.png",
+     "images/*.gif",
     "js/*.js",
     "views/*.html"
   ]
