@@ -98,9 +98,7 @@ class CandleappstoreAdapter(Adapter):
         print("self.user_profile:")
         print(str(self.user_profile))
         self.addon_path = os.path.join(self.user_profile['addonsDir'], self.addon_name)
-        #self.dnsmasq_log_path = os.path.join(self.addon_path,"snips","response.wav")
         self.data_dir_path = os.path.join(self.user_profile['dataDir'], self.addon_name)
-        self.hostapd_conf_file_path = os.path.join(self.data_dir_path, "hostapd.conf")
 
 
         # Make sure the data directory exists
@@ -108,18 +106,9 @@ class CandleappstoreAdapter(Adapter):
             if not os.path.isdir(self.data_dir_path):
                 os.mkdir( self.data_dir_path )
                 print("data directory did not exist, created it now")
-        except:
-            print("Error: could not make sure data dir exists.")
+        except Exception as ex:
+            print("Error: could not make sure data dir exists: " + str(ex))
             
-        # Make sure the hosts directory exists
-        try:
-            if not os.path.isdir(self.dnsmasq_hosts_dir_path):
-                os.system("cp -R " + self.dnsmasq_addon_hosts_dir_path + " " + self.dnsmasq_hosts_dir_path )
-                #os.mkdir( self.dnsmasq_hosts_dir_path )
-                print("hosts directory did not exist, copied the built-in files")
-        except:
-            print("Error: could not make sure data dir exists.")
-
 
         # Get persistent data
         try:
@@ -206,45 +195,6 @@ class CandleappstoreAdapter(Adapter):
         except Exception as e:
             print("Failed to start API handler (this only works on gateway version 0.10 or higher). Error: " + str(e))
 
-            
-        # Create notifier
-        try:
-            #self.voice_messages_queue = queue.Queue()
-            #self.notifier = CandleappstoreNotifier(self,self.voice_messages_queue,verbose=True) # TODO: It could be nice to move speech completely to a queue system so that voice never overlaps.
-            pass
-        except:
-            print("Error creating notifier")
-
-        # Start the internal clock which is used to handle timers. It also receives messages from the notifier.
-        if self.DEBUG:
-            print("Starting the internal clock")
-        try:
-            #self.t = threading.Thread(target=self.clock, args=(self.voice_messages_queue,))
-            #self.t = threading.Thread(target=self.clock)
-            #self.t.daemon = True
-            #self.t.start()
-            pass
-        except:
-            print("Error starting the clock thread")
-
-
-            
-        #time.sleep(1.34)
-        
-        # Set thing to connected state
-        try:
-            #self.devices['candleappstore'].connected = True
-            #self.devices['candleappstore'].connected_notify(True)
-            pass
-        except Exception as ex:
-            print("Error setting device details: " + str(ex))
-            
-        #time.sleep(5.4) # Snips needs some time to start
-
-
-        #time.sleep(10)
-        
-        #self.save_persistent_data()
         print("end of init")
 
         
@@ -348,14 +298,6 @@ class CandleappstoreAdapter(Adapter):
                 real_dirs.append(filename)
                 
         return real_dirs
-
-
-
-
-
-
-
-
 
 
  
