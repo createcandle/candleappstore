@@ -1,4 +1,4 @@
-<div id="extension-candleappstore-content" class="extension-candleappstore-show-tab-satellites">
+<div id="extension-candleappstore-content">
     
     
     <div id="extension-candleappstore-content-container">
@@ -14,17 +14,18 @@
 		-->
 		
 		<div class="extension-candleappstore-tab-buttons">
-            <button id="extension-candleappstore-tab-button-satellites" class="extension-candleappstore-main-tab-button">Installed</button>
-            <button id="extension-candleappstore-tab-button-timers" class="extension-candleappstore-main-tab-button">Shop</button>
-            <button id="extension-candleappstore-tab-button-tutorial" class="extension-candleappstore-main-tab-button">?</button>
+            <button id="extension-candleappstore-tab-button-installed" class="extension-candleappstore-main-tab-button extension-candleappstore-tab-selected">Installed</button>
+            <button id="extension-candleappstore-tab-button-shop" class="extension-candleappstore-main-tab-button extension-candleappstore-hidden">Shop</button>
+            <button id="extension-candleappstore-tab-button-updates" class="extension-candleappstore-main-tab-button extension-candleappstore-hidden">Updates</button>
+            <button id="extension-candleappstore-tab-button-help" class="extension-candleappstore-main-tab-button">?</button>
         </div>
 		
 		<div id="extension-candleappstore-tabs-container">
 			
-			<div id="extension-candleappstore-tab-satellites" class="extension-candleappstore-tab">
-				<div id="extension-candleappstore-satellites" class="extension-candleappstore-centered-page">
-                    <h2>Installed apps</h2>
-					<p>These are all the apps that you have installed so far.</p> 
+			<div id="extension-candleappstore-tab-installed" class="extension-candleappstore-tab">
+				<div id="extension-candleappstore-installed" class="extension-candleappstore-centered-page">
+                    <h2>Installed</h2>
+					<p>These are all the addons that are currently installed.</p> 
 					
 					<div id="extension-candleappstore-installedlist">
                         <div class="extension-candleappstore-spinner">
@@ -37,7 +38,25 @@
 			</div>
             
             
-			<div id="extension-candleappstore-tab-timers" class="extension-candleappstore-tab">
+            
+            
+            <div id="extension-candleappstore-tab-updates" class="extension-candleappstore-tab extension-candleappstore-hidden">
+                <div id="extension-candleappstore-updates" class="extension-candleappstore-centered-page">
+                    <h2>Updates</h2>
+                    <!--<p>There are new versions available of these addons:</p> -->
+					<div id="extension-candleappstore-updates-list">
+                        <div class="extension-candleappstore-spinner">
+                            <div></div><div></div><div></div><div></div>
+                        </div>
+					</div>
+                </div>
+            </div>
+            
+            
+            
+            
+            
+			<div id="extension-candleappstore-tab-shop" class="extension-candleappstore-tab extension-candleappstore-hidden">
 				
 				<div id="extension-candleappstore-list">
                     <div class="extension-candleappstore-spinner">
@@ -60,34 +79,14 @@
                     </div>
                 </div>
                 
-                
-                <div id="extension-candleappstore-original-review-item" class="extension-candleappstore-review-item">
-			        <div class="extension-candleappstore-review-item-info">
-                        <div class="extension-candleappstore-review-item-version-separated">
-                            Version: 
-                            <span class="extension-candleappstore-review-item-mayor_version"></span>.<span 
-                                  class="extension-candleappstore-review-item-meso_version"></span>.<span 
-                                  class="extension-candleappstore-review-item-minor_version"></span>
-                        </div>
-                        <div class="extension-candleappstore-review-item-username"></div>
-                        <div class="extension-candleappstore-review-item-rating">rating: </div>
-                        <div class="extension-candleappstore-review-item-risk">risk: </div>
-                        <div class="extension-candleappstore-review-item-review"></div>
-                    </div>
-                    <div class="extension-candleappstore-review-item-options">
-                        
-                    </div>
-
-                </div>
-                
 			</div>
 
 			
 			
 
 
-			<div id="extension-candleappstore-tab-tutorial" class="extension-candleappstore-tab">
-				<div id="extension-candleappstore-tutorial" class="extension-candleappstore-centered-page">
+			<div id="extension-candleappstore-tab-help" class="extension-candleappstore-tab extension-candleappstore-hidden">
+				<div id="extension-candleappstore-help" class="extension-candleappstore-centered-page">
 					<h2>How to use Candle App Store</h2>
 					<p>Most privacy and security issues around smart homes are caused by wifi-enabled devices. These form a juicy target for hackers, since they can autonomously access the internet, and be a stepping stone to taking over other devices in your network.</p>
                     <p>It's highly recommended to avoid using smart devices that connect via Wifi. However, in some cases you will have little choice. Security cameras, for example, need the high bandwidth that wifi provides. If you have a lot of wifi-based smart home devices it's good practice to create a separate wifi network for your wifi-enabled smart home devices.</p>
@@ -151,6 +150,18 @@
             </div>
         </div>
         
+        <!--
+        <div id="extension-candleappstore-busy-updating" class="extension-candleappstore-popup">
+            
+            <div id="extension-candleappstore-updating-close-container" class="back-button icon-button" data-l10n-id="back-button" aria-label="Back"></div>
+            <div class="extension-candleappstore-centered-page">
+                <p>Update in progress</p>
+                <div class="extension-privacy-manager-spinner">
+                    <div></div><div></div><div></div><div></div>
+                </div>
+            </div>
+        </div>
+        -->
         
 
         <div id="extension-candleappstore-selected" class="extension-candleappstore-overlay">
@@ -357,6 +368,24 @@
                 </div>
                 -->
             </div>
+        </div>
+        
+        
+        
+        <div id="extension-candleappstore-original-review-item" class="extension-candleappstore-review-item">
+	        <div class="extension-candleappstore-review-item-info">
+                <div class="extension-candleappstore-review-item-version-separated">
+                    Version: 
+                    <span class="extension-candleappstore-review-item-mayor_version"></span>.<span 
+                          class="extension-candleappstore-review-item-meso_version"></span>.<span 
+                          class="extension-candleappstore-review-item-minor_version"></span>
+                </div>
+                <div class="extension-candleappstore-review-item-username"></div>
+                <div class="extension-candleappstore-review-item-rating">rating: </div>
+                <div class="extension-candleappstore-review-item-risk">risk: </div>
+                <div class="extension-candleappstore-review-item-review"></div>
+            </div>
+            <div class="extension-candleappstore-review-item-options"></div>
         </div>
         
         

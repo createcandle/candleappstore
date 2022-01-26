@@ -89,7 +89,7 @@
    display:block;
 }
 .extension-candleappstore-hidden{
-   display:none;
+   display:none!important;
 }
 
 .extension-candleappstore-button{
@@ -556,11 +556,11 @@
 /*  TABS  */
 
 
+
 .extension-candleappstore-tab-buttons{
 	margin-top: 2rem;
 	background-color: rgba(255,255,255,.1);
 	border-radius: .7rem;
-	overflow: hidden;
 	font-size:0;
 }
 
@@ -570,6 +570,7 @@
 	color: #eee;
 	cursor:pointer;
 	font-size:1.8rem;
+    position:relative;
 }
 #extension-candleappstore-view .extension-candleappstore-tab-buttons button:last-child{
 	float:right;
@@ -581,22 +582,77 @@
 }
 
 
+#extension-candleappstore-view .extension-candleappstore-tab-buttons button.extension-candleappstore-tab-selected{
+    background-color:rgba(0,0,0,.3);
+}
+
+
+
+/*  UPDATES  */
+
+.extension-candleappstore-tab-button-updates-available::after{
+    content: "!";
+    padding: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    font-size: 1.7rem;
+    overflow: hidden;
+    font-weight: bold;
+    line-height: 1.2rem;
+    background-color: orange;
+    border-radius: 50%;
+    display: inline-block;
+    position: absolute;
+    top: -0.5rem;
+}
+
+
+
+#extension-candleappstore-updates-list .extension-candleappstore-item{
+    width:100%;
+}
+
+
+.extension-candleappstore-busy-updating{
+    opacity:.3;
+    /*background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.8));*/
+    background:transparent;
+    background-size: 400% 400%;
+
+    -webkit-animation: pulsate .5s ease infinite;
+    -moz-animation: pulsate .5s ease infinite;
+    animation: pulsate .5s ease infinite;
+}
+
+@-webkit-keyframes pulsate {
+    0%{background-position:49% 0%}
+    50%{background-position:52% 100%}
+    100%{background-position:49% 0%}
+}
+@-moz-keyframes pulsate {
+    0%{background-position:49% 0%}
+    50%{background-position:52% 100%}
+    100%{background-position:49% 0%}
+}
+@keyframes pulsate {
+    0%{background-position:49% 0%}
+    50%{background-position:52% 100%}
+    100%{background-position:49% 0%}
+}
+
+
+
+
+
 
 #extension-candleappstore-tabs-container > div{
-	display:none;
+	/*display:none;*/
 }
 
-#extension-candleappstore-content.extension-candleappstore-show-tab-timers #extension-candleappstore-tab-button-timers,
-#extension-candleappstore-content.extension-candleappstore-show-tab-satellites #extension-candleappstore-tab-button-satellites,
-#extension-candleappstore-content.extension-candleappstore-show-tab-tutorial #extension-candleappstore-tab-button-tutorial{
-	color: white;
-    background-color: rgba(0,0,0,0.18);
-}
-#extension-candleappstore-content.extension-candleappstore-show-tab-timers #extension-candleappstore-tab-timers,
-#extension-candleappstore-content.extension-candleappstore-show-tab-satellites #extension-candleappstore-tab-satellites,
-#extension-candleappstore-content.extension-candleappstore-show-tab-tutorial #extension-candleappstore-tab-tutorial{
-	display:block;
-}
+
+
+
+
 
 
 

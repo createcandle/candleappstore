@@ -97,6 +97,7 @@ class CandleappstoreAdapter(Adapter):
         # Some paths
         print("self.user_profile:")
         print(str(self.user_profile))
+        
         self.addon_path = os.path.join(self.user_profile['addonsDir'], self.addon_name)
         self.data_dir_path = os.path.join(self.user_profile['dataDir'], self.addon_name)
 
@@ -195,8 +196,10 @@ class CandleappstoreAdapter(Adapter):
         except Exception as e:
             print("Failed to start API handler (this only works on gateway version 0.10 or higher). Error: " + str(e))
 
-        print("end of init")
+        print("end of candle app store adapter init")
 
+        
+        
         
 #
 #  GET CONFIG
@@ -290,13 +293,16 @@ class CandleappstoreAdapter(Adapter):
 
 
     def scan_installed_addons(self):
-        raw_dirs = os.listdir( self.user_profile['addonsDir'] )
-
         real_dirs = []
-        for filename in raw_dirs:
-            if os.path.isdir( os.path.join(self.user_profile['addonsDir'],filename) ):
-                real_dirs.append(filename)
-                
+        print("self.user_profile['addonsDir'] = " + str(self.user_profile['addonsDir']))
+        try:
+            raw_dirs = os.listdir( self.user_profile['addonsDir'] )
+            for filename in raw_dirs:
+                if os.path.isdir( os.path.join(self.user_profile['addonsDir'],filename) ):
+                    real_dirs.append(filename)
+        except Exception as ex:
+            print("could not get list of actually installed addons directories: " + str(ex))
+            
         return real_dirs
 
 
