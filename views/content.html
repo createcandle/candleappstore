@@ -88,8 +88,10 @@
 			<div id="extension-candleappstore-tab-help" class="extension-candleappstore-tab extension-candleappstore-hidden">
 				<div id="extension-candleappstore-help" class="extension-candleappstore-centered-page">
 					<h2>How to use Candle App Store</h2>
-					<p>Most privacy and security issues around smart homes are caused by wifi-enabled devices. These form a juicy target for hackers, since they can autonomously access the internet, and be a stepping stone to taking over other devices in your network.</p>
-                    <p>It's highly recommended to avoid using smart devices that connect via Wifi. However, in some cases you will have little choice. Security cameras, for example, need the high bandwidth that wifi provides. If you have a lot of wifi-based smart home devices it's good practice to create a separate wifi network for your wifi-enabled smart home devices.</p>
+					<p>You can add additional functionality to this smart home controller by installing 'addons'. You can think of them as apps for your smart home. They are made by people all over the world, often in their spare time.</p>
+                    <p>Some might need to connect to the cloud. Some addons might requires a higher technical skill level to use. As the code for these addons is likely to be open source, if you want to you can inspect what goes on under the hood.</p>
+                    
+                    <p>After installing a new addon you might want to look at its settings.</p>
                     
                     <h4>Recommendations</h4>
 					<ul>
@@ -173,12 +175,22 @@
                 <h2 class="extension-candleappstore-selected-name"></h2>
                 <div class="extension-candleappstore-selected-tags"></div>
                 <div class="extension-candleappstore-selected-description"></div>
-                
+                <div class="extension-candleappstore-selected-details"></div>
                 <div class="extension-candleappstore-selected-opinion"></div>
                 <div id="extension-candleappstore-screenshots" class="extension-candleappstore-selected-screenshots"></div>
                 
                 <div class="extension-candleappstore-two-column">
         	        <div class="extension-candleappstore-basic-info extension-candleappstore-vlak">
+                        
+                        <div class="extension-candleappstore-selected-version-separated">
+                            Version: 
+                            <span id="extension-candleappstore-selected-mayor_version" class="extension-candleappstore-selected-mayor_version"></span>.<span 
+                                  id="extension-candleappstore-selected-meso_version"  class="extension-candleappstore-selected-meso_version"></span>.<span 
+                                  id="extension-candleappstore-selected-minor_version" class="extension-candleappstore-selected-minor_version"></span>
+                        </div>
+                        <div class="extension-candleappstore-selected-version" style="display:none"></div>
+                        <div class="extension-candleappstore-selected-rating"></div>
+                        <div class="extension-candleappstore-selected-risk"></div>
                         
                         <a href="#" target="_blank" class="extension-candleappstore-selected-homepage_url extension-candleappstore-selected-author"><span class="extension-candleappstore-selected-by">by </span></a>
 
@@ -197,21 +209,12 @@
                         </div>
                         -->
                     
-                        <div class="extension-candleappstore-selected-details">details</div>
+                        
                         <a href="#" target="_blank" class="extension-candleappstore-selected-license_url">license</a>
                         <div class="extension-candleappstore-selected-privacy"></div>
                         <a href="#" target="_blank" class="extension-candleappstore-selected-policy_url">privacy policy</a>
                     </div>
                     <div class="extension-candleappstore-basic-sidebar extension-candleappstore-vlak">
-                        <div class="extension-candleappstore-selected-version-separated">
-                            Version: 
-                            <span id="extension-candleappstore-selected-mayor_version" class="extension-candleappstore-selected-mayor_version"></span>.<span 
-                                  id="extension-candleappstore-selected-meso_version"  class="extension-candleappstore-selected-meso_version"></span>.<span 
-                                  id="extension-candleappstore-selected-minor_version" class="extension-candleappstore-selected-minor_version"></span>
-                        </div>
-                        <div class="extension-candleappstore-selected-version" style="display:none"></div>
-                        <div class="extension-candleappstore-selected-rating"></div>
-                        <div class="extension-candleappstore-selected-risk"></div>
                      
                         <div class="extension-candleappstore-histogram-container">
                           <div class="extension-candleappstore-histogram-inner">
@@ -232,7 +235,7 @@
                               -->
                               
                               <div class="extension-candleappstore-histogram-rating-users">
-                                <i class="extension-candleappstore-histogram-icon-user"></i> <span id="extension-candleappstore-histogram-total-rating-count"></span> total
+                                <i class="extension-candleappstore-histogram-icon-user"></i> <span id="extension-candleappstore-histogram-total-rating-count"></span> review
                               </div>
                             </div>
     

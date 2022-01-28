@@ -14,7 +14,7 @@
   "gateway_specific_settings": {
     "webthings": {
       "exec": "python3 {path}/main.py",
-      "primary_type": "adapter",
+      "primary_type": "extension",
       "strict_max_version": "*",
       "strict_min_version": "0.10.0"
     }
@@ -47,12 +47,14 @@
     }
   },
   "short_name": "candleapps",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "web_accessible_resources": [
     "css/*.css",
     "images/*.svg",
     "images/*.png",
-     "images/*.gif",
+    "images/*.gif",
+    "images/*.jpg",
+    "images/*.jpeg",
     "js/*.js",
     "views/*.html"
   ]

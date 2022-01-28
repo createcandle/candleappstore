@@ -371,13 +371,7 @@
             };
             
             
-            this.get_installed_addons_data()
-            .then((result) => { 
-                console.log("in get_installed_addons_data.then");
-                this.generate_overview('installed');
-			}).catch((e) => {
-				console.log("get_installed_addons_data catch (error?):", e);
-			});
+
             
             window.API.getExtensions()
             .then((result) => { 
@@ -861,6 +855,16 @@
                     document.getElementById('extension-candleappstore-tab-button-shop').classList.remove('extension-candleappstore-hidden');
                     document.getElementById('extension-candleappstore-tab-button-updates').classList.remove('extension-candleappstore-hidden');
                 }
+                
+                
+                this.get_installed_addons_data()
+                .then((result) => { 
+                    console.log("in get_installed_addons_data.then");
+                    this.generate_overview('installed');
+    			}).catch((e) => {
+    				console.log("get_installed_addons_data catch (error?):", e);
+    			});
+                
 
 			})
             .catch((e) => {
@@ -1162,8 +1166,8 @@
             
             return new Promise((myResolve, myReject) =>
             {
-                console.log("url = " + url);
-                console.log("parameters = " + parameters);
+                console.log("url = ", url);
+                console.log("parameters = ", parameters);
                 
                 //console.log(this);
                 
@@ -1186,6 +1190,7 @@
                         
     				}
     				else{
+                        console.log('get_data: returned state was not "ok"');
                         myReject({});
     				}
 
@@ -1302,6 +1307,9 @@
                 
                 if(page == 'installed'){
                     data = this.api_addons_data;
+                    
+                    data.sort((a, b) => (a.id.toLowerCase() > b.id.toLowerCase()) ? 1 : -1) // sort alphabetically
+                    
                 }
                 else if(page == 'shop'){
                     data = this.cloud_app_data;
@@ -1309,6 +1317,7 @@
                 }
                 else if(page == 'updates'){
                     data = this.api_addons_data;
+                    data.sort((a, b) => (a.id.toLowerCase() > b.id.toLowerCase()) ? 1 : -1) // sort alphabetically
                     output_list_element = document.getElementById('extension-candleappstore-updates-list');
                 }
                 
@@ -1479,8 +1488,9 @@
                             .then(response => {
     							console.log("GET APP response: ");
     							console.log(response);
-                                this.show_selected_app(data_addon_id, response, target.getAttribute('data-installed') ); // data, and whether it is installed already
                                 selected.style.display = 'block';
+                                this.show_selected_app(data_addon_id, response, target.getAttribute('data-installed') ); // data, and whether it is installed already
+                                
                             })
                             .catch((e) => {
     							console.log("candleappstore: error while getting detailed data about an addon");
@@ -2173,6 +2183,7 @@
                                 if(result.enabled == true){
                                     console.log("installed succesfully");
                                     this.installed.push(data['versions'][v]["addon_id"]);
+                                    this.generate_overview('shop');
                                 }
                                 else{
                                     console.log("installed ok, but is disabled?");
@@ -2199,50 +2210,55 @@
                 
                 // ADD UNINSTALL BUTTON
                 else if( installed && data['versions'][v]["addon_id"] != undefined ){
-                    var b = document.createElement("button");
-                    b.classList.add('extension-candleappstore-selected-uninstall-button');
-                    b.classList.add('extension-candleappstore-button');
-                    var t = document.createTextNode("Uninstall");
-                    b.appendChild(t);
-					b.addEventListener('click', (event) => {
-                        console.log("uninstall button clicked");
-                        console.log(event);
-                        event.stopImmediatePropagation();
-                        console.log( data['versions'][v]["addon_id"] );
+                    
+                    if(data['versions'][v]["addon_id"] != 'candleappstore'){
+                        var b = document.createElement("button");
+                        b.classList.add('extension-candleappstore-selected-uninstall-button');
+                        b.classList.add('extension-candleappstore-button');
+                        b.disabled = true;
+                        var t = document.createTextNode("Uninstall");
+                        b.appendChild(t);
+    					b.addEventListener('click', (event) => {
+                            console.log("uninstall button clicked");
+                            console.log(event);
+                            event.stopImmediatePropagation();
+                            console.log( data['versions'][v]["addon_id"] );
                         
-                        const addon_id = data['versions'][v]["addon_id"];
+                            const addon_id = data['versions'][v]["addon_id"];
                         
-                        var really = confirm("Are you sure you want to uninstall this addon?");
-                        if (really) {
-                            document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
-                            window.API.uninstallAddon( data['versions'][v]["addon_id"] )
-                            .then((result) => { 
-    							console.log("uninstallation result: ");
-                                console.log("addon_id: " + addon_id + " was uninstalled, in theory.");
-    							console.log(result); 
-                                document.getElementById("extension-candleappstore-selected").style.display = 'none';
-                                //document.getElementById("extension-candleappstore-settings").style.display = 'none';
+                            var really = confirm("Are you sure you want to uninstall this addon?");
+                            if (really) {
+                                document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
+                                window.API.uninstallAddon( data['versions'][v]["addon_id"] )
+                                .then((result) => { 
+        							console.log("uninstallation result: ");
+                                    console.log("addon_id: " + addon_id + " was uninstalled, in theory.");
+        							console.log(result); 
+                                    document.getElementById("extension-candleappstore-selected").style.display = 'none';
+                                    //document.getElementById("extension-candleappstore-settings").style.display = 'none';
                             
-                                console.log("this.installed = " + this.installed );
-                                for (var i=this.installed.length-1; i>=0; i--) {
-                                    if (this.installed[i] === addon_id) {
-                                        this.installed.splice(i, 1);
+                                    console.log("this.installed = " + this.installed );
+                                    for (var i=this.installed.length-1; i>=0; i--) {
+                                        if (this.installed[i] === addon_id) {
+                                            this.installed.splice(i, 1);
+                                        }
                                     }
-                                }
                             
-                                this.generate_overview();
+                                    this.generate_overview();
                             
-    						}).catch((e) => {
-    							console.log("uninstallation catch (error?)");
-                                console.log(e);
-    							pre.innerText = e.toString();
-    						});
-                        }
+        						}).catch((e) => {
+        							console.log("uninstallation catch (error?)");
+                                    console.log(e);
+        							pre.innerText = e.toString();
+        						});
+                            }
                         
                         
-                    });
-                    console.log("adding uninstall button");
-                    selected_options_bar.appendChild(b);
+                        });
+                        console.log("adding uninstall button");
+                        selected_options_bar.appendChild(b);
+                    }
+                    
                 }
                 //installAddon
                 
