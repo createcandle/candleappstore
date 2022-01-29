@@ -15,8 +15,8 @@
 		
 		<div class="extension-candleappstore-tab-buttons">
             <button id="extension-candleappstore-tab-button-installed" class="extension-candleappstore-main-tab-button extension-candleappstore-tab-selected">Installed</button>
-            <button id="extension-candleappstore-tab-button-shop" class="extension-candleappstore-main-tab-button extension-candleappstore-hidden">Shop</button>
             <button id="extension-candleappstore-tab-button-updates" class="extension-candleappstore-main-tab-button extension-candleappstore-hidden">Updates</button>
+            <button id="extension-candleappstore-tab-button-shop" class="extension-candleappstore-main-tab-button extension-candleappstore-hidden">Shop</button>
             <button id="extension-candleappstore-tab-button-help" class="extension-candleappstore-main-tab-button">?</button>
         </div>
 		
@@ -25,7 +25,6 @@
 			<div id="extension-candleappstore-tab-installed" class="extension-candleappstore-tab">
 				<div id="extension-candleappstore-installed" class="extension-candleappstore-centered-page">
                     <h2>Installed</h2>
-					<p>These are all the addons that are currently installed.</p> 
 					
 					<div id="extension-candleappstore-installedlist">
                         <div class="extension-candleappstore-spinner">
@@ -58,6 +57,41 @@
             
 			<div id="extension-candleappstore-tab-shop" class="extension-candleappstore-tab extension-candleappstore-hidden">
 				
+                <div id="extension-candleappstore-filter-container">
+                    
+                    <div id="extension-candleappstore-filter-privacy-container">
+                        <span>Privacy</span>
+                        <select id="extension-candleappstore-filter-privacy-select">
+                            <option value="4">Great</option>
+                            <option value="3" selected>Ok</option>
+                            <option value="0">All</option>
+                        </select>
+                    </div>
+                    
+                    <div id="extension-candleappstore-filter-reviews-container">
+                        <span>Reviews</span>
+                        <select id="extension-candleappstore-filter-reviews-select">
+                            <option value="4">4+</option>
+                            <option value="3">3+</option>
+                            <option value="2">2+</option>
+                            <option value="1">1+</option>
+                            <option value="0" selected>All</option>
+                        </select>
+                    </div>
+                    
+                    <div id="extension-candleappstore-filter-expert-container">
+                        <span>Expert level</span>
+                        <select id="extension-candleappstore-filter-expert-select">
+                            <option value="1">Easy</option>
+                            <option value="2" selected>Tinkerer</option>
+                            <option value="3">Expert</option>
+                            <option value="4">Hardcore</option>
+                            <option value="5">Beta testers</option>
+                        </select>
+                    </div>
+                    
+                </div>
+                
 				<div id="extension-candleappstore-list">
                     <div class="extension-candleappstore-spinner">
                         <div></div><div></div><div></div><div></div>
@@ -170,29 +204,33 @@
             <div id="extension-candleappstore-selected-close-container" class="back-button icon-button" data-l10n-id="back-button" aria-label="Back"></div>
             
 
-            <div class="extension-candleappstore-centered-page">
-                
-                <h2 class="extension-candleappstore-selected-name"></h2>
+            <div id="extension-candleappstore-selected-main" class="extension-candleappstore-centered-page">
                 <div class="extension-candleappstore-selected-tags"></div>
+                <h2 class="extension-candleappstore-selected-name"></h2>
+                <span class="extension-candleappstore-selected-version-separated">
+                    <span id="extension-candleappstore-selected-mayor_version" class="extension-candleappstore-selected-mayor_version"></span>.<span 
+                          id="extension-candleappstore-selected-meso_version"  class="extension-candleappstore-selected-meso_version"></span>.<span 
+                          id="extension-candleappstore-selected-minor_version" class="extension-candleappstore-selected-minor_version"></span>
+                </span>
+                <div id="extension-candleappstore-selected-by-container">
+                    <a href="#" target="_blank" class="extension-candleappstore-selected-homepage_url extension-candleappstore-selected-author"><span class="extension-candleappstore-selected-by">by </span></a>
+                </div>
+                
                 <div class="extension-candleappstore-selected-description"></div>
+                <div id="extension-candleappstore-screenshots" class="extension-candleappstore-selected-screenshots"></div>
                 <div class="extension-candleappstore-selected-details"></div>
                 <div class="extension-candleappstore-selected-opinion"></div>
-                <div id="extension-candleappstore-screenshots" class="extension-candleappstore-selected-screenshots"></div>
+                
                 
                 <div class="extension-candleappstore-two-column">
         	        <div class="extension-candleappstore-basic-info extension-candleappstore-vlak">
                         
-                        <div class="extension-candleappstore-selected-version-separated">
-                            Version: 
-                            <span id="extension-candleappstore-selected-mayor_version" class="extension-candleappstore-selected-mayor_version"></span>.<span 
-                                  id="extension-candleappstore-selected-meso_version"  class="extension-candleappstore-selected-meso_version"></span>.<span 
-                                  id="extension-candleappstore-selected-minor_version" class="extension-candleappstore-selected-minor_version"></span>
-                        </div>
+
                         <div class="extension-candleappstore-selected-version" style="display:none"></div>
                         <div class="extension-candleappstore-selected-rating"></div>
-                        <div class="extension-candleappstore-selected-risk"></div>
+                        <div id="extension-candleappstore-selected-risk" class="extension-candleappstore-selected-risk"></div>
                         
-                        <a href="#" target="_blank" class="extension-candleappstore-selected-homepage_url extension-candleappstore-selected-author"><span class="extension-candleappstore-selected-by">by </span></a>
+                        
 
                         <!--
                         <div class="extension-candleappstore-stars-rating">
@@ -212,14 +250,14 @@
                         
                         <a href="#" target="_blank" class="extension-candleappstore-selected-license_url">license</a>
                         <div class="extension-candleappstore-selected-privacy"></div>
-                        <a href="#" target="_blank" class="extension-candleappstore-selected-policy_url">privacy policy</a>
+                        <a target="_blank" class="extension-candleappstore-selected-policy_url">privacy policy</a>
                     </div>
                     <div class="extension-candleappstore-basic-sidebar extension-candleappstore-vlak">
                      
                         <div class="extension-candleappstore-histogram-container">
                           <div class="extension-candleappstore-histogram-inner">
                             <div class="extension-candleappstore-histogram-rating">
-                              <span id="extension-candleappstore-histogram-average-rating" class="extension-candleappstore-histogram-rating-num">4.0</span>
+                              <span id="extension-candleappstore-histogram-average-rating" class="extension-candleappstore-histogram-rating-num"></span>
                           
                               <div id="extension-candleappstore-stars-container"><!-- stars here --></div>
                           
@@ -235,7 +273,7 @@
                               -->
                               
                               <div class="extension-candleappstore-histogram-rating-users">
-                                <i class="extension-candleappstore-histogram-icon-user"></i> <span id="extension-candleappstore-histogram-total-rating-count"></span> review
+                                <i class="extension-candleappstore-histogram-icon-user"></i> <span id="extension-candleappstore-histogram-total-rating-count">0</span> reviews
                               </div>
                             </div>
     
@@ -292,8 +330,15 @@
                             </div>
                           </div>
                         </div>
-                        <button id="extension-candleappstore-show-review-button" class="extension-candleappstore-button">Add review</button>
+                        
                     </div>
+                </div>
+                
+                <h3 id="extension-candleappstore-selected-reviews-title">Reviews</h3>
+                
+                
+                <div id="extension-candleappstore-reviews-container">
+                    <div id="extension-candleappstore-reviews-list">There are no reviews yet. Be the first!</div>
                 </div>
                 <div id="extension-candleappstore-review-container" class="extension-candleappstore-vlak">
                     
@@ -321,38 +366,40 @@
                                 <option value="3">3. Works, could be improved</option>
                                 <option value="2">2. Works most of the time</option>
                                 <option value="1">1. Worked, but crashed</option>
-                                <option value="0">0. Doesn't work</option>
+                                <option value="0">0. Doesn't work for me</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="extension-candleappstore-two-column">
-                        <div>Trustworthyness</div>
+                        <div>Recommended skill level</div>
                         <div>
                             <select id="extension-candleappstore-risk-select">
                                 <option value="-1" selected>Please select</option>
-                                <option value="10">10. Stable and verified</option>
-                                <option value="8">8. Widely installed</option>
-                                <option value="6">6. Code reviewed</option>
-                                <option value="4">6. Seems legit</option>
-                                <option value="2">2. Beta tested</option>
-                                <option value="0">0. Brand new, untested</option>
+                                <option value="10">6. For beta testers</option>
+                                <option value="8">5. Very nerdy.</option>
+                                <option value="6">4. Tech knowledge or API key required</option>
+                                <option value="4">3. Some tinkering required</option>
+                                <option value="2">2. Requires simple setup</option>
+                                <option value="0">1. Perfect for beginners</option>
                             </select>
                         </div>
                     </div>
                     
                     <textarea id="extension-candleappstore-review-text" placeholder="How would you review this addon? Do you recommend it?"></textarea>
                     <div class="extension-candleappstore-options">
-                        <button id="extension-candleappstore-review-save-button" class="extension-candleappstore-button">Send rating</button> 
+                        <button id="extension-candleappstore-review-save-button" class="extension-candleappstore-button">Send review</button> 
                         <button id="extension-candleappstore-review-cancel-button" class="extension-candleappstore-button">Cancel</button>
                     </div>
                     <div id="extension-candleappstore-review-response" class="extension-candleappstore-italic"></div>
                     
                 </div>
-                <div id="extension-candleappstore-review-complete" class="extension-candleappstore-italic extension-candleappstore-vlak"></div>
+                <div id="extension-candleappstore-review-complete" class="extension-candleappstore-italic extension-candleappstore-vlak">
+                </div>
                 
-                <div id="extension-candleappstore-reviews-container" class="extension-candleappstore-vlak">
-                    <div id="extension-candleappstore-reviews-list"></div>
+                <div id="extension-candleappstore-review-tip" class="extension-candleappstore-italic extension-candleappstore-vlak">
+                    <p>Have you tried using it?</p>
+                    <button id="extension-candleappstore-show-review-button" class="extension-candleappstore-button">Add review</button>
                 </div>
                 
                 
@@ -371,21 +418,35 @@
                 </div>
                 -->
             </div>
+            
+            
+            <div id="extension-candleappstore-selected-post-install" class="extension-candleappstore-centered-page">
+                
+                <h2>Your new addon has installed succesfully</h2>
+                <p>Most addons need to be provided with additional information before they will function properly.</p>
+                
+                <div id="extension-candleappstore-post-install-settings-button-container" class="extension-candleappstore-options">
+                    <!--<button id="extension-candleappstore-post-install-settings-button" class="extension-candleappstore-button">View addon settings</button>-->
+                </div>
+                
+            </div>
+            
         </div>
         
         
         
         <div id="extension-candleappstore-original-review-item" class="extension-candleappstore-review-item">
 	        <div class="extension-candleappstore-review-item-info">
-                <div class="extension-candleappstore-review-item-version-separated">
-                    Version: 
-                    <span class="extension-candleappstore-review-item-mayor_version"></span>.<span 
-                          class="extension-candleappstore-review-item-meso_version"></span>.<span 
-                          class="extension-candleappstore-review-item-minor_version"></span>
+                <div class="extension-candleappstore-review-item-meta">
+                    <div class="extension-candleappstore-review-item-rating">rating: </div>
+                    <div class="extension-candleappstore-review-item-risk">risk: </div>
+                    <div class="extension-candleappstore-review-item-version-separated">
+                        Version 
+                        <span class="extension-candleappstore-review-item-mayor_version"></span>.<span 
+                              class="extension-candleappstore-review-item-meso_version"></span>.<span 
+                              class="extension-candleappstore-review-item-minor_version"></span>
+                    </div>
                 </div>
-                <div class="extension-candleappstore-review-item-username"></div>
-                <div class="extension-candleappstore-review-item-rating">rating: </div>
-                <div class="extension-candleappstore-review-item-risk">risk: </div>
                 <div class="extension-candleappstore-review-item-review"></div>
             </div>
             <div class="extension-candleappstore-review-item-options"></div>
@@ -429,14 +490,16 @@
                     <h2>Sign up</h2>
                     <p>To create an account you must verify an email address.</p>
                 
+                    <!--
                     <div class="extension-candleappstore-auth-form-group">
                         <label for="username">Username</label> 
                     <input type="text" id="extension-candleappstore-signup-username" name="username" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: auto;">    
                     </div>
+                    -->
 
                     <div class="extension-candleappstore-auth-form-group">
                         <label for="extension-candleappstore-signup-email">Email</label> 
-                    <input type="email" pattern="[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*" id="extension-candleappstore-signup-email" name="extension-candleappstore-signup-email">    
+                        <input type="email" pattern="[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*" id="extension-candleappstore-signup-email" name="extension-candleappstore-signup-email">    
                     </div>
 
                     <div class="extension-candleappstore-auth-form-group">
@@ -448,11 +511,16 @@
                         <label for="extension-candleappstore-signup-cpassword">Confirm Password</label> 
                         <input type="password" id="extension-candleappstore-signup-cpassword" name="extension-candleappstore-signup-cpassword">
                     </div>
+                    
+                    <div class="extension-candleappstore-auth-form-group">
+                        <label for="username">What is 9 + 2?</label> 
+                        <input type="text" id="extension-candleappstore-signup-check" name="check">    
+                    </div>
                 
                     <div class="extension-candleappstore-auth-form-group extension-candleappstore-auth-form-beta-group">
-                        <label for="extension-candleappstore-signup-beta">Join beta program</label> 
+                        <label for="extension-candleappstore-signup-beta">Join developer program</label> 
                         <input type="checkbox" id="extension-candleappstore-signup-beta" name="extension-candleappstore-signup-beta">
-                        <p class="extension-candleappstore-italic">Joining the beta program will give you access to addons which may still be in early development, and could harm your system. By signing up you agree to the risks of being at the cutting edge.</p>
+                        <p class="extension-candleappstore-italic">Joining the developer program will give you access to addons which may still be in early development. By signing up you agree to the risks of being at the cutting edge.</p>
                     </div>
                     
 

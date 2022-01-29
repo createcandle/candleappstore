@@ -34,6 +34,10 @@
 	        })
 	        .catch((e) => console.error('Failed to fetch content:', e));
             
+            
+            
+            //console.log("local storage JWT: ", localStorage.getItem('jwt'));
+            
             /*
             window.location.prototype.changed = function(e){};
 
@@ -150,7 +154,7 @@
                 
                 for(let i = 0; i < this.api_addons_data.length; i++){
                     //console.log("generating. item data: ", data[i]);
-                    console.log( this.api_addons_data[i].id );
+                    //console.log( this.api_addons_data[i].id );
                     var addon_id = "error";
 
                     // Get the data about this addon from the gateway API as well
@@ -162,26 +166,33 @@
                                 
                                 const api_version_parts = this.api_addons_data[i]['version'].split(".");
                                 
-                                if(this.api_addons_data[i].id == 'esphome-adapter'){
-                                    console.log("\n\nFound esphome-adapter in cloud data");
+                                if(this.api_addons_data[i].id == 'candleappstore'){
+                                    console.log("\n\nFound in cloud data");
                                 
                                     console.log(this.api_addons_data[i]);
-                                    console.log(this.cloud_app_data[u])
+                                    console.log(this.cloud_app_data[u]);
                                     console.log("api_version_parts: ", api_version_parts);
                                     
-                                    
-                                    
-                                    console.log("mayor: ", parseInt(api_version_parts[0]) , parseInt(this.cloud_app_data[u]['mayor_version']))
-                                    console.log("meso: ",  parseInt(api_version_parts[1]) , parseInt(this.cloud_app_data[u]['meso_version']))
-                                    console.log("minor: ", parseInt(api_version_parts[2]) , parseInt(this.cloud_app_data[u]['minor_version']))
+                                    console.log("mayor: ", parseInt(api_version_parts[0]) , parseInt(this.cloud_app_data[u]['mayor_version']));
+                                    console.log("meso: ",  parseInt(api_version_parts[1]) , parseInt(this.cloud_app_data[u]['meso_version']));
+                                    console.log("minor: ", parseInt(api_version_parts[2]) , parseInt(this.cloud_app_data[u]['minor_version']));
                                 }
                                 
                                 
+                                const local_version_int = (parseInt(api_version_parts[0]) * 1000000) + (parseInt(api_version_parts[1]) * 1000) + parseInt(api_version_parts[2]);
+                                const cloud_version_int = (parseInt(this.cloud_app_data[u]['mayor_version']) * 1000000) + (parseInt(this.cloud_app_data[u]['meso_version']) * 1000) + parseInt(this.cloud_app_data[u]['minor_version']);
                                 
+                                //console.log("local and cloud version ints : ", local_version_int, cloud_version_int);
+                                
+                                if( cloud_version_int > local_version_int){
+                                    console.log("an update is available for: " + this.api_addons_data[i].id);
+                                    this.addons_to_update.push(this.api_addons_data[i].id);
+                                }
+                                
+                                
+                                /*
                                 
                                 var update_available = false;
-                                
-                                
                                 
                                 if( parseInt(api_version_parts[0]) < parseInt(this.cloud_app_data[u]['mayor_version'])){
                                     update_available = true;
@@ -197,6 +208,7 @@
                                     console.log("an update is available for: " + this.api_addons_data[i].id);
                                     this.addons_to_update.push(this.api_addons_data[i].id);
                                 }
+                                */
                                 
                                 
                                 //api_data = this.api_addons_data[u];
@@ -215,19 +227,19 @@
                 }
                 
                 if(this.addons_to_update.length > 0){
-                    console.log("addons with updates: ", this.addons_to_update);
+                    //console.log("addons with updates: ", this.addons_to_update);
                     document.getElementById('extension-candleappstore-tab-button-updates').classList.add('extension-candleappstore-tab-button-updates-available');
                     this.generate_overview('updates');
                 }
                 else{
-                    console.log('no updates were available');
+                    //console.log('no updates were available');
                     document.getElementById('extension-candleappstore-tab-button-updates').classList.remove('extension-candleappstore-tab-button-updates-available');
                     document.getElementById('extension-candleappstore-updates-list').innerHTML = 'All your addons are up to date';
                 }
                 
             }
             else{
-                console.log('- one of the two data sources is empty');
+                console.log('- check for updates: one of the two data sources is empty');
             }
             
             
@@ -415,8 +427,6 @@
 			});
             
             
-            
-            
             const auth = document.getElementById('extension-candleappstore-auth');
             
             const login_form = document.getElementById('extension-candleappstore-auth-login-form');
@@ -427,7 +437,7 @@
             const review_container = document.getElementById('extension-candleappstore-review-container');
             
             const auth_response = document.getElementById('extension-candleappstore-auth-response');
-            const review_response = document.getElementById("extension-candleappstore-review-response")
+            const review_response = document.getElementById("extension-candleappstore-review-response");
             
             const username = document.getElementById('extension-candleappstore-username');
             const check_login_button = document.getElementById('extension-candleappstore-check-login-button');
@@ -624,8 +634,11 @@
             signup_button.addEventListener('click', (event) => {
                 console.log("signup button clicked");
                 
-                const username = document.getElementById('extension-candleappstore-signup-username').value;
+                
+                
+                //const username = document.getElementById('extension-candleappstore-signup-username').value;
                 const email = document.getElementById('extension-candleappstore-signup-email').value;
+                const check = document.getElementById('extension-candleappstore-signup-check').value;
                 const password = document.getElementById('extension-candleappstore-signup-password').value;
                 const cpassword = document.getElementById('extension-candleappstore-signup-cpassword').value;
                 const beta = signup_beta_checkbox.checked;
@@ -634,7 +647,8 @@
                 if(password == cpassword){
                     
                     const register_data = {
-                        'username':username,
+                        'action':'signup',
+                        'check':check,
                         'email':email,
                         'password':password,
                         'beta':beta,
@@ -642,7 +656,7 @@
                     }
                 
                     // Get data for apps overview
-                    this.get_data("signup_json.php",register_data).then(response => {
+                    this.get_data("ajax.php",register_data).then(response => {
                         console.log("SIGNUP RESPONSE!");
                         console.log(response);
                         console.log("typeof response = " + typeof response);
@@ -650,9 +664,16 @@
                             this.selector = response['selector'];
                             signup_form.style.display = 'none';
                             verify_form.style.display = 'block';
+                            
+                            document.getElementById("extension-candleappstore-auth-intro").innerText = "";
+                            
                         }
-                        else  if(response.hasOwnProperty('error')){   
+                        else if(response.hasOwnProperty('error')){   
                             auth_response.innerText = response['error'];
+                        }
+                        
+                        if(response.hasOwnProperty('message')){
+                            document.getElementById('extension-candleappstore-auth-response').innerText = response.message;
                         }
                         
                     });
@@ -672,7 +693,17 @@
                 const code = document.getElementById('extension-candleappstore-verify-code').value;
                 
                 if(code != ""){
-                    this.get_data('verify_json.php?selector=' + this.selector + '&token=' + code ).then(response => {
+                    
+                    
+                    const verify_data = {
+                        'action':'verify',
+                        'selector':this.selector,
+                        'token':code
+                    }
+                    
+                    
+                    //this.get_data('verify_json.php?selector=' + this.selector + '&token=' + code ).then(response => {
+                    this.get_data('ajax.php',verify_data).then(response => {
                         console.log("VERIFY RESPONSE!");
                         console.log(response);
                         console.log("typeof response = " + typeof response);
@@ -680,9 +711,12 @@
                             verify_form.style.display = 'none';
                             login_form.style.display = 'block';
                             auth_response.innerText = response['ok'];
+                            review_response.innerText = response['ok'];
                             auth.style.display = 'none';
+                            alert("Congratulations, you are now logged in.")
+                            document.getElementById('extension-candleappstore-review-response').innerText = "";
                             if(response.hasOwnProperty('username')){
-                                username.innerText = response['username'];
+                                //username.innerText = response['username'];
                                 logout_container.style.display = 'inline-block';
                                 login_button.style.display = 'none';
                             }
@@ -704,10 +738,41 @@
             document.getElementById("extension-candleappstore-show-review-button").addEventListener('click', (event) => {
                 console.log("show review container button clicked");
                 review_container.style.display = "block";
+                document.getElementById("extension-candleappstore-review-tip").style.display = 'none';
+                
+                
+                // Get data for apps overview
+                this.get_data("login_json.php",{}).then(response => {
+                    console.log("LOGIN TEST RESPONSE!");
+                    console.log(response);
+                    console.log("typeof response = " + typeof response);
+                    
+                    if(response.hasOwnProperty('username')){
+                        console.log("username spotted");
+                        this.username = response['username'];
+                        //document.getElementById("extension-candleappstore-username").innerText = response['username'];
+                        //logout_button.style.display = 'block';
+                        //login_form.style.display = 'none';
+                    }
+                    
+                    if(response.hasOwnProperty('ok')){
+                        console.log("ok in response");
+                        //auth_response.innerText = response['ok'];
+                        logout_button.style.display = 'block';
+                        login_form.style.display = 'none';
+                    }
+                    else if(response.hasOwnProperty('error')){   
+                        console.log(response['error']);
+                    }
+                    
+                });
+                
+                
             });
             
             
             // SAVE REVIEW
+            
             review_save_button.addEventListener('click', (event) => {
                 console.log("review save button clicked");
                 
@@ -720,8 +785,12 @@
                     if(review_risk_select.value != -1){
                         parameters['risk'] = review_risk_select.value;
                     }
-                    if(review_text.value != ""){
+                    if(review_text.value.length > 3){
                         parameters['review'] = review_text.value;
+                    }
+                    else{
+                        alert("Please provide an opinion");
+                        return;
                     }
                     
                     parameters['mayor_version'] = document.getElementById("extension-candleappstore-selected-mayor_version").innerText;
@@ -736,8 +805,7 @@
                     
                     this.get_data(url, parameters)
                     .then(response => {
-    					console.log("ADD RATING response: ");
-    					console.log(response);
+    					console.log("ADD RATING response: ", response);
                         if(response.hasOwnProperty('error')){
                             review_response.innerText = response['error'];
                         }
@@ -745,6 +813,17 @@
                             review_complete.innerText = response['ok'];
                             review_complete.style.display = 'block';
                             review_container.style.display = 'none';
+                            review_text.value = '';
+                            document.getElementById('extension-candleappstore-review-tip').style.display = "none";
+                            document.getElementById('extension-candleappstore-reviews-list').innerHTML = "";
+                            
+                            console.log("selected.getAttribute('data-addon-id'): ", selected.getAttribute('data-addon-id'));
+                            //console.log("addon_id: ", addon_id);
+                            //console.log("data: ", data);
+                            //console.log("installed: ", installed);
+                            
+                            this.show_selected_app(selected.getAttribute('data-addon-id'));
+                            
                         }
                         if(response.hasOwnProperty('action')){
                             console.log("action spotted: " + response['action']);
@@ -759,9 +838,12 @@
                         }
                     })
                     .catch((e) => {
-    					console.log("candleappstore: error while saving rating");
-    					pre.innerText = e.toString();
+    					console.log("candleappstore: error while saving rating: ", e);
+    					//pre.innerText = e.toString();
     				});
+                }
+                else{
+                    alert("please select a rating option");
                 }
                 
 			});
@@ -775,9 +857,24 @@
             
             
 
+            //
+            //  SHOP FILTERS
+            //
             
+            document.getElementById('extension-candleappstore-filter-privacy-select').addEventListener('change', (event) => {
+                console.log('privacy filter changed');
+                this.generate_overview('shop');
+			});
             
+            document.getElementById('extension-candleappstore-filter-reviews-select').addEventListener('change', (event) => {
+                console.log('reviews filter changed');
+                this.generate_overview('shop');
+			});
             
+            document.getElementById('extension-candleappstore-filter-expert-select').addEventListener('change', (event) => {
+                console.log('expert filter changed');
+                this.generate_overview('shop');
+			});
             
             // Useful info about the system and what addons it may be able to install
             /*
@@ -862,7 +959,7 @@
                     console.log("in get_installed_addons_data.then");
                     this.generate_overview('installed');
     			}).catch((e) => {
-    				console.log("get_installed_addons_data catch (error?):", e);
+    				console.log("init: get_installed_addons_data catch (error?):", e);
     			});
                 
 
@@ -1068,7 +1165,6 @@
     				console.log("get_installed_addons_data catch (error?):", e);
     			});
                 
-                
 			});
 
 			document.getElementById('extension-candleappstore-tab-button-shop').addEventListener('click', (event) => {
@@ -1273,6 +1369,22 @@
         
         
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
         //
         //  GENERATE OVERVIEW
         //
@@ -1307,7 +1419,7 @@
                 
                 if(page == 'installed'){
                     data = this.api_addons_data;
-                    
+                    console.log("this.api_addons_data = ", this.api_addons_data);
                     data.sort((a, b) => (a.id.toLowerCase() > b.id.toLowerCase()) ? 1 : -1) // sort alphabetically
                     
                 }
@@ -1320,6 +1432,18 @@
                     data.sort((a, b) => (a.id.toLowerCase() > b.id.toLowerCase()) ? 1 : -1) // sort alphabetically
                     output_list_element = document.getElementById('extension-candleappstore-updates-list');
                 }
+                
+                
+                
+                
+                
+                
+                
+                // FILTER
+                
+                const minimal_privacy = document.getElementById('extension-candleappstore-filter-privacy-select').value;
+                const minimal_reviews = document.getElementById('extension-candleappstore-filter-reviews-select').value;
+                const maximum_expert = document.getElementById('extension-candleappstore-filter-expert-select').value;
                 
                 
                 
@@ -1395,8 +1519,9 @@
                         var clone = original_basic_item.cloneNode(true);
                         clone.removeAttribute('id');
                         clone.setAttribute('data-addon-id', addon_id);
-                        clone.style.background = "#" + this.string_to_color(addon_id);
-                
+                        if(page == 'shop'){
+                            clone.style.background = "#" + this.string_to_color(addon_id);
+                        }
                 
                         // Check if this addon is a UI extension
                         var ui_extension = false
@@ -1467,6 +1592,8 @@
                             selected.style.display = 'none';
                             document.getElementById("extension-candleappstore-review-container").style.display = "none";
                             document.getElementById('extension-candleappstore-review-complete').style.display = "none";
+                            //document.getElementById('extension-candleappstore-review-tip').style.display = "block";
+                            
                     
     						var target = event.currentTarget;
                             //console.log(target);
@@ -1481,21 +1608,11 @@
                             //console.log("addon_id = " + target.dataset['addon-id']);
                             //const url = "get_addons.php?addon_id=" + target.dataset.addon_id;
                             const data_addon_id = target.getAttribute('data-addon-id');
-                            const url = "get_app.php?addon_id=" + data_addon_id;
-                            //console.log(url);
-                    
-                            this.get_data(url)
-                            .then(response => {
-    							console.log("GET APP response: ");
-    							console.log(response);
-                                selected.style.display = 'block';
-                                this.show_selected_app(data_addon_id, response, target.getAttribute('data-installed') ); // data, and whether it is installed already
-                                
-                            })
-                            .catch((e) => {
-    							console.log("candleappstore: error while getting detailed data about an addon");
-    							pre.innerText = e.toString();
-    						});
+                            
+                            this.show_selected_app(data_addon_id);
+                            
+                            
+                            
                     
 
         				});
@@ -1538,7 +1655,13 @@
                                 }
                                 */
                     
-                                if(highlight_score == current_highlight_level){
+                                console.log("data[i]['reviews_average']");
+                                
+                                //console.log("privacy score: " + data[i]['privacy_score']);
+                                //console.log("minimal score: " + minimal_privacy);
+                                //if(minimal_privacy)
+
+                                if(data[i]['privacy_score'] >= minimal_privacy && data[i]['nerdy'] <= maximum_expert && data[i]['reviews_average'] >= minimal_reviews && highlight_score == current_highlight_level){
                                     //console.log("HIGHLIGHTING addon:"  + addon_id + " , at level: ", current_highlight_level);
                                     //console.log("-This addon is a UI extension");
                                     //list.insertBefore(clone, list.firstChild);
@@ -1578,9 +1701,7 @@
                                     event.stopImmediatePropagation();
                                     console.log("clicked on settings button for: ", addon_id );
                                     console.log( event.target.getAttribute('data-addon-id') );
-                                    // Show settings overlay
-                                    settings_container.style.display = 'block';
-                                    settings_container.classList.add("extension-candleappstore-busy");
+
                         
                                     /*
             						window.API.postJson(
@@ -1602,23 +1723,7 @@
             						});
                                     */
                         
-                                    //this.get_installed_addons_data();
-                                    console.log("calling getAddonConfig for: " + addon_id);
-                                    window.API.getAddonConfig( event.target.getAttribute('data-addon-id') )
-                                    .then((result) => { 
-            							console.log("get addon config result: ");
-            							console.log(result); 
-                                
-                                        //document.getElementById("extension-candleappstore-settings-title").innerText = this.api_addons_data[ event.target.getAttribute('data-addon-id') ]['name'];
-                                        this.show_addon_config( event.target.getAttribute('data-addon-id') , result);
-
-            						}).catch((e) => {
-            							console.log("get addon config catch (error?)");
-                                        console.log(e);
-            							pre.innerText = e.toString();
-            						});
-                        
-                        
+                                    this.show_addon_config( event.target.getAttribute('data-addon-id') );                
                         
                         
                                 });
@@ -1951,26 +2056,23 @@
 				console.log("appstore: generate overview error: ", e); // pass exception object to error handler
 			}
         }
+
         
         
         
         
-        //
-        //  GENERATE INSTALLED
-        //
-        /*
-        generate_installed(data){
-            console.log("in generate installed");
-            console.log(data);
-            
-			const pre = document.getElementById('extension-candleappstore-response-data');
-			const list = document.getElementById('extension-candleappstore-list');
-			//const original = document.getElementById('extension-candleappstore-original-item');
-            const original_basic_item = document.getElementById('extension-candleappstore-original-item-installed');
-            const installedlist = document.getElementById('extension-candleappstore-installedlist');
-            
-        }
-        */
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
@@ -1978,452 +2080,668 @@
         //  SHOW SELECTED APP
         //
         
-        show_selected_app(addon_id, data, installed){
-            try{
-                console.log("in show_selected_app");
-                console.log(data);
+        show_selected_app(addon_id){
+            console.log('show_selected_app');
+            
+            // installed
+            
+            const url = "get_app.php?addon_id=" + addon_id
+            //console.log(url);
+    
+            this.get_data(url)
+            .then(data => {
+				console.log("show_selected_app: GET APP response: ");
+				console.log(data);
                 
-                const pre = document.getElementById('extension-candleappstore-response-data');
-                const selected = document.getElementById('extension-candleappstore-selected');
-                const selected_options_bar = document.getElementById("extension-candleappstore-selected-options");
-               
-               
-                document.getElementById('extension-candleappstore-screenshots').innerHTML = "";
-                document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
-                
-                
-                
-                if(typeof data.error != 'undefined'){
-                    console.log("There was an arror showing the app. Maybe server gave a bad response?");
-                    alert("Sorry, there was an error. Details could not be loaded.");
-                    selected.style.display = 'none';
-                    return;
-                }
+                //this.show_selected_app(data_addon_id, response, target.getAttribute('data-installed') ); // data, and whether it is installed already
                 
                 
-                installed = !!Number(installed); // turn into boolean
-                console.log("installed: " + installed);
-                console.log("typeof installed: " + typeof installed);
-                //console.log(data['body']);
+                try{
+                    console.log("in show_selected_app");
+                    console.log(data);
                 
-                 
-                selected.setAttribute('data-addon-id',addon_id);
-                if(installed){
-                    selected.classList.add('extension-candleappstore-installed');  
-                }
-                else{
-                    selected.classList.remove('extension-candleappstore-installed');  
-                }
-                
-                
-                var v = 0;
-                
-                console.log("data['versions'][v]: ", data['versions'][v]);
-                if(typeof data['versions'] != 'undefined'){
-                    const keys = Object.keys(data['versions'][v]);
-                
-        			keys.forEach((info, index) => {
-                        try{
-                            try{
-                                console.log(" -------------> ", index, info, data['versions'][v][info]);
-                            }
-                            catch(e){
-                                console.log(" -------------> ", index, info);
-                            }
+                    const pre = document.getElementById('extension-candleappstore-response-data');
+                    const selected = document.getElementById('extension-candleappstore-selected');
+                    const selected_options_bar = document.getElementById("extension-candleappstore-selected-options");
                     
-                            const element_id = 'extension-candleappstore-selected-' + this.makeSafeForCSS(info);
-                            const selector_name = '.' + element_id;
-                    
-                            var target_element = null;
-                            try{
-                                console.log("looking for element: " + selector_name);
-                                var target_element = selected.querySelector( selector_name );
-                            }
-                            catch(e){
-                                console.log("Unable to find matching '" + info + "' element in app details view: " + e);
-                            }
+                    selected.style.display = 'block';
+               
+                    document.getElementById('extension-candleappstore-screenshots').innerHTML = "";
+                    document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+                
+                    document.getElementById("extension-candleappstore-selected-main").style.display = 'block';
+                    document.getElementById("extension-candleappstore-selected-post-install").style.display = 'none';
+                
+                    document.getElementById("extension-candleappstore-review-response").innerText = "";
+                    document.getElementById('extension-candleappstore-review-tip').style.display = 'block';
 
                     
-                            if(target_element == undefined || target_element == null){
-                                console.log("no matching selected-css tag element was found"); // No quick way to dump the data
-                                return;
-                            }
-                            console.log("-target element found");
-                            //target_element.innerHTML = "";
+                
+                    if(typeof data.error != 'undefined'){
+                        console.log("There was an arror showing the app. Maybe server gave a bad response?");
+                        alert("Sorry, there was a error. Details could not be loaded. It could be a connection error, or - less likely - an unknown app.");
+                        selected.style.display = 'none';
+                        return;
+                    }
+                
+                    //installed = !!Number(installed); // turn into boolean
                     
-                            if(typeof data['versions'][v][info] != 'undefined'){
-                                console.log("-target intended content exists: ", data['versions'][v][info]);
-                                if(data['versions'][v][info] != null){
-                                    //console.log("warning, value is null");
-                                //}
-                                    try{
-                                        if( info.endsWith("_url") ){
-                                            console.log("adding URL to href");
-                                            target_element.href = data['versions'][v][info];
-                                        }
-                                        else if(info == 'description'){
-                                            console.log("adding description");
-                                            if(typeof data['versions'][v][info] != 'undefined'){
-                                                target_element.innerHTML = linkify(data['versions'][v][info])
+                    
+                    console.log("this.installed: ", this.installed);
+                    var installed = false;
+                    if(this.installed.indexOf(addon_id) != -1){
+                        installed = true;
+                    }
+                    
+                    console.log("installed: " + installed);
+                    //console.log("typeof installed: " + typeof installed);
+                    //console.log(data['body']);
+                 
+                    selected.setAttribute('data-addon-id',addon_id);
+                    if(installed){
+                        selected.classList.add('extension-candleappstore-installed');  
+                    }
+                    else{
+                        selected.classList.remove('extension-candleappstore-installed');  
+                    }
+                    
+                
+                    var v = 0;
+                
+                    console.log("data['versions'][v]: ", data['versions'][v]);
+                    if(typeof data['versions'] != 'undefined'){
+                        const keys = Object.keys(data['versions'][v]);
+                
+            			keys.forEach((info, index) => {
+                            try{
+                                try{
+                                    console.log(" -------------> ", index, info, data['versions'][v][info]);
+                                }
+                                catch(e){
+                                    console.log(" -------------> ", index, info);
+                                }
+                    
+                                const element_id = 'extension-candleappstore-selected-' + this.makeSafeForCSS(info);
+                                const selector_name = '.' + element_id;
+                    
+                                var target_element = null;
+                                try{
+                                    console.log("looking for element: " + selector_name);
+                                    var target_element = selected.querySelector( selector_name );
+                                }
+                                catch(e){
+                                    console.log("Unable to find matching '" + info + "' element in app details view: " + e);
+                                }
+
+                    
+                                if(target_element == undefined || target_element == null){
+                                    console.log("no matching selected-css tag element was found"); // No quick way to dump the data
+                                    return;
+                                }
+                                console.log("-target element found");
+                                //target_element.innerHTML = "";
+                    
+                                if(typeof data['versions'][v][info] != 'undefined'){
+                                    console.log("-target intended content exists: ", data['versions'][v][info]);
+                                    if(data['versions'][v][info] != null){
+                                        //console.log("warning, value is null");
+                                    //}
+                                        try{
+                                            if( info.endsWith("_url") ){
+                                                console.log("adding URL to href");
+                                                target_element.href = data['versions'][v][info];
                                             }
-                                        }
-                                        else if(info == 'tags'){
-                                            console.log("adding tags");
-                                            target_element.innerHTML = "";
-                                            if(typeof data['versions'][v][info] != 'undefined'){
-                                                const tags_array = data['versions'][v][info].split(",");
-                                                console.log("tags array: ", tags_array);
-                                                for (var j = 0; j < tags_array.length; j++) {
-                                                    if(tags_array[j].length > 2){
-                                                        var s = document.createElement("span");
-                                    					s.classList.add('extension-candleappstore-tag');                
-                                    					var t = document.createTextNode(tags_array[j]);
-                                    					s.appendChild(t);
-                                                        //s.addEventListener('click', (event) => {
-                                                        //    console.log('clicked on tag: ', event.target.innerText);
-                                                        //});
-                                                        target_element.append(s);
-                                                    }
+                                            else if(info == 'description'){
+                                                console.log("adding description");
+                                                if(typeof data['versions'][v][info] != 'undefined'){
+                                                    target_element.innerHTML = linkify(data['versions'][v][info])
                                                 }
                                             }
-                                            else{
-                                                console.log("no tags present");
+                                            else if(info == 'tags'){
+                                                console.log("adding tags");
+                                                target_element.innerHTML = "";
+                                                if(typeof data['versions'][v][info] != 'undefined'){
+                                                    const tags_array = data['versions'][v][info].split(",");
+                                                    console.log("tags array: ", tags_array);
+                                                    for (var j = 0; j < tags_array.length; j++) {
+                                                        if(tags_array[j].length > 2){
+                                                            var s = document.createElement("span");
+                                        					s.classList.add('extension-candleappstore-tag');                
+                                        					var t = document.createTextNode(tags_array[j]);
+                                        					s.appendChild(t);
+                                                            //s.addEventListener('click', (event) => {
+                                                            //    console.log('clicked on tag: ', event.target.innerText);
+                                                            //});
+                                                            target_element.append(s);
+                                                        }
+                                                    }
+                                                }
+                                                else{
+                                                    console.log("no tags present");
+                                                }
+                                    
+                            
+                                                //clone.getElementsByClassName("extension-internet-radio-item-tags")[0].innerText = items[item].tags;
                                             }
-                                    
-                            
-                                            //clone.getElementsByClassName("extension-internet-radio-item-tags")[0].innerText = items[item].tags;
-                                        }
                                 
-                                        else if(info == 'screenshots'){
-                                            console.log("[ ]");
-                                            console.log('in screenshot');
+                                            else if(info == 'screenshots'){
+                                                console.log("[ ]");
+                                                console.log('in screenshot');
                                     
                                 
-                                            var screenshot1 = document.createElement('img');
-                                            screenshot1.style.opacity = 0
-                                            screenshot1.onload = function() {
-                                                this.style.opacity = 1;
-                                            };
-                                            screenshot1.src = 'https://www.candlesmarthome.com/appstore/images/' + String(addon_id) + '/screenshot.png';
-                                            target_element.appendChild(screenshot1);
+                                                var screenshot1 = document.createElement('img');
+                                                screenshot1.style.opacity = 0
+                                                screenshot1.onload = function() {
+                                                    this.style.opacity = 1;
+                                                };
+                                                screenshot1.src = 'https://www.candlesmarthome.com/appstore/images/' + String(addon_id) + '/screenshot.png';
+                                                target_element.appendChild(screenshot1);
                                             
-                                            var screenshot2 = document.createElement('img');
-                                            screenshot2.style.opacity = 0
-                                            screenshot2.onload = function() {
-                                                this.style.opacity = 1;
-                                            };
-                                            screenshot2.src = 'https://www.candlesmarthome.com/appstore/images/' + String(addon_id) + '/screenshot.jpg';
-                                            target_element.appendChild(screenshot2);
+                                                var screenshot2 = document.createElement('img');
+                                                screenshot2.style.opacity = 0
+                                                screenshot2.onload = function() {
+                                                    this.style.opacity = 1;
+                                                };
+                                                screenshot2.src = 'https://www.candlesmarthome.com/appstore/images/' + String(addon_id) + '/screenshot.jpg';
+                                                target_element.appendChild(screenshot2);
                                 
-                                            //document.getElementById('extension-candleappstore-screenshots').appendChild(img);
+                                                //document.getElementById('extension-candleappstore-screenshots').appendChild(img);
                                 
-                                        }
-                                        else{
-                                            target_element.innerHTML = "";
-                                            const text_to_use = data['versions'][v][info];
-                                            console.log("text_to_use: " + text_to_use);
-                                            console.log("filling in left-over value: ", data['versions'][v][info], 'into: ', target_element);
-                                            //target_element.innerHTML = "xxx" + text_to_use;
-                                            //var spanny = document.createElement("span");
-                                            var texty = document.createTextNode(text_to_use);
-                                            //spanny.appendChild(texty);
-                                            target_element.appendChild(texty);
-                                            //console.log("selector_name = " + selector_name);
-                                            //s.id = element_id;
-                                            //s.classList.add('extension-candleappstore-nice-name-span');      
-                                            //var t = document.createTextNode(data['versions'][v][info]);
-                                            //s.appendChild(t);
-                                            //target_element.innerHTML = data['versions'][v][info];
-                                            //target_element.appendChild(t);
-                                        }
+                                            }
+                                            else if(info == 'risk'){
+                                                // skip for now, show community judgement instead
+                                            }
+                                            else{
+                                                target_element.innerHTML = "";
+                                                const text_to_use = data['versions'][v][info];
+                                                console.log("text_to_use: " + text_to_use);
+                                                console.log("filling in left-over value: ", data['versions'][v][info], 'into: ', target_element);
+                                                //target_element.innerHTML = "xxx" + text_to_use;
+                                                //var spanny = document.createElement("span");
+                                                var texty = document.createTextNode(text_to_use);
+                                                //spanny.appendChild(texty);
+                                                target_element.appendChild(texty);
+                                                //console.log("selector_name = " + selector_name);
+                                                //s.id = element_id;
+                                                //s.classList.add('extension-candleappstore-nice-name-span');      
+                                                //var t = document.createTextNode(data['versions'][v][info]);
+                                                //s.appendChild(t);
+                                                //target_element.innerHTML = data['versions'][v][info];
+                                                //target_element.appendChild(t);
+                                            }
                         
+                                        }
+                                        catch(e){
+                                            console.log("Error populaiing selected: " + e);
+                                        }
                                     }
-                                    catch(e){
-                                        console.log("Error populaiing selected: " + e);
+                                    else{
+                                        console.log("it was null");
                                     }
-                                }
-                                else{
-                                    console.log("it was null");
-                                }
                             
-                            }
-                        }
-                        catch(e){
-                            console.log("Error generating content element for single app overlay: ", e);
-                        }
-                    
-                    });
-                }
-                else{
-                    console.log("weird, no versions? ", data);
-                }
-                
-                selected_options_bar.innerHTML = "";
-                
-                // ADD INSTALL BUTTON
-                if( !installed && data['versions'][v]["addon_id"] != undefined && data['versions'][v]["download_url"] != undefined && data['versions'][v]["checksum"] != undefined ){
-                    var b = document.createElement("button");
-                    b.classList.add('extension-candleappstore-selected-install-button');
-                    b.classList.add('extension-candleappstore-button');
-                    var t = document.createTextNode("Install");
-                    b.appendChild(t);
-					b.addEventListener('click', (event) => {
-                        console.log("install button clicked");
-                        console.log(event);
-                        event.stopImmediatePropagation();
-                        event.target.style.display = 'none';
-                        document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
-                        console.log( "installing addon. parameters: ", data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] );
-                        
-                        window.API.installAddon( data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] )
-                        .then((result) => { 
-							console.log("installation result: ");
-							console.log(result); 
-                            if(typeof result.enabled != "undefined"){
-                                if(result.enabled == true){
-                                    console.log("installed succesfully");
-                                    this.installed.push(data['versions'][v]["addon_id"]);
-                                    this.generate_overview('shop');
                                 }
-                                else{
-                                    console.log("installed ok, but is disabled?");
-                                }
-                                document.getElementById("extension-candleappstore-selected").style.display = 'none';    
                             }
-                            else{
-                                console.log("installation failed, severely");
-                                alert("Error: could not install.");
+                            catch(e){
+                                console.log("Error generating content element for single app overlay: ", e);
                             }
-                            document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
-
-						}).catch((e) => {
-							console.log("installation catch (error?)");
-                            console.log(e);
-							pre.innerText = e.toString();
-                            alert("Error: could not install. Could not connect to the controller.");
-                            document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
-						});
-                    });
-                    console.log("adding install button");
-                    selected_options_bar.appendChild(b);
-                }
-                
-                // ADD UNINSTALL BUTTON
-                else if( installed && data['versions'][v]["addon_id"] != undefined ){
                     
-                    if(data['versions'][v]["addon_id"] != 'candleappstore'){
+                        });
+                    }
+                    else{
+                        console.log("weird, no versions? ", data);
+                    }
+                
+                    selected_options_bar.innerHTML = "";
+                
+                
+                    // ADD INSTALL BUTTON
+                
+                    if( !installed && data['versions'][v]["addon_id"] != undefined && data['versions'][v]["download_url"] != undefined && data['versions'][v]["checksum"] != undefined ){
                         var b = document.createElement("button");
-                        b.classList.add('extension-candleappstore-selected-uninstall-button');
+                        b.classList.add('extension-candleappstore-selected-install-button');
                         b.classList.add('extension-candleappstore-button');
-                        b.disabled = true;
-                        var t = document.createTextNode("Uninstall");
+                        var t = document.createTextNode("Install");
                         b.appendChild(t);
     					b.addEventListener('click', (event) => {
-                            console.log("uninstall button clicked");
+                            console.log("install button clicked");
                             console.log(event);
                             event.stopImmediatePropagation();
-                            console.log( data['versions'][v]["addon_id"] );
+                            event.target.style.display = 'none';
+                            document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
+                            console.log( "installing addon. parameters: ", data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] );
                         
-                            const addon_id = data['versions'][v]["addon_id"];
-                        
-                            var really = confirm("Are you sure you want to uninstall this addon?");
-                            if (really) {
-                                document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
-                                window.API.uninstallAddon( data['versions'][v]["addon_id"] )
-                                .then((result) => { 
-        							console.log("uninstallation result: ");
-                                    console.log("addon_id: " + addon_id + " was uninstalled, in theory.");
-        							console.log(result); 
-                                    document.getElementById("extension-candleappstore-selected").style.display = 'none';
-                                    //document.getElementById("extension-candleappstore-settings").style.display = 'none';
-                            
-                                    console.log("this.installed = " + this.installed );
-                                    for (var i=this.installed.length-1; i>=0; i--) {
-                                        if (this.installed[i] === addon_id) {
-                                            this.installed.splice(i, 1);
-                                        }
+                            window.API.installAddon( data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] )
+                            .then((result) => { 
+    							console.log("installation result: ");
+    							console.log(result); 
+                                this.api_addons_data = []; // Remove the existing data about addons so that it will be re-requested from the window.API
+                                this.installed.push(data['versions'][v]["addon_id"]);
+                                if(typeof result.enabled != "undefined"){
+                                    if(result.enabled == true){
+                                        console.log("installed succesfully");
+                                    
+                                        //this.generate_overview('shop');
                                     }
-                            
-                                    this.generate_overview();
-                            
-        						}).catch((e) => {
-        							console.log("uninstallation catch (error?)");
-                                    console.log(e);
-        							pre.innerText = e.toString();
-        						});
-                            }
-                        
-                        
-                        });
-                        console.log("adding uninstall button");
-                        selected_options_bar.appendChild(b);
-                    }
-                    
-                }
-                //installAddon
-                
-            }
-            catch(e){
-                console.log("Error in show selected app: ", e);
-            }
-                
-            
-            try{
-                // SHOW RATINGS
-                // handles the display of the last 100 ratings
-                
-                const original_review_item = document.getElementById('extension-candleappstore-original-review-item');
-                const reviews_container = document.getElementById('extension-candleappstore-reviews-container');
-                const reviews_list = document.getElementById('extension-candleappstore-reviews-list');
-                reviews_container.style.display = "none";
-                reviews_list.innerHTML = "";
-                
-                
-                if( data.hasOwnProperty('ratings') ){
-                    reviews_container.style.display = "block";
-                    console.log(data['ratings'].length + " RATING(S) EXIST");
-                    
-                    var rating_count = "100+";
-                    if(data['ratings'].length < 100){
-                        rating_count = data['ratings'].length;
-                    }
-                    document.getElementById('extension-candleappstore-histogram-total-rating-count').innerText = rating_count;
-                    
-                    var ratings_added_up = 0;
-                    var risk_added_up = 0;
-                    var risk_counter = 0;
-                    var ratings_count_array = [0,0,0,0,0,0];
-                    for(let i = 0; i < data['ratings'].length; i++){
-                        console.log( data['ratings'][i] );
-                        
-                        var clone = original_review_item.cloneNode(true);
-                        clone.removeAttribute('id');
-                        //clone.setAttribute('data-addon-id', data[i].addon_id);
-                        //clone.style.background = "#" + this.string_to_color(data[i].addon_id);
-                    
-                        const keys = Object.keys(data['ratings'][i]);
-                        console.log(keys);
-    					keys.forEach((info, index) => {
-                            console.log(info);
-                            
-                            const selector_name = '.extension-candleappstore-review-item-' + info;
-                            console.log("selector name: " + selector_name);
-                            var target_element = clone.querySelectorAll( selector_name )[0];
-                            if(target_element != undefined){
-                                //console.log("- element existed");
-                                //if(info == 'review' || info == 'username'){     
-                                var t = document.createTextNode(data['ratings'][i][info]);
-                                target_element.appendChild(t);
-                                //}
-                            }
-                            /*
-                            else if( info == 'ip' ){
-                                var a = document.createElement("a");
-                                a.classList.add('extension-candleappstore-ip-link');
-                                const url = window.location.href;
-                                a.href = url.split("/")[0] + '//' + this.animals[mac][info]
-                                var h = document.createTextNode(this.animals[mac][info]);
-                                a.appendChild(h);
-                            
-                                const selector_name = '.extension-candleappstore-' + info;
-                                var target_element = clone.querySelectorAll( selector_name )[0];
-                                target_element.appendChild(a);
-                            }
-                            else if(info == 'protected'){
-                                clone.querySelectorAll( '.extension-candleappstore-domains' )[0].innerHTML = '<p class="extension-candleappstore-privacy-warning">This device has connected to so many domains that it may be a laptop or mobile phone. To safeguard privacy its connection log will not be shown.</p>';
-                                clone.querySelectorAll( '.extension-candleappstore-item-clear-button' )[0].remove();
-                            
-                            }
-                            */
-                            
-                            
-                            if(info == 'risk'){
-                                if(data['ratings'][i][info] != undefined){
-                                    risk_counter++; //remember how often a risk score was found
-                                    risk_added_up = risk_added_up + data['ratings'][i]['risk'];
+                                    else{
+                                        console.log("installed ok, but is disabled?");
+                                    }
                                 }
-                            }
-                    
+                                else{
+                                    console.log("installation failed, severely");
+                                    alert("Error: could not install.");
+                                }
+                            
+                                window.API.getInstalledAddons()
+                                .then((result) => { 
+                    				console.log("get_installed_addons_data: result: ");
+                    				console.log(result);
+                                    this.api_addons_data = result;
+                                    this.generate_overview('shop');
+                                
+
+                                    document.getElementById("extension-candleappstore-selected-post-install").style.display = 'block'; 
+                                    //document.getElementById("extension-candleappstore-post-install-settings-button").setAttribute("data-addon_id", data['versions'][v]["addon_id"]);
+                                    document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+                                
+                    			}).catch((e) => {
+                    				console.log("get getInstalledAddons info catch (error?)");
+                                    console.log(e);
+                                    document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+                    			});
+
+
+    						}).catch((e) => {
+    							console.log("installation catch (error?)");
+                                console.log(e);
+    							pre.innerText = e.toString();
+                                alert("Error: could not install. Could not connect to the controller.");
+                                document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+    						});
                         });
-                        
-                        //clone.classList.add("installed");
-                        //clone.setAttribute('data-installed', 0);
-                        reviews_list.appendChild(clone); 
-                        ratings_added_up = ratings_added_up + Number(data['ratings'][i]['rating']);
-                        
-                        ratings_count_array[ data['ratings'][i]['rating'] ]++;
-                        
-                    }
-                    console.log("ratings_added_up = " + ratings_added_up);
-                    const average_rating = ratings_added_up / data['ratings'].length;
-                    console.log("average_rating = " + average_rating);
-                    //const rounded_rating = Math.round(average_rating * 10) / 10;
-                    const rounded_rating = ((average_rating * 10) /10 ).toFixed(1);
-                    document.getElementById('extension-candleappstore-histogram-average-rating').innerText = rounded_rating;
+                        console.log("adding install button");
+                        if( this.installed.indexOf(data['versions'][v]["addon_id"]) == -1 ){
+                            selected_options_bar.appendChild(b);
+                        }
                     
-                    console.log(ratings_count_array);
-                    for(let r = 1; r < ratings_count_array.length; r++){
-                        //const target_rating_counter = 
-                        
-                        document.getElementById('extension-candleappstore-histogram-rating-count' + r).innerText = ratings_count_array[r];
-                        document.getElementById('extension-candleappstore-histogram-bar' + r).style.width = 1 + (ratings_count_array[r] * 2) + "px";
-                        
                     }
-                        
-                    if(risk_counter > 1){
-                        const average_risk = risk_added_up / risk_counter;
-                        const rounded_risk = Math.round(average_risk * 10) / 10;
-                        //document.getElementById('extension-candleappstore-histogram-average-rating').innerText = 4;
-                    }
+                
+                
+                    // ADD UNINSTALL BUTTON
+                
+                    else if( installed && data['versions'][v]["addon_id"] != undefined ){
                     
+                        if(data['versions'][v]["addon_id"] != 'candleappstore'){
+                            var b = document.createElement("button");
+                            b.classList.add('extension-candleappstore-selected-uninstall-button');
+                            b.classList.add('extension-candleappstore-button');
+                            //b.disabled = true;
+                            var t = document.createTextNode("Uninstall");
+                            b.appendChild(t);
+        					b.addEventListener('click', (event) => {
+                                console.log("uninstall button clicked");
+                                console.log(event);
+                                event.stopImmediatePropagation();
+                                console.log( data['versions'][v]["addon_id"] );
+                        
+                                const addon_id = data['versions'][v]["addon_id"];
+                        
+                                var really = confirm("Are you sure you want to uninstall this addon?");
+                                if (really) {
+                                    document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
+                                    window.API.uninstallAddon( data['versions'][v]["addon_id"] )
+                                    .then((result) => { 
+            							console.log("uninstallation result: ");
+                                        console.log("addon_id: " + addon_id + " was uninstalled, in theory.");
+            							console.log("API.uninstallAddon result: ", result); 
+                                        document.getElementById("extension-candleappstore-selected").style.display = 'none';
+                                        //document.getElementById("extension-candleappstore-settings").style.display = 'none';
+                            
+                                        console.log("this.installed = " + this.installed );
+                                        for (var i=this.installed.length-1; i>=0; i--) {
+                                            if (this.installed[i] === addon_id) {
+                                                console.log("popping addon from this.installed list: ", addon_id);
+                                                this.installed.splice(i, 1);
+                                            }
+                                        }
+                                        window.API.getInstalledAddons()
+                                        .then((result) => { 
+                            				console.log("get_installed_addons_data: result: ");
+                            				console.log(result);
+                                            this.api_addons_data = result;
+                                            this.generate_overview('installed'); // user might have come from either page
+                                            this.generate_overview('shop');
+                                            document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+                                            // post-uninstall here?
+                                
+                            			}).catch((e) => {
+                            				console.log("get getInstalledAddons info catch (error?)");
+                                            console.log(e);
+                                            document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+                            			});
+                            
+            						}).catch((e) => {
+            							console.log("uninstallation catch (error?)");
+                                        console.log(e);
+            							pre.innerText = e.toString();
+            						});
+                                }
+                        
+                            });
+                            console.log("adding uninstall button");
+                            selected_options_bar.appendChild(b);
+                        }
+                    
+                    }
+                
+                
+                    //
+                    //  POST INSTALL
+                    //
+                
+                    // Add post-install view settings button
+                    /*
+                    document.getElementById('extension-candleappstore-post-install-settings-button').addEventListener('click', (event) => {
+                        console.log(event.target.dataset.addon_id);
+                        document.getElementById("extension-candleappstore-selected").style.display = 'none';
+                        this.show_addon_config(event.target.dataset.addon_id);
+                    
+                    });
+                
+                    */
+                    console.log("Should add post-install button now.");
+                
+                    var b = document.createElement("button");
+                    b.classList.add('extension-candleappstore-selected-settings-button');
+                    b.classList.add('extension-candleappstore-button');
+                    b.classList.add('addon-settings-config');
+                    b.classList.add('text-button');
+                    b.setAttribute('id','extension-candleappstore-post-install-settings-button');
+                    b.setAttribute('data-addon-id', data['versions'][v]["addon_id"]);
+                    var t = document.createTextNode("Settings");
+                    b.appendChild(t);
+                    console.log("button: ", b);
+    				/*
+                    b.addEventListener('click', (event) => {
+                        console.log("settings button clicked");
+                        console.log(event);
+                        event.stopImmediatePropagation();
+                        console.log("clicked on settings button for: ", addon_id );
+                        console.log( event.target.getAttribute('data-addon-id') );
+                    
+                        // Show settings overlay
+                        //settings_container.style.display = 'block';
+                        //settings_container.classList.add("extension-candleappstore-busy");
+        
+                        //this.get_installed_addons_data();
+                        this.show_addon_config( event.target.getAttribute('data-addon-id'));
+        
+                    });*/
+                    console.log("adding post-install settings button");
+                    const post_install_button_container = document.getElementById("extension-candleappstore-post-install-settings-button-container");
+                    console.log("post_install_button_container: ", post_install_button_container);
+                    document.getElementById("extension-candleappstore-post-install-settings-button-container").innerHTML = "";
+                    document.getElementById("extension-candleappstore-post-install-settings-button-container").appendChild(b);
+                
+                    console.log("post install settings button: ", document.getElementById("extension-candleappstore-post-install-settings-button"));
+                
+                    window.setTimeout(() =>{
+                        document.getElementById("extension-candleappstore-post-install-settings-button").addEventListener('click', (event) => {
+                            console.log("post-install settings button clicked");
+                            console.log(event);
+                            event.stopImmediatePropagation();
+                            //console.log("clicked on settings button for: ", addon_id );
+                            console.log( event.target.getAttribute('data-addon-id') );
+                        
+                            // Show settings overlay
+                            //settings_container.style.display = 'block';
+                            //settings_container.classList.add("extension-candleappstore-busy");
+                            document.getElementById('extension-candleappstore-selected').style.display = 'none';
+                            //this.get_installed_addons_data();
+                            this.show_addon_config( event.target.getAttribute('data-addon-id'));
+
+                        });
+                    },100);
+                
+    
+                    //clone.setAttribute('data-installed', 1);
+                    //var target_element = clone.querySelectorAll( '.extension-candleappstore-basic-options' )[0];
+                    //if(page != 'updates'){
+                    //    target_element.appendChild(b);
+                    //}
+                
+                
+                    //*/
+                
+                
+                
+                }
+                catch(e){
+                    console.log("Error in show selected app: ", e);
                 }
                 
                 
+                console.log("next: generate reviews");
+                console.log("data: ", data);
+                
+                //
+                //  REVIEWS
+                //
+            
+                try{
+                    // SHOW RATINGS
+                    // handles the display of the last 100 ratings
+                
+                    const original_review_item = document.getElementById('extension-candleappstore-original-review-item');
+                    const reviews_container = document.getElementById('extension-candleappstore-reviews-container');
+                    const reviews_list = document.getElementById('extension-candleappstore-reviews-list');
+                    //reviews_container.style.display = "none";
+                    reviews_list.innerHTML = "There are no reviews yet. Be the first!";
                 
                 
-                /*
-                const stars = document.getElementById("extension-candleappstore-stars-rating");
-                stars.addEventListener('click', function(event) {
-                    console.log(event);
-                    const target = event.target;
-                    if (event.target.tagName.toLowerCase() === 'label') {
-                        console.log("clicked on a star");
-                        console.log( event.target.htmlFor.slice(-1) );
-                        document.getElementById("extension-candleappstore-review-container").style.display = "block";
+                    if( data.hasOwnProperty('ratings') ){
+                        //reviews_container.style.display = "block";
+                        console.log(data['ratings'].length + " RATING(S) EXIST");
+                    
+                        var rating_count = "100+";
+                        if(data['ratings'].length < 100){
+                            rating_count = data['ratings'].length;
+                        }
+                        document.getElementById('extension-candleappstore-histogram-total-rating-count').innerText = rating_count;
+                    
+                        var ratings_added_up = 0;
+                        var risk_added_up = 0;
+                        var risk_counter = 0;
+                        var ratings_count_array = [0,0,0,0,0,0];
+                    
+                        if(data['ratings'].length > 0){
+                            reviews_list.innerHTML = "";
+                        }
+                    
+                    
+                    
+                        const pixels_per_opinion = Math.floor( 100 / data['ratings'].length);
+                    
+                        for(let i = 0; i < data['ratings'].length; i++){
+                            console.log( data['ratings'][i] );
+                        
+                            var clone = original_review_item.cloneNode(true);
+                            clone.removeAttribute('id');
+                            //clone.setAttribute('data-addon-id', data[i].addon_id);
+                            //clone.style.background = "#" + this.string_to_color(data[i].addon_id);
+                    
+                            const keys = Object.keys(data['ratings'][i]);
+                            console.log(keys);
+        					keys.forEach((info, index) => {
+                                console.log(info);
+                            
+                                const selector_name = '.extension-candleappstore-review-item-' + info;
+                                console.log("selector name: " + selector_name);
+                                var target_element = clone.querySelectorAll( selector_name )[0];
+                                if(target_element != undefined){
+                                    //console.log("- element existed");
+                                    //if(info == 'review' || info == 'username'){
+                                    
+                                    if(info == 'rating'){
+                                        var number = parseInt(data['ratings'][i][info])
+                                        var stars = "";
+                                        for (let s = 0; s < 5; s++) {
+                                            if( s < number){
+                                                stars += '★';
+                                            }
+                                            else{
+                                                stars += '<span>★</span>';
+                                            }
+                                      
+                                        }
+                                        target_element.innerHTML = stars;
+                                    }
+                                    else{
+                                        //var t = document.createTextNode( htmlDecode() );
+                                        //target_element.appendChild(t);
+                                    
+                                        target_element.innerHTML = data['ratings'][i][info];
+                                    }
+                                
+                                    //}
+                                }
+                                /*
+                                else if( info == 'ip' ){
+                                    var a = document.createElement("a");
+                                    a.classList.add('extension-candleappstore-ip-link');
+                                    const url = window.location.href;
+                                    a.href = url.split("/")[0] + '//' + this.animals[mac][info]
+                                    var h = document.createTextNode(this.animals[mac][info]);
+                                    a.appendChild(h);
+                            
+                                    const selector_name = '.extension-candleappstore-' + info;
+                                    var target_element = clone.querySelectorAll( selector_name )[0];
+                                    target_element.appendChild(a);
+                                }
+                                else if(info == 'protected'){
+                                    clone.querySelectorAll( '.extension-candleappstore-domains' )[0].innerHTML = '<p class="extension-candleappstore-privacy-warning">This device has connected to so many domains that it may be a laptop or mobile phone. To safeguard privacy its connection log will not be shown.</p>';
+                                    clone.querySelectorAll( '.extension-candleappstore-item-clear-button' )[0].remove();
+                            
+                                }
+                                */
+                            
+                            
+                                if(info == 'risk'){
+                                    if(data['ratings'][i][info] != undefined){
+                                        risk_counter++; //remember how often a risk score was found
+                                        risk_added_up = risk_added_up + parseInt(data['ratings'][i]['risk']);
+                                    }
+                                }
+                            
+                    
+                            });
+                        
+                            //clone.classList.add("installed");
+                            //clone.setAttribute('data-installed', 0);
+                            reviews_list.appendChild(clone); 
+                            ratings_added_up = ratings_added_up + Number(data['ratings'][i]['rating']);
+                        
+                            ratings_count_array[ data['ratings'][i]['rating'] ]++;
+                        
+                        }
+                        console.log("ratings_added_up = " + ratings_added_up);
+                        const average_rating = ratings_added_up / data['ratings'].length;
+                        console.log("average_rating = " + average_rating);
+                        //const rounded_rating = Math.round(average_rating * 10) / 10;
+                        const rounded_rating = ((average_rating * 10) /10 ).toFixed(1);
+                        document.getElementById('extension-candleappstore-histogram-average-rating').innerText = rounded_rating;
+                    
+                        console.log(ratings_count_array);
+                        for(let r = 1; r < ratings_count_array.length; r++){
+                            //const target_rating_counter = 
+                        
+                            document.getElementById('extension-candleappstore-histogram-rating-count' + r).innerText = ratings_count_array[r];
+                            document.getElementById('extension-candleappstore-histogram-bar' + r).style.width = 1 + (ratings_count_array[r] * pixels_per_opinion) + "px";
+                        
+                        }
+                        
+                        if(risk_counter > 1){
+                            const average_risk = risk_added_up / risk_counter;
+                            const rounded_risk = 1 + Math.floor(average_risk / 2 );
+                            //document.getElementById('extension-candleappstore-histogram-average-rating').innerText = 4;
+                            console.log("risk_counter: ", risk_counter);
+                            console.log("risk_added_up: ", risk_added_up);
+                        
+                            console.log("rounded_risk: ", rounded_risk);
+                        
+                            var glasses = "";
+                            for (let s = 0; s < 5; s++) {
+                                if( s < rounded_risk){
+                                    glasses += '&#128083;';
+                                }
+                                else{
+                                    glasses += '<span>&#128083;</span>';
+                                }
+                          
+                            }
+                            document.getElementById('extension-candleappstore-selected-risk').innerHTML = glasses;
+                        
+                        }
+                    
                     }
-                });
-                */
+                    else{
+                        console.log("error: data has no rating dictionary");
+                    }
+                
+                
+                
+                    /*
+                    const stars = document.getElementById("extension-candleappstore-stars-rating");
+                    stars.addEventListener('click', function(event) {
+                        console.log(event);
+                        const target = event.target;
+                        if (event.target.tagName.toLowerCase() === 'label') {
+                            console.log("clicked on a star");
+                            console.log( event.target.htmlFor.slice(-1) );
+                            document.getElementById("extension-candleappstore-review-container").style.display = "block";
+                        }
+                    });
+                    */
                 
 
-                /*
-                // Get data for apps overview
-                this.get_data("login_json.php",login_data).then(response => {
-                    console.log("LOGIN RESPONSE!");
-                    console.log(response);
-                    console.log("typeof response = " + typeof response);
+                    /*
+                    // Get data for apps overview
+                    this.get_data("login_json.php",login_data).then(response => {
+                        console.log("LOGIN RESPONSE!");
+                        console.log(response);
+                        console.log("typeof response = " + typeof response);
                     
-                    if(response.hasOwnProperty('username')){
-                */
+                        if(response.hasOwnProperty('username')){
+                    */
                 
                 
                 
-                /*
-                var children = stars.children;
-                for (var i = 0; i < children.length; i++) {
-                  var star = children[i];
-                  // Do stuff
+                    /*
+                    var children = stars.children;
+                    for (var i = 0; i < children.length; i++) {
+                      var star = children[i];
+                      // Do stuff
+                    }
+                
+                    const parent = document.querySelector(selector);
+                    Array.from(parent.children).forEach((child, index) => {
+                      // Do stuff
+                    });
+                    */
+                
                 }
+                catch(e){
+                    console.log("Error in adding ratings to selected app display: " + e);
+                }   
                 
-                const parent = document.querySelector(selector);
-                Array.from(parent.children).forEach((child, index) => {
-                  // Do stuff
-                });
-                */
                 
-            }
-            catch(e){
-                console.log("Error in adding ratings to selected app display: " + e);
-            }    
+            })
+            .catch((e) => {
+				console.log("candleappstore: error while getting detailed data about an addon");
+				//pre.innerText = e.toString();
+			});
+            
+            
+             
 
             
         }
@@ -2437,553 +2755,600 @@
         //  SHOW ADDON SETTINGS
         //
         
-        show_addon_config(addon_id,data){ // ingests .schema data from self.api_addon_data
+        show_addon_config(addon_id){ // ingests .schema data from self.api_addon_data
             try{
-                console.log("in show_addon_config for " + addon_id);
-                console.log(data);
-                //console.log(data['body']);
+                console.log("in show_addon_config for: " + addon_id);
                 
-                var spotted_advanced_setting = false;
-            
-                const settings_container = document.getElementById('extension-candleappstore-settings');
+                // Clean up from previous addon settings
                 const pre = document.getElementById('extension-candleappstore-response-data');
                 const form = document.getElementById('extension-candleappstore-settings-form');
                 const advanced_form = document.getElementById('extension-candleappstore-advanced-settings-form');
                 const advanced_form_container = document.getElementById("extension-candleappstore-advanced-settings-form-container");
                 const settings_options_bar = document.getElementById("extension-candleappstore-settings-options");
-                
                 const permissions_dropdown = document.getElementById("extension-candleappstore-permissions");
                 
+                document.getElementById("extension-candleappstore-settings-title").innerText = "";
+                document.getElementById('extension-candleappstore-settings-options').style.display = 'block';
                 form.innerHTML = "";
                 advanced_form.innerHTML = "";
                 settings_options_bar.innerHTML = "";
                 advanced_form_container.style.display = "none";
-                settings_container.classList.remove("extension-candleappstore-busy");
                 
-                const data_keys = Object.keys(data);
-                if(data_keys.length == 0){
-                    form.innerHTML = '<p>This addon does not have any settings.</p>';
-                    return;
-                }
-                console.log("data keys length = " + data_keys.length);
-                var abort = false;
-                data_keys.forEach((info, index) => {
-                    console.log("typeof data[info] = " + typeof data[info]);
-                    if(typeof data[info] == 'object'){
-                        console.log("Houston, we have a problem");
-                        form.innerHTML = '<a href="/settings/addons/config/' + addon_id + '"><button>Click here to change settings</button></a>';
-                        abort = true;
-                        return;
-                    }
-                });
-                if(abort){
-                    return;
-                }
                 
-                var addon_settings_schema = {};
-                var api_data = null;
-                for(let f = 0; f < this.api_addons_data.length; f++){
-                    console.log();
-                    if( this.api_addons_data[f]['id'] == addon_id ){
-                        api_data = this.api_addons_data[f];
-                        if(this.api_addons_data[f].hasOwnProperty('schema')){
-                            addon_settings_schema = this.api_addons_data[f]['schema'];
+                // Show settings overlay
+                const settings_container = document.getElementById('extension-candleappstore-settings');
+                settings_container.style.display = 'block';
+                settings_container.classList.add("extension-candleappstore-busy");
+                
+                
+                //window.API.getAddonsInfo()
+                window.API.getInstalledAddons()
+                .then((installed_adons_data) => {
+					console.log("get installed_adons_data result: ");
+					console.log(installed_adons_data);
+                    
+                    
+                    window.API.getAddonConfig( addon_id )
+                    .then((data) => { 
+    					console.log("get addon config result: ");
+    					console.log(data);
+                        //console.log(data['body']);
+                
+                        var spotted_advanced_setting = false;
+            
+
+                        settings_container.classList.remove("extension-candleappstore-busy");
+                
+                        const data_keys = Object.keys(data);
+                        if(data_keys.length == 0){
+                            console.log('This addon does not have any saved preferences yet');
+                            form.innerHTML = '<p>This addon does not have any saved preferences yet.</p>';
+                            //return;
                         }
-                    }
-                }
-                if(addon_settings_schema == {}){
-                    form.innerHTML = '<span class="extension-candleappstore-error">Error, could not load settings</span>';
-                    return;
-                }
-                console.log("api_data = ");
-                console.log(api_data);
-                
-                if(api_data != null){
-                    document.getElementById("extension-candleappstore-settings-title").innerText = api_data.name;
-                }
-                
-                //console.log("window.origin = " + window.origin);
-                
-                if(!addon_settings_schema.hasOwnProperty('properties')){
-                    form.innerHTML = '<span class="extension-candleappstore-info">This addon does not have any settings.</span>';
-                    return;
-                }
-                
-                /*
-                if(addon_settings_schema.hasOwnProperty("type")){
-                    if(addon_settings_schema['type'] == 'object'){
-                        console.log("It's a complex addon setting, with arrays.");
-                        form.innerHTML = '<span class="extension-candleappstore-info">This addon does not have any settings.</span>';
+                        console.log("data keys length = " + data_keys.length);
                         
-                        const base_url = window.location.protocol + "//" + window.location.host + '/settings/addons/config/';
-                        
-                        form.innerHTML = '<a href="/settings/addons/config/' + addon_id + '">Click here to change settings</a>';
-                        
-                        document.getElementById("settings-back-button").addEventListener('click', (event) => {
-                            console.log("settings back button clicked");
-                            console.log(event);
-                            event.stopImmediatePropagation();
-                            if(document.location.href.startsWith(base_url)){
-                                console.log("attempting to go back to app store.");
-                                //document.location.href = window.origin; //window.location.protocol + "//" + window.location.host + '/extensions/candleappstore';
-                                window.location.href = window.origin + '/extensions/candleappstore';
-                                
-                                window.test1 = setTimeout(function(){
-                                    console.log("1 second later");
-                                    //document.location.href = window.origin;
-                                    window.location.href = window.origin + '/extensions/candleappstore';
-                                    //document.location.href = window.location.protocol + "//" + window.location.host + '/extensions/candleappstore';
-                                }, 1000);  
-                                window.test2 = setTimeout(function(){
-                                    console.log("4 seconds later");
-                                    //document.location.href = window.origin;
-                                    //document.location.href = window.location.protocol + "//" + window.location.host + '/extensions/candleappstore';
-                                }, 4000); 
+                        /*
+                        // let the api_data loop handle this.
+                        var abort = false;
+                        data_keys.forEach((info, index) => {
+                            console.log("typeof data[info] = " + typeof data[info]);
+                            if(typeof data[info] == 'object'){
+                                console.log("This addon has a complex object in its settings. Creating redirect button.");
+                                form.innerHTML = '<a href="/settings/addons/config/' + addon_id + '"><button>Click here to change settings</button></a>';
+                                abort = true;
+                                return;
                             }
                         });
-                        //this.hide();
                         
-                        //document.location.href = base_url + addon_id;
-                        
-                        return;
-                    }
-                }
-                */
+                        if(abort){
+                            console.log("aborting generating config fields");
+                            return;
+                        }
+                        */
                 
-                console.log("addon_settings_schema:");
-                console.log(addon_settings_schema);
-                
-                const addon_settings_props = addon_settings_schema['properties'];
-                
-                var addon_settings_required = [];
-                if(addon_settings_schema.hasOwnProperty('required')){
-                    addon_settings_required = addon_settings_schema['required'];
-                }
-                
-                const settings_keys = Object.keys(addon_settings_props);
-                console.log("addon_settings_props:");
-                console.log(addon_settings_props);
-                console.log("all props: " + settings_keys);
-                console.log("addon_settings_required = " + addon_settings_required);
-                
-                /*
-                settings_keys.forEach((info, index) => {
-                    if()
-                });
-                */
-                
-                settings_keys.forEach((info, index) => {
-                    console.log("ADDING SETTING ITEM: " + info);
-                    var advanced = false;
-                    var is_required = false;
-                    
-
-                    const css_element_id = 'extension-candleappstore-settings-setting-' + this.makeSafeForCSS(info);
-                    var d = document.createElement("div");
-
-                    //
-                    //  ADDING EXTRA PERMISSION DROPDOWN FOR TOKEN
-                    //
-
-                    if(info.toLowerCase() == 'authorization token'){
-                        var token_state = null;
-                        if(this.permissions.hasOwnProperty(addon_id)){
-                            console.log("Info about permissions for this addon existed");
-                            if( this.permissions[addon_id].hasOwnProperty('token') ){
-                                token_state = this.permissions[addon_id]['token'];
+                        var addon_settings_schema = {};
+                        var api_data = null;
+                        for(let f = 0; f < this.api_addons_data.length; f++){
+                            console.log(f);
+                            if( this.api_addons_data[f]['id'] == addon_id ){
+                                console.log("bingo. this.api_addons_data[f]: ", this.api_addons_data[f])
+                                api_data = this.api_addons_data[f];
+                                if(this.api_addons_data[f].hasOwnProperty('schema')){
+                                    addon_settings_schema = this.api_addons_data[f]['schema'];
+                                }
+                                break;
                             }
                         }
-                        console.log("Authorization token input field spotted");
-                        /*
+                        if(addon_settings_schema == {}){
+                            form.innerHTML = '<span class="extension-candleappstore-error">Error, could not load settings</span>';
+                            return;
+                        }
+                        console.log("api_data = ");
+                        console.log(api_data);
+                
                         if(api_data != null){
-                            document.getElementById("extension-candleappstore-permissions-title").innerText = api_data['name'];
+                            document.getElementById("extension-candleappstore-settings-title").innerText = api_data.name;
                         }
-                        */
-                        
-                        // If the token string is empty, that means the permission is 'none'.
-                        if(token_state == null && data[info] == ""){
-                            token_state = 'none';
+                
+                        //console.log("window.origin = " + window.origin);
+                
+                        if(!addon_settings_schema.hasOwnProperty('properties')){
+                            form.innerHTML = '<span class="extension-candleappstore-info">This addon does not have any settings.</span>';
+                            return;
                         }
-                        
-                        var xd = document.createElement("div");
-                        xd.classList.add('extension-candleappstore-settings-permission-setting');
-                        
-                        var xl = document.createElement("label");
-                        xl.for = info + "-permission";
-                        var xt = document.createTextNode("Access to your things");
-                        xl.appendChild(xt); // append text to label
-                    
-                        xd.appendChild(xl); // append label to div
-                        
-                        
-                        console.log("should create permission enum");
-                        var xs = document.createElement("select");
-                        xs.name = info + "-permission";
-                        
-						//const property_lists = this.get_property_lists(this.all_things[thing]['properties']);
-						//console.log("property lists:");
-						//console.log(property_lists);
-						
-                        //const possible_permissions = {'none':'No access', 'read':'Read only', 'full':'Read and toggle'};
-                        const possible_permissions = {'none':'No access', 'full':'Read and toggle'};
-                        
-                        const permission_keys = Object.keys(possible_permissions);
-                    
-    					permission_keys.forEach((preference, index) => {
-                        
-                        //for(let q = 0; q < possible_permissions.length; q++){
-						//for( var title in data[info]['enum'] ){
-                            //const option_name = addon_settings_props[info]['enum'][q];
-							console.log("adding permissions preference option: " + preference);
-                            const new_option_element = new Option(preference, possible_permissions[preference]);
-							
-                            if(token_state == preference){
-                                console.log("spotted selected permission dropdown option");
-                                // found the selected item
-                                //new_option_element.selected = true;
-                                new_option_element.setAttribute("selected", "selected");
-                            }
-                            xs.options[xs.options.length] = new_option_element;
-						});
-                        
-                        xs.addEventListener('change', (event) => {
-                            console.log("permission dropdown changed");
-                            console.log(event);
-                            event.stopImmediatePropagation();
-                            //this.remember_permission(addon_id,'token','none');
-                            
-                            console.log("new value: " + event.target.value);
-                            //revokeAuthorization
-                            
-                            if(event.target.value == possible_permissions['none']){
-                                console.log("permission was set to none. Revoke?");
-                                document.getElementById(css_element_id).value = "";
-                            }
-                            else if(event.target.value == possible_permissions['read']){
-                                console.log("permission was set to read only");
-                                
-                                // http://thuis.local/oauth/authorize?response_type=code&client_id=local-token&scope=/things:readwrite&state=asdf
-                            }
-                            else if(event.target.value == possible_permissions['full']){
-                                console.log("permission was set to full");
-                                console.log( localStorage.getItem('jwt') );
-                                console.log("target input el: " + css_element_id);
-                                document.getElementById(css_element_id).value = localStorage.getItem('jwt');
-                                
-                                //http://thuis.local/oauth/authorize?response_type=code&client_id=local-token&scope=/things:readwrite&state=asdf
-                            }
-                            
-                        });
-                        
-                        xd.appendChild(xs);
-                        
-                        // Add description
-                        var xp = document.createElement("p");
-                        const xpt = document.createTextNode("This app would like permission to control your devices. Is that ok?");
-                        xp.appendChild(xpt);
-                        xd.appendChild(xp); // append description to div
-                        
-                        form.appendChild(xd);
-                        
+    
+                
+                        console.log("addon_settings_schema:", addon_settings_schema);
+                
+                        const addon_settings_props = addon_settings_schema['properties'];
+                
+                        var addon_settings_required = [];
+                        if(addon_settings_schema.hasOwnProperty('required')){
+                            addon_settings_required = addon_settings_schema['required'];
+                        }
+                
+                        const settings_keys = Object.keys(addon_settings_props);
+                        console.log("addon_settings_props:");
+                        console.log(addon_settings_props);
+                        console.log("all props: " + settings_keys);
+                        console.log("addon_settings_required = " + addon_settings_required);
+                
                         /*
-                        //permissions_dropdown.style.display = 'block';
-                        var x = document.createElement("div");
-                        var xt = document.createTextNode(api_data['name'] = " would like permission to read the state of and toggle your devices. Is that ok?");
-                        x.appendChild(xt);
-                        
-                        var po = document.createElement("div");
-                        //s.id = css_element_id
-                        
-                        var none = document.createElement("button");
-                        var nonet = document.createTextNode("no");
-                        none.appendChild(not);
-                        none.classList.add('extension-candleappstore-permission-button-no');      
-                        
-                        none.addEventListener('click', (event) => {
-                            console.log("no button clicked");
-                            console.log(event);
-                            event.stopImmediatePropagation();
-                            this.remember_permission(addon_id,'token','none');
+                        settings_keys.forEach((info, index) => {
+                            if()
                         });
-                        po.appendChild(none);
-                        
-                        
-                        var read = document.createElement("button");
-                        var readt = document.createTextNode("Read only");
-                        read.appendChild(readt);
-                        read.classList.add('extension-candleappstore-permission-button-read'); 
-                        
-                        read.addEventListener('click', (event) => {
-                            console.log("read button clicked");
-                            console.log(event);
-                            event.stopImmediatePropagation();
-                            this.remember_permission(addon_id,'token','read');
-                        });
-                        po.appendChild(read);
-                        
-                        var full = document.createElement("button");
-                        var fullt = document.createTextNode("Read and toggle");
-                        full.appendChild(fullt);
-                        full.classList.add('extension-candleappstore-permission-button-full'); 
-                        
-                        full.addEventListener('click', (event) => {
-                            console.log("read and write button clicked");
-                            console.log(event);
-                            event.stopImmediatePropagation();
-                            this.remember_permission(addon_id,'token','full');
-                        });
-                        po.appendChild(full);
-                        x.appendChild(po);
                         */
-                        
-                        
-                        //return;
-                    }
+                
+                        var stop_processing = false;
+                
+                        // Looping over the fields defined in the api_data schema
+                        settings_keys.forEach((info, index) => {
+                            console.log("ADDING SETTING ITEM: " + info);
+                            var advanced = false;
+                            var is_required = false;
                     
-                    //addon_settings_props
-                    if( addon_settings_required != undefined){
-                        if(addon_settings_required.indexOf(info) != -1){
-                            console.log("-is_required");
-                            is_required = true;
-                            d.classList.add('extension-candleappstore-required-setting');      
-                        }
-                    }
 
+                            if(stop_processing){return;} // weird that return false didn't work.
+
+                            // CREATE DIV
+                            const css_element_id = 'extension-candleappstore-settings-setting-' + this.makeSafeForCSS(info);
+                            var d = document.createElement("div");
+                            d.classList.add("extension-candleappstore-settings-item");
+                            //var left_div = document.createElement("div");
                     
-                    var l = document.createElement("label");
-                    l.for = info;
-                    var t = document.createTextNode(info);
-                    l.appendChild(t); // append text to label
-                    
-                    d.appendChild(l); // append label to div
-                    //s.classList.add('extension-candleappstore-nice-name-span');      
-                    //var t = document.createTextNode(data[i][info]);
-                    //s.appendChild(t);
-                    
-                    // prepare description
-                    
-                    var description = addon_settings_props[info]['description'];
-                    var p = document.createElement("p");
-                    if(description != undefined){
-                        if( description.startsWith('Advanced.') ){
-                            console.log("descriptions started with Advanced.");
-                            advanced = true;
-                            description = description.replace('Advanced. ','');
-                            description = description.replace('Advanced.','');
-                        }
-                        console.log(description);
-                        
-                        var pt = document.createTextNode(description);
-                        p.appendChild(pt); // append description text to paragraph
-                    }
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    try{
-                        //if( typeof info == "boolean" ){
-                        if( addon_settings_props[info]['type'] == 'boolean'){
-                        //if(addon_settings_schema[info] == "true" || data[info] == "false"){
-                            console.log("boolean spotted. checked = " + data[info]);
-                            var s = document.createElement("input");
-                            s.id = css_element_id
-                            
-                            s.name = info;
-                            s.type = "checkbox";
-                            if(data[info] == "true"){
-                                s.checked = true;
-                            }
-                            d.appendChild(s);
-                            
-                            d.appendChild(p); // append description to div
-                            
-                        }
-                        else if( addon_settings_props[info].hasOwnProperty('enum') ){
-                            console.log("should create enum");
-                            var s = document.createElement("select");
-                            s.name = info;
-                            s.id = css_element_id;
-                            if(is_required){
-                                s.required = true;
-                            }
-                            
-							//const property_lists = this.get_property_lists(this.all_things[thing]['properties']);
-							//console.log("property lists:");
-							//console.log(property_lists);
-							
-                            for(let q = 0; q < addon_settings_props[info]['enum'].length; q++){
-							//for( var title in data[info]['enum'] ){
-                                const option_name = addon_settings_props[info]['enum'][q];
-								console.log("adding enum option: " + option_name);
-                                const new_option_element = new Option(option_name, option_name);
-								
-                                if(data[info] == option_name){
-                                    console.log("spotted selected dropdown option");
-                                    // found the selected item
-                                    //new_option_element.selected = true;
-                                    new_option_element.setAttribute("selected", "selected");
-                                }
-                                s.options[s.options.length] = new_option_element;
-							}
-                            d.appendChild(s);
-                            
-                            d.appendChild(p); // append description to div
-                            
-                        }
-                        else{
-                            console.log("string spotted");
-                            var s = document.createElement("input");
-                            s.id = css_element_id;
-                            s.name = info;
-                            
-                            var input_type = 'text';
-                            if(addon_settings_props[info]['type'] != "string"){
-                                if(addon_settings_props[info]['type'] == "integer"){
-                                    input_type = "number";
-                                }
-                                else{
-                                    input_type = addon_settings_props[info]['type'];
+                            // REQUIRED?
+                            if( addon_settings_required != undefined){
+                                if(addon_settings_required.indexOf(info) != -1){
+                                    console.log("-is_required");
+                                    is_required = true;
+                                    d.classList.add('extension-candleappstore-required-setting');      
                                 }
                             }
-                            if(info.toLowerCase() == 'authorization token'){
-                                d.classList.add('extension-candleappstore-hidden-setting'); 
-                            }
-                            
-                            s.type = input_type;
-                            
-                            if(data[info] != undefined){
-                                s.value = data[info];
-                            }
-                            
-                            
-                            if(is_required){
-                                s.required = true;
-                            }
+                    
+                    
+                            // LABEL
+                            var l = document.createElement("label");
+                            l.for = info;
+                            var t = document.createTextNode(info);
+                            l.appendChild(t); // append text to label
+                
                             
                             //s.classList.add('extension-candleappstore-nice-name-span');      
                             //var t = document.createTextNode(data[i][info]);
                             //s.appendChild(t);
                             
                             
+                    
+                    
+                    
+                            // DESCRIPTION, and detect 'advanced'.
+                            var description = addon_settings_props[info]['description'];
+                            var p = document.createElement("p");
+                            if(description != undefined){
+                                if( description.startsWith('Advanced.') ){
+                                    console.log("descriptions started with Advanced.");
+                                    advanced = true;
+                                    description = description.replace('Advanced. ','');
+                                    description = description.replace('Advanced.','');
+                                }
+                                console.log(description);
+                        
+                                var pt = document.createTextNode(description);
+                                p.appendChild(pt); // append description text to paragraph
+                            }
+                    
+                            //d.appendChild(p);
+                    
+                    
                             
-                            d.appendChild(s);
                             
-                            d.appendChild(p); // append description to div
-                        }
+                            try{
+                                console.log("\n\nstored preference: ", data[info]);
+                                
+                                // BOOLEAN SWITCH
+                                
+                                if( addon_settings_props[info]['type'] == 'boolean' || addon_settings_props[info].hasOwnProperty('boolean')){
+                                //if(addon_settings_schema[info] == "true" || data[info] == "false"){
+                                    
+                                    var left = document.createElement("div");
+                                    left.classList.add("extension-candleappstore-settings-left");
+                                    left.appendChild(l); // append label to div
+                                    left.appendChild(p); // Append description to div
+                                    d.appendChild(left);
+                                    d.classList.add("extension-candleappstore-flex");
+                                    
+                                    console.log("boolean spotted. checked = " + data[info]);
+                                    var s = document.createElement("input");
+                                    s.id = css_element_id
+                                    
+                                    s.name = info;
+                                    s.type = "checkbox";
+                                    if(data[info] == true || data[info] == 'true'){
+                                        console.log("checking box");
+                                        s.checked = true;
+                                    }
+                                    d.appendChild(s);
+                            
+                                    //d.appendChild(p); // append description to div
+                            
+                                }
+                                
+                                // ENUM
+                                
+                                else if( addon_settings_props[info]['type'] == 'enum' || addon_settings_props[info].hasOwnProperty('enum') ){ // not sure is that second part is needed.
+                                    console.log("should create enum");
+                                    
+                                    
+                                    var left = document.createElement("div");
+                                    left.classList.add("extension-candleappstore-settings-left");
+                                    left.appendChild(l); // append label to div
+                                    left.appendChild(p); // Append description
+                                    d.appendChild(left);
+                                    d.classList.add("extension-candleappstore-flex");
+                                    d.classList.add('extension-candleappstore-settings-enum');
+                                    
+                                    var s = document.createElement("select");
+                                    s.name = info;
+                                    s.id = css_element_id;
+                                    if(is_required){
+                                        s.required = true;
+                                    }
+                            
+        							//const property_lists = this.get_property_lists(this.all_things[thing]['properties']);
+        							//console.log("property lists:");
+        							//console.log(property_lists);
+							
+                                    for(let q = 0; q < addon_settings_props[info]['enum'].length; q++){
+        							//for( var title in data[info]['enum'] ){
+                                        const option_name = addon_settings_props[info]['enum'][q];
+        								console.log("adding enum option: " + option_name);
+                                        const new_option_element = new Option(option_name, option_name);
+								
+                                        if(data[info] == option_name){
+                                            console.log("spotted selected dropdown option");
+                                            // found the selected item
+                                            //new_option_element.selected = true;
+                                            new_option_element.setAttribute("selected", "selected");
+                                        }
+                                        s.options[s.options.length] = new_option_element;
+        							}
+                                    d.appendChild(s);
+                            
+                                    //d.appendChild(p); // append description to div
+                            
+                                }
+                                
+                                // STRING
+                                
+                                else if( addon_settings_props[info]['type'] == 'string' || addon_settings_props[info].hasOwnProperty('string') || addon_settings_props[info]['type'] == 'integer' || addon_settings_props[info]['type'] == 'number'){
+                                    console.log("string spotted");
+                                    
+                                    
+                                    
+                                    //
+                                    //  ADDING EXTRA PERMISSION DROPDOWN FOR TOKEN
+                                    //
+
+                                    if(info.toLowerCase() == 'authorization token'){
+                                        
+                                        var token_state = null;
+                                        
+                                        // The this.permissions dictionary may be a bit overcomplicated for now.
+                                        if(this.permissions.hasOwnProperty(addon_id)){
+                                            console.log("Info about permissions for this addon existed");
+                                            if( this.permissions[addon_id].hasOwnProperty('token') ){
+                                                console.log("token state was present");
+                                                token_state = this.permissions[addon_id]['token'];
+                                            }
+                                        }
+                                        console.log("Authorization token input field spotted");
+                                        /*
+                                        if(api_data != null){
+                                            document.getElementById("extension-candleappstore-permissions-title").innerText = api_data['name'];
+                                        }
+                                        */
+                        
+                                        // If the token string is empty, that means the permission is 'none'.
+                                        if(token_state == null && data[info] == ""){
+                                            token_state = 'none';
+                                        }
+                                        
+                                        // Simpler: if there is a token string, there must be permission.
+                                        if(data[info].length > 10){
+                                            console.log("token is longer than 10 characters, so setting token state to 'full' (aka yes)");
+                                            token_state = 'full';
+                                        }
+                                        
+                                        //var xd = document.createElement("div");
+                                        //xd.classList.add('extension-candleappstore-settings-permission-setting');
+                        
+                                        var xl = document.createElement("label");
+                                        xl.for = info + "-permission";
+                                        var xt = document.createTextNode("Access to your things");
+                                        xl.appendChild(xt); // append text to label
+                    
+                                        //xd.appendChild(xl); // append label to div
+                        
+                        
+                                        console.log("should create permission enum");
+                                        var xs = document.createElement("select");
+                                        xs.name = info + "-permission";
+                        
+                						//const property_lists = this.get_property_lists(this.all_things[thing]['properties']);
+                						//console.log("property lists:");
+                						//console.log(property_lists);
+						
+                                        //const possible_permissions = {'none':'No access', 'read':'Read only', 'full':'Read and toggle'};
+                                        const possible_permissions = {'no':'none', 'yes':'full'};
+                        
+                                        const permission_keys = Object.keys(possible_permissions);
+                    
+                    					permission_keys.forEach((preference, index) => {
+                        
+                                        //for(let q = 0; q < possible_permissions.length; q++){
+                						//for( var title in data[info]['enum'] ){
+                                            //const option_name = addon_settings_props[info]['enum'][q];
+                							console.log("adding permissions preference option: " + preference + ", token: " + token_state);
+                                            const new_option_element = new Option(preference, possible_permissions[preference]);
+							
+                                            if(token_state == 'full'){
+                                                console.log("spotted full permission dropdown option");
+                                                // found the selected item
+                                                //new_option_element.selected = true;
+                                                new_option_element.setAttribute("selected", "selected");
+                                            }
+                                            xs.options[xs.options.length] = new_option_element;
+                						});
+                        
+                                        xs.addEventListener('change', (event) => {
+                                            console.log("permission dropdown changed");
+                                            console.log(event);
+                                            event.stopImmediatePropagation();
+                                            //this.remember_permission(addon_id,'token','none');
+                            
+                                            console.log("new value selected: " + event.target.value);
+                                            //revokeAuthorization
+                            
+                                            console.log("possible_permissions['none']: ", possible_permissions['none']);
+                            
+                                            if(event.target.value == possible_permissions['none']){
+                                                console.log("permission was set to none. Revoke?");
+                                                document.getElementById(css_element_id).value = "";
+                                            }
+                                            else if(event.target.value == possible_permissions['read']){
+                                                console.log("permission was set to read only");
+                                
+                                                // http://thuis.local/oauth/authorize?response_type=code&client_id=local-token&scope=/things:readwrite&state=asdf
+                                            }
+                                            else if(event.target.value == possible_permissions['full']){
+                                                console.log("permission was set to full");
+                                                console.log( localStorage.getItem('jwt') );
+                                                console.log("target input el: " + css_element_id);
+                                                document.getElementById(css_element_id).value = localStorage.getItem('jwt');
+                                
+                                                //http://thuis.local/oauth/authorize?response_type=code&client_id=local-token&scope=/things:readwrite&state=asdf
+                                            }
+                            
+                                        });
+                        
+                                        
+                        
+                                        // Add description
+                                        var xp = document.createElement("p");
+                                        const xpt = document.createTextNode("This app requires permission to control and get data from your devices. Is that ok?");
+                                        xp.appendChild(xpt);
+                                        //xd.appendChild(xp); // append description to div
+                        
+                        
+                                        var left = document.createElement("div");
+                                        left.classList.add("extension-candleappstore-settings-left");
+                                        left.appendChild(xl); // append label to div
+                                        left.appendChild(xp); // Append description
+                                        d.appendChild(left);
+                                        d.appendChild(xs); // Append dropdown
+                                        d.classList.add("extension-candleappstore-flex");
+                                        d.classList.add('extension-candleappstore-settings-permission-setting');
+                                        d.classList.add('extension-candleappstore-settings-enum');
+                                        
+                                        form.prepend(d);
+                                        return;
+                                        
+                                    }
+                    
+                                    else{
+                                        
+                                        d.appendChild(l); // append label to div
+                                        
+                                        console.log("creating input for normal string");
+                                        var s = document.createElement("input");
+                                        s.id = css_element_id;
+                                        s.name = info;
+                            
+                                        var input_type = 'text';
+                                        if(addon_settings_props[info]['type'] != "string"){
+                                            if(addon_settings_props[info]['type'] == "integer"){
+                                                input_type = "number";
+                                            }
+                                            else{
+                                                input_type = addon_settings_props[info]['type'];
+                                            }
+                                        }
+                                        if(info.toLowerCase() == 'authorization token'){
+                                            d.classList.add('extension-candleappstore-hidden-setting'); 
+                                        }
+                            
+                                        s.type = input_type;
+                            
+                                        if(data[info] != undefined){
+                                            s.value = data[info];
+                                        }
+                            
+                            
+                                        if(is_required){
+                                            s.required = true;
+                                        }
+                            
+                                        //s.classList.add('extension-candleappstore-nice-name-span');      
+                                        //var t = document.createTextNode(data[i][info]);
+                                        //s.appendChild(t);
+                            
+                            
+                            
+                                        d.appendChild(s); // append string input
+                            
+                                        d.appendChild(p); // append description to div
+                                    }
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                }
+                                else{
+                                    
+                                    // Detected an object
+                                    if( addon_settings_props[info]['type'] == 'object'){
+                                        console.log("OBJECT setting spotted. checked = " + data[info]);
+                                    }
+                                    if( addon_settings_props[info]['type'] == 'array'){
+                                        console.log("ARRAY setting spotted. checked = " + data[info]);
+                                    }
+                                    
+                                    console.log("This addon has a complex object in its settings. Creating redirect button. type: ", addon_settings_props[info]['type']);
+                                    form.innerHTML = '<p>This addon has some complicated settings. Click the button below to close the Candle app store and change your preferences via the system settings instead.</p><a href="/settings/addons/config/' + addon_id + '"><button class="extension-candleappstore-button">Click here to change settings</button></a>';
+                                    document.getElementById('extension-candleappstore-settings-options').style.display = 'none';
+                                    
+                                    stop_processing = true;
+                                    return false;
+                                }
                         
                     
-                    }
-                    catch(e){
-                        console.log("Error popularing selected: " + e);
-                    }
-                    
+                            }
+                            catch(e){
+                                console.log("Error popularing selected: " + e);
+                            }
+                            
 
 
                     
-                    console.log("advanced = " + advanced);
-                    console.log("is_required = " + is_required);
-                    // split new settings items between normal and advanced area
-                    if( advanced && !is_required){
-                        spotted_advanced_setting = true;
-                        advanced_form.appendChild(d);
-                        advanced_form_container.style.display = "block";
-                    }
-                    else{
-                        form.appendChild(d);
-                    }
-                    
-                    
-                });
-                
-                // ADD SETTINGS SAVE BUTON
-                var b = document.createElement("button");
-                b.classList.add('extension-candleappstore-settings-save-button');
-                b.classList.add('extension-candleappstore-button');
-                var t = document.createTextNode("Save");
-                b.appendChild(t);
-				b.addEventListener('click', (event) => {
-                    console.log("settings save button clicked");
-                    console.log(event);
-                    event.stopImmediatePropagation();
-                    
-                    //const addon_id = data[i]["addon_id"];
-                    
-                    // extract new settings
-                    var missing_value = false;
-                    var new_data = {};
-                    settings_keys.forEach((info, index) => {
-                        console.log("EXTRACTING SETTING ITEM: " + info);
-                    
-                        const css_element_id = 'extension-candleappstore-settings-setting-' + this.makeSafeForCSS(info);
-                        console.log("target element id: --" + css_element_id + '--');
-                        var target_element = document.getElementById( css_element_id );
-                        
-                        console.log("setting extraction target element:");
-                        console.log(target_element);
-                        
-                        try{
-                            //if( typeof info == "boolean" ){
-                            if( addon_settings_props[info]['type'] == 'boolean'){                                
-                                new_data[info] = target_element.checked;
-                            
+                            console.log("advanced = " + advanced);
+                            console.log("is_required = " + is_required);
+                            // split new settings items between normal and advanced area
+                            if( advanced && !is_required){
+                                spotted_advanced_setting = true;
+                                advanced_form.appendChild(d);
+                                advanced_form_container.style.display = "block";
                             }
                             else{
-                                var value = target_element.value;
-                                
-                                if( target_element.required && value == "" ){
-                                    console.log("required value was not filled");
-                                    missing_value = true;
-                                    target_element.classList.add("extension-candleappstore-settings-empty-warning"); 
-                                }
-                                new_data[info] = value;
-
+                                form.appendChild(d);
                             }
+                    
+                    
+                        }); // end of looping over settings
+                        
+                
+                        // ADD SETTINGS SAVE BUTON
+                        var b = document.createElement("button");
+                        b.classList.add('extension-candleappstore-settings-save-button');
+                        b.classList.add('extension-candleappstore-button');
+                        var t = document.createTextNode("Save");
+                        b.appendChild(t);
+        				b.addEventListener('click', (event) => {
+                            console.log("settings save button clicked");
+                            console.log(event);
+                            event.stopImmediatePropagation();
+                    
+                            //const addon_id = data[i]["addon_id"];
+                    
+                            // extract new settings
+                            var missing_value = false;
+                            var new_data = {};
+                            settings_keys.forEach((info, index) => {
+                                console.log("EXTRACTING SETTING ITEM: " + info);
+                    
+                                const css_element_id = 'extension-candleappstore-settings-setting-' + this.makeSafeForCSS(info);
+                                console.log("target element id: --" + css_element_id + '--');
+                                var target_element = document.getElementById( css_element_id );
+                        
+                                console.log("setting extraction target element:");
+                                console.log(target_element);
+                        
+                                try{
+                                    //if( typeof info == "boolean" ){
+                                    if( addon_settings_props[info]['type'] == 'boolean'){                                
+                                        new_data[info] = target_element.checked;
+                            
+                                    }
+                                    else{
+                                        var value = target_element.value;
+                                
+                                        if( target_element.required && value == "" ){
+                                            console.log("required value was not filled");
+                                            missing_value = true;
+                                            target_element.classList.add("extension-candleappstore-settings-empty-warning"); 
+                                        }
+                                        new_data[info] = value;
+
+                                    }
                            
-                            console.log("new_data[info] = " + new_data[info]);
+                                    console.log("new_data[info] = " + new_data[info]);
                     
-                        }
-                        catch(e){
-                            console.log("Error extracting setting value: " + e);
-                        }
+                                }
+                                catch(e){
+                                    console.log("Error extracting setting value: " + e);
+                                }
                     
-                    });
+                            });
                     
-                    if(missing_value == false){
+                            if(missing_value == false){
                         
-                        console.log("WILLL SAVE NEW ADDONS SETTINGS:");
-                        console.log(new_data);
+                                console.log("WILLL SAVE NEW ADDONS SETTINGS:");
+                                console.log(new_data);
                         
-                        settings_container.classList.add("extension-candleappstore-busy");
+                                settings_container.classList.add("extension-candleappstore-busy");
                         
-                        //window.API.setAddonConfig( addon_id, JSON.stringify(new_data) )
-                        window.API.setAddonConfig( addon_id, new_data )
-                        .then(() => { 
-    						console.log("saved settings result for addon: " + addon_id);
-    						//console.log(result); 
-                            document.getElementById("extension-candleappstore-settings").style.display = 'none';
+                                //window.API.setAddonConfig( addon_id, JSON.stringify(new_data) )
+                                window.API.setAddonConfig( addon_id, new_data )
+                                .then(() => { 
+            						console.log("saved settings result for addon: " + addon_id);
+            						//console.log(result); 
+                                    document.getElementById("extension-candleappstore-settings").style.display = 'none';
                         
-    					}).catch((e) => {
-    						console.log("uninstallation catch (error?)");
-                            console.log(e);
-    						pre.innerText = e.toString();
-                            document.getElementById("extension-candleappstore-settings").style.display = 'none';
-    					});
+            					}).catch((e) => {
+            						console.log("uninstallation catch (error?)");
+                                    console.log(e);
+            						pre.innerText = e.toString();
+                                    document.getElementById("extension-candleappstore-settings").style.display = 'none';
+            					});
                         
-                    }
-                    else{
-                        alert("A required value was not filled in and/or selected");
-                    }
+                            }
+                            else{
+                                alert("A required value was not filled in and/or selected");
+                            }
                     
                     
 
-                });
+                        });
                 
                 
-                settings_options_bar.appendChild(b);
+                        settings_options_bar.appendChild(b);
+                    
+            
+    				})
+                    .catch((e) => {
+    					console.log("get addon config catch (error?): ", e);
+    					alert("Error, could not load setting, sorry.");
+    				});
+				})
+                .catch((e) => {
+					console.log("get addons overview error: ", e);
+				});
+                
+                
+                
+                
+                
                 
             }
             catch(e){
@@ -3050,6 +3415,7 @@
                 return '__' + ('000' + c.toString(16)).slice(-4);
             });
             */
+            name = name.toLowerCase();
             return name.replace(/[^a-z0-9_]/g,"");
         }
         

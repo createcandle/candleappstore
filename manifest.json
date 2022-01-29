@@ -32,11 +32,11 @@
     "schema": {
       "properties": {
         "App store server": {
-            "description": "The server that controls which apps you can install.",
+            "description": "Advanced. The server that controls which apps you can install. The default is https://www.candlesmarthome.com/appstore",
             "type": "string"
         },
         "Debugging": {
-          "description": "Debugging allows you to diagnose any issues with the add-on. If enabled it will result in a lot more debug data in the internal log (which can be found under settings -> developer -> view internal logs).",
+          "description": "Advanced. Debugging allows you to diagnose any issues with the add-on. If enabled it will result in a lot more debug data in the internal log (which can be found under settings -> developer -> view internal logs).",
           "type": "boolean"
         }
       },
