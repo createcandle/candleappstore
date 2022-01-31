@@ -73,6 +73,22 @@
 }
 
 
+.extension-candleappstore-selected-settings{
+    font-style:italic;
+}
+
+.extension-candleappstore-selected-settings:not(:empty)::before{
+    content:"This addon has the following settings: ";
+    display:inline-block;
+    margin-right:1rem;
+    font-weight: normal;
+    font-style:normal;
+    margin-top:2rem;
+    margin-bottom:.5rem;
+    
+}
+
+
 
 /*  SELECTED APP OVERLAY TWO COLUMNS */
 
@@ -231,26 +247,24 @@
 }
 
 
-.extension-candleappstore-select-satellites-question,
 .extension-candleappstore-item{
-	padding: 0;
 	display: flex;
     justify-content:space-between;
 	/*background-color: #46769C;*/
     background-color:rgba(0,0,0,.2);
 	border-radius:.5rem;
-	margin-top:1rem;
 	position: relative;
 	width:100%;
-}
-
-.extension-candleappstore-item{
-	margin-top: 4rem;
+	margin-top: 2rem;
     width: calc(33.3% - 2rem);
     min-width:10rem;
     padding:2rem;
     box-sizing: border-box;
     cursor:pointer;
+}
+
+#extension-candleappstore-list .extension-candleappstore-item{
+    margin-top:4rem;
 }
 
 #extension-candleappstore-installedlist .extension-candleappstore-item{
@@ -265,6 +279,7 @@
 #extension-candleappstore-list .extension-candleappstore-item:first-of-type{
     min-height:40rem;
     padding:4rem;
+    margin-top:0;
     font-size:3rem;
     width:100%;
     background-size:cover!important;
@@ -1019,10 +1034,13 @@
 }
 
 
+/*  risk / expert level  */
+
 .extension-candleappstore-selected-risk{
     font-size:3rem;
     letter-spacing:.5rem;
 }
+
 .extension-candleappstore-selected-risk:not(:empty)::before{
     content:'Expert level: ';
     font-weight:bold;
@@ -1035,6 +1053,46 @@
 .extension-candleappstore-selected-risk span{
     opacity:.2;
 }
+
+
+/*  privacy score  */
+
+.extension-candleappstore-selected-privacy_score{
+    display:flex;
+}
+.extension-candleappstore-selected-privacy_score img{
+    width: 2.5rem;
+    margin-right: 0.5rem;
+}
+
+.extension-candleappstore-bad-privacy-icon{
+    opacity:.2;
+}
+
+
+.extension-candleappstore-selected-privacy_score:not(:empty)::before{
+    content:'Privacy protection: ';
+    font-weight:bold;
+    font-size:1.6rem;
+    display: block;
+    line-height: 1rem;
+    letter-spacing:0;
+}
+
+.extension-candleappstore-selected-license{
+    font-weight:normal;
+}
+.extension-candleappstore-selected-license::before{
+    content:'License: ';
+    font-weight:bold;
+    /*font-size:1.6rem;
+    display: block;
+    line-height: 1rem;
+    letter-spacing:0;*/
+}
+
+
+
 
 
 #extension-candleappstore-selected a[href=""],
@@ -1399,16 +1457,21 @@
     letter-spacing: .5rem;
     color:orange;
     font-size:2rem;
+    margin-right:2rem;
 }
 .extension-candleappstore-review-item-rating span{
     color:white;
     opacity:.1;
 }
 
-.extension-candleappstore-review-item-risk{
-    display:none;
-}
 
+.extension-candleappstore-review-item-risk{
+    font-size: 3rem;
+    line-height: 3rem;
+}
+.extension-candleappstore-review-item-risk span{
+    opacity:.2;
+}
 
 #extension-candleappstore-review-tip{
     text-align:center;

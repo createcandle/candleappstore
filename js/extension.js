@@ -1469,8 +1469,8 @@
                 if(page == 'shop'){highest_highlight_level = 5;}
                 
                 for(let current_highlight_level = highest_highlight_level; current_highlight_level >= 0; current_highlight_level--){
-                    console.log("x");
-                    console.log("current_highlight_level: ", current_highlight_level );
+                    //console.log("x");
+                    //console.log("current_highlight_level: ", current_highlight_level );
                     for(let i = 0; i < data.length; i++){
                         //console.log("generating. item data: ", data[i]);
 
@@ -1485,27 +1485,8 @@
                                 //console.log('Setting api_data to data from cloud. Cloud addon data: ', data[i]);
                                 addon_id = data[i].addon_id;
                                 api_data = data[i];
-                                //console.log('Cloud addon data addon_id: ' + addon_id);
-                                
-                                /*
-                                // loops over the addon data downloaded from the cloud, and sets the cloud data as the data to work with.
-                                for(let u= 0; u < this.api_addons_data.length; u++){
-                                    if( this.api_addons_data[u]['id'] == data[i].addon_id ){
-                                        api_data = this.api_addons_data[u];
-                                        addon_id = data[i].addon_id;
-                                        console.log("found api_data");
-                                        console.log(api_data);
-                                        //break;
-                                    }
-                                }
-                                */
                             }
                             else{
-                                //console.log( this.api_addons_data, data[i].name );
-                            
-                                //document.getElementById('extension-candleappstore-list').innerHTML = '<div class="extension-candleappstore-centered-page"><h2>App store not available</h2><p>Is the controller connected to the internet? If so, then the server may be down. You can test this by checking online:</p><p><a href="' + this.app_store_url + '">' + this.app_store_url + '</a><br/><br/><br/></p></div>';
-                                //console.log("Not showing shop. this.api_addons_data[ i ]: ", this.api_addons_data[ i ] );
-                                //api_data = this.api_addons_data[ i ];
                                 api_data = data[i]
                                 addon_id = api_data.id;
                                 
@@ -1657,8 +1638,8 @@
 
                                 
                                 
-                                console.log("data[i]['reviews_average']: ", data[i]['reviews_average']);
-                                console.log("data[i]['tags']: ", data[i]['tags']);
+                                //console.log("data[i]['reviews_average']: ", data[i]['reviews_average']);
+                                //console.log("data[i]['tags']: ", data[i]['tags']);
                                 //console.log("privacy score: " + data[i]['privacy_score']);
                                 //console.log("minimal score: " + minimal_privacy);
                                 //if(minimal_privacy)
@@ -1668,11 +1649,19 @@
                                     //console.log("-This addon is a UI extension");
                                     //list.insertBefore(clone, list.firstChild);
                                     
-                                    console.log("search_text: ", search_text);
+                                    //console.log("search_text: ", search_text);
                                     if(search_text.length > 1){
+                                    
+                                       var tags_string = "";
+                                       if( typeof data[i]['tags'] != 'undefined'){
+                                           if( data[i]['tags'] != null ){
+                                               tags_string = data[i]['tags'].toLowerCase();
+                                           }
+                                       }
+                                        
                                         //const addon_name = data[i]['name'].toLowerCase();
-                                        if(data[i]['name'].toLowerCase().indexOf(search_text.toLowerCase()) == -1 && data[i]['tags'].toLowerCase().indexOf(search_text.toLowerCase()) == -1){
-                                            console.log("skipping based on search text: ", data[i]['name']);
+                                        if(data[i]['name'].toLowerCase().indexOf(search_text.toLowerCase()) == -1 && tags_string.indexOf(search_text.toLowerCase()) == -1){
+                                            //console.log("skipping based on search text: ", data[i]['name']);
                                             continue;
                                         }
                                     }
@@ -1767,7 +1756,8 @@
                                 b.classList.add('extension-candleappstore-button');
                         
                                 b.setAttribute('data-extension', ui_extension);
-                        
+                                b.setAttribute('data-addon_id', addon_id);
+                                
                                 if(api_data != null){
                                     if(api_data.enabled){
                                         b.classList.add('extension-candleappstore-pause-button');
@@ -1801,6 +1791,8 @@
                                     //if (event.target.tagName.toLowerCase() === 'label') {
                                     console.log( addon_id );
                         
+                                    const this_addon_id = event.target.getAttribute('data-addon_id')
+                        
                                     var should_enable = null;
                                     console.log(event.target.dataset.enabled);
                                     if(event.target.dataset.enabled == 1){
@@ -1812,12 +1804,17 @@
                                         should_enable = true;
                                     }
                                     if(should_enable != null){
-                                        console.log("SWITCHING ADDON: " + addon_id + ", TO NEW STATE: " + should_enable);
-                                        event.target.innerText = "busy";
-                                        window.API.setAddonSetting( addon_id, should_enable)
+                                        console.log("SWITCHING ADDON: " + this_addon_id + ", TO NEW STATE: " + should_enable);
+                                        event.target.innerText = "....";
+                                        window.API.setAddonSetting( this_addon_id, should_enable)
                                         .then((result) => {
                 							console.log("get addon play/pause result: ");
                 							console.log(result);
+                                            
+                                            if(typeof result.enabled != 'undefined'){
+                                                console.log('addon has been switch to: ', result.enabled);
+                                            }
+                                            
                                             console.log("ui_extension = " + ui_extension);
                                     
                                             console.log("event.target.dataset.extension: " + event.target.dataset.extension );
@@ -1837,11 +1834,24 @@
                                                     window.location.reload();
                                                 }
                                             }
-                                            this.generate_overview();
+                                            //setTimeout(() =>{
+                                                //this.generate_overview('installed');
+                                            //},1000);
+                                            
+                                            this.get_installed_addons_data()
+                                            .then((result) => { 
+                                                console.log("in get_installed_addons_data.then");
+                                                this.generate_overview('installed');
+                                			}).catch((e) => {
+                                				console.log("init: get_installed_addons_data catch (error?):", e);
+                                			});
+                                            
+                                
+                                
                                 
 
                 						}).catch((e) => {
-                							console.log("Error enabling/disabling addon");
+                							console.log("Error enabling/disabling addon: ", this_addon_id);
                                             console.log(e);
                                             if(should_enable){
                                                 event.target.innerText = "Start";
@@ -1849,7 +1859,7 @@
                                             else{
                                                 event.target.innerText = "Stop";
                                             }
-                							pre.innerText = e.toString();
+                							//pre.innerText = e.toString();
                 						});
                                     }
                                     else{
@@ -1901,7 +1911,6 @@
                                 //b.classList.add('addon-settings-config');
                                 b.classList.add('text-button');
                                 b.setAttribute('data-addon-id', addon_id);
-                                b.setAttribute('data-addon-id', addon_id);
                                 var t = document.createTextNode("Update");
                                 b.appendChild(t);
             					b.addEventListener('click', (event) => {
@@ -1910,7 +1919,7 @@
                                     event.stopImmediatePropagation();
                                     
                                     if(confirm("Are you sure you want to update this addon?")){
-                                        const this_addon_id = event.target.getAttribute('data-addon-id')
+                                        const this_addon_id = event.target.getAttribute('data-addon-id');
                                     
                                         console.log("clicked on update button for: ", addon_id );
                                         console.log( event.target.getAttribute('data-addon-id') );
@@ -2268,8 +2277,46 @@
                                 
                                             }
                                             else if(info == 'risk'){
-                                                // skip for now, show community judgement instead
+                                                // skip for now, show community judgement instead. Or generate it, and then let community values override it?
+                                                /*
+                                                const risk_score = parseInt(data['versions'][v][info]);
+                                                var glasses = "";
+                                                for (let s = 0; s < 5; s++) {
+                                                    if( s < rounded_risk){
+                                                        glasses += '&#128083;';
+                                                    }
+                                                    else{
+                                                        glasses += '<span>&#128083;</span>';
+                                                    }
+                          
+                                                }
+                                                document.getElementById('extension-candleappstore-selected-risk').innerHTML = glasses;
+                                                */
+                                                
                                             }
+                                            
+                                            
+                                            else if(info == 'privacy_score'){
+                                                const privacy_protection_score = parseInt(data['versions'][v][info]);
+                                                console.log("privacy_protection_score: ", privacy_protection_score);
+                                                //var privacy_protection_html = '<img src = "../images/privacy-icon.svg" alt="privacy protection icon" />'
+                                                
+                                                var privacy_protection_html = "";
+                                                for (let p = 0; p < 5; p++) {
+                                                    if( p < privacy_protection_score){
+                                                        privacy_protection_html += '<img src = "/extensions/candleappstore/images/privacy-icon.svg" alt="privacy protection icon" class="extension-candleappstore-good-privacy-icon" title="More closed eye icons means stronger privacy protection"/>';
+                                                    }
+                                                    else{
+                                                        privacy_protection_html += '<img src = "/extensions/candleappstore/images/no-privacy-icon.svg" alt="privacy protection icon" class="extension-candleappstore-bad-privacy-icon" title="More closed eye icons means stronger privacy protection"/>';
+                                                    }
+                          
+                                                }
+                                                //document.getElementById('extension-candleappstore-selected-risk').innerHTML = glasses;
+                                                
+                                                target_element.innerHTML = privacy_protection_html;
+                                                
+                                            }
+                                            
                                             else{
                                                 target_element.innerHTML = "";
                                                 const text_to_use = data['versions'][v][info];
@@ -2601,7 +2648,7 @@
                                     //if(info == 'review' || info == 'username'){
                                     
                                     if(info == 'rating'){
-                                        var number = parseInt(data['ratings'][i][info])
+                                        var number = parseInt(data['ratings'][i][info]);
                                         var stars = "";
                                         for (let s = 0; s < 5; s++) {
                                             if( s < number){
@@ -2614,6 +2661,24 @@
                                         }
                                         target_element.innerHTML = stars;
                                     }
+                                    else if(info == 'risk'){
+                                        var number = 1 + parseInt(data['ratings'][i][info]/2);
+                                            var glasses = "";
+                                            for (let s = 0; s < 5; s++) {
+                                                if( s < number){
+                                                    glasses += '👓';
+                                                }
+                                                else{
+                                                    glasses += '<span>👓</span>';
+                                                }
+                                      
+                                            }
+                                            target_element.innerHTML = glasses;
+                                    
+                                    }
+                                    
+                                    
+                                    
                                     else{
                                         //var t = document.createTextNode( htmlDecode() );
                                         //target_element.appendChild(t);
@@ -2703,10 +2768,11 @@
                     
                     }
                     else{
-                        console.log("error: data has no rating dictionary");
+                        console.log("NO REVIEWS YET");
                     }
                 
-                
+                    
+                    
                 
                     /*
                     const stars = document.getElementById("extension-candleappstore-stars-rating");
