@@ -143,6 +143,7 @@
 
 
 
+
         // Compares the data from the internal API with the cloud data
         check_for_updates(){
             console.log("in check_for_updates");
@@ -481,7 +482,7 @@
                 })
                 .catch((e) => {
 					console.log("candleappstore: error while test");
-					pre.innerText = e.toString();
+					//pre.innerText = e.toString();
 				});
                 
             });
@@ -512,7 +513,7 @@
                 })
                 .catch((e) => {
 					console.log("candleappstore: error while test");
-					pre.innerText = e.toString();
+					//pre.innerText = e.toString();
 				});
             });
             
@@ -861,6 +862,11 @@
             //  SHOP FILTERS
             //
             
+            document.getElementById('extension-candleappstore-filter-search-input').addEventListener('input', (event) => {
+                console.log('search input changed');
+                this.generate_overview('shop');
+			});
+            
             document.getElementById('extension-candleappstore-filter-privacy-select').addEventListener('change', (event) => {
                 console.log('privacy filter changed');
                 this.generate_overview('shop');
@@ -940,7 +946,7 @@
 				console.log("App Store INIT response: ");
 				console.log(body);
 				if( body['state'] != true ){
-					pre.innerText = body['message'];
+					//pre.innerText = body['message'];
 				}
                 else{
                     this.app_store_url = body['app_store_url'];
@@ -1444,7 +1450,7 @@
                 const minimal_privacy = document.getElementById('extension-candleappstore-filter-privacy-select').value;
                 const minimal_reviews = document.getElementById('extension-candleappstore-filter-reviews-select').value;
                 const maximum_expert = document.getElementById('extension-candleappstore-filter-expert-select').value;
-                
+                const search_text = document.getElementById('extension-candleappstore-filter-search-input').value;
                 
                 
                 //
@@ -1548,9 +1554,6 @@
                             if(info == 'name' || info == 'description'){
                         
                                 var t = document.createElement('span');
-                            
-                                
-                                
                                 t.innerHTML = linkify(data[i][info]); // removes links from descriptions, and turns them into actual links
                             
                                 const selector_name = '.extension-candleappstore-basic-' + info;
@@ -1588,10 +1591,6 @@
                             event.stopImmediatePropagation();
                     
                             //target.dataset.domain
-                            const selected = document.getElementById('extension-candleappstore-selected');
-                            selected.style.display = 'none';
-                            document.getElementById("extension-candleappstore-review-container").style.display = "none";
-                            document.getElementById('extension-candleappstore-review-complete').style.display = "none";
                             //document.getElementById('extension-candleappstore-review-tip').style.display = "block";
                             
                     
@@ -1654,9 +1653,12 @@
                                     list.appendChild(clone); 
                                 }
                                 */
-                    
-                                console.log("data[i]['reviews_average']");
                                 
+
+                                
+                                
+                                console.log("data[i]['reviews_average']: ", data[i]['reviews_average']);
+                                console.log("data[i]['tags']: ", data[i]['tags']);
                                 //console.log("privacy score: " + data[i]['privacy_score']);
                                 //console.log("minimal score: " + minimal_privacy);
                                 //if(minimal_privacy)
@@ -1665,6 +1667,16 @@
                                     //console.log("HIGHLIGHTING addon:"  + addon_id + " , at level: ", current_highlight_level);
                                     //console.log("-This addon is a UI extension");
                                     //list.insertBefore(clone, list.firstChild);
+                                    
+                                    console.log("search_text: ", search_text);
+                                    if(search_text.length > 1){
+                                        //const addon_name = data[i]['name'].toLowerCase();
+                                        if(data[i]['name'].toLowerCase().indexOf(search_text.toLowerCase()) == -1 && data[i]['tags'].toLowerCase().indexOf(search_text.toLowerCase()) == -1){
+                                            console.log("skipping based on search text: ", data[i]['name']);
+                                            continue;
+                                        }
+                                    }
+                                    
                                     output_list_element.appendChild(clone); 
                                 }
                             }
@@ -2083,6 +2095,9 @@
         show_selected_app(addon_id){
             console.log('show_selected_app');
             
+            const selected = document.getElementById('extension-candleappstore-selected');
+            selected.style.display = 'none';
+            
             // installed
             
             const url = "get_app.php?addon_id=" + addon_id
@@ -2100,8 +2115,8 @@
                     console.log("in show_selected_app");
                     console.log(data);
                 
-                    const pre = document.getElementById('extension-candleappstore-response-data');
-                    const selected = document.getElementById('extension-candleappstore-selected');
+                    //const pre = document.getElementById('extension-candleappstore-response-data');
+                    //const selected = document.getElementById('extension-candleappstore-selected');
                     const selected_options_bar = document.getElementById("extension-candleappstore-selected-options");
                     
                     selected.style.display = 'block';
@@ -2115,6 +2130,10 @@
                     document.getElementById("extension-candleappstore-review-response").innerText = "";
                     document.getElementById('extension-candleappstore-review-tip').style.display = 'block';
 
+
+                    document.getElementById("extension-candleappstore-review-container").style.display = "none";
+                    document.getElementById('extension-candleappstore-review-complete').style.display = "none";
+                    
                     
                 
                     if(typeof data.error != 'undefined'){
@@ -2353,7 +2372,7 @@
     						}).catch((e) => {
     							console.log("installation catch (error?)");
                                 console.log(e);
-    							pre.innerText = e.toString();
+    							//pre.innerText = e.toString();
                                 alert("Error: could not install. Could not connect to the controller.");
                                 document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
     						});
@@ -2422,7 +2441,7 @@
             						}).catch((e) => {
             							console.log("uninstallation catch (error?)");
                                         console.log(e);
-            							pre.innerText = e.toString();
+            							//pre.innerText = e.toString();
             						});
                                 }
                         
@@ -3054,10 +3073,13 @@
                                         }
                                         
                                         // Simpler: if there is a token string, there must be permission.
-                                        if(data[info].length > 10){
-                                            console.log("token is longer than 10 characters, so setting token state to 'full' (aka yes)");
-                                            token_state = 'full';
+                                        if(typeof data[info] != 'undefined'){
+                                            if(data[info].length > 10){
+                                                console.log("token is longer than 10 characters, so setting token state to 'full' (aka yes)");
+                                                token_state = 'full';
+                                            }
                                         }
+                                        
                                         
                                         //var xd = document.createElement("div");
                                         //xd.classList.add('extension-candleappstore-settings-permission-setting');
@@ -3200,10 +3222,6 @@
                                     }
                                     
                                     
-                                    
-                                    
-                                    
-                                    
                                 }
                                 else{
                                     
@@ -3318,7 +3336,7 @@
             					}).catch((e) => {
             						console.log("uninstallation catch (error?)");
                                     console.log(e);
-            						pre.innerText = e.toString();
+            						//pre.innerText = e.toString();
                                     document.getElementById("extension-candleappstore-settings").style.display = 'none';
             					});
                         
