@@ -4,15 +4,6 @@
     <div id="extension-candleappstore-content-container">
         <h3 id="extension-candleappstore-title">Candle App Store</h3>
         <div id="extension-candleappstore-auth-state-container"><div><span id="extension-candleappstore-check-login-button">login</span> <span id="extension-candleappstore-logout"><span id="extension-candleappstore-username"></span><span id="extension-candleappstore-logout-button">logout</span></span></div></div>
-
-        <!--
-		<div id="extension-candleappstore-countdown" class="extension-candleappstore-hidden">
-			<h2>The candleappstore will launch in <span id="extension-candleappstore-countdown-seconds">...</span> seconds.</h2>
-            <p>If this addon is somehow causing issues, you can abort it starting (and/or disable it in your <a href="/settings/addons">addons overview</a>).</p>
-			<button id="extension-candleappstore-abort-button" class="extension-candleappstore-button">Abort launch</button> <button id="extension-candleappstore-launch-button" class="extension-candleappstore-button">Launch now</button> <span id="extension-candleappstore-abort-message"></span>
-		</div>
-		-->
-		
 		<div class="extension-candleappstore-tab-buttons">
             <button id="extension-candleappstore-tab-button-installed" class="extension-candleappstore-main-tab-button extension-candleappstore-tab-selected">Installed</button>
             <button id="extension-candleappstore-tab-button-updates" class="extension-candleappstore-main-tab-button extension-candleappstore-hidden">Updates</button>
@@ -152,17 +143,11 @@
 				</div>
 			</div>
             
-            
 		</div>
         
         
         
-        
-        
-        
-        
         <div id="extension-candleappstore-settings" class="extension-candleappstore-overlay">
-            <!--<div id="extension-candleappstore-settings-close-container">X</div>-->
             <div id="extension-candleappstore-settings-close-container" class="back-button icon-button" data-l10n-id="back-button" aria-label="Back"></div>
             <div class="extension-candleappstore-centered-page">
                 <h2><span id="extension-candleappstore-settings-title"></span> settings</h2>
@@ -180,7 +165,6 @@
         
         
         <div id="extension-candleappstore-permissions" class="extension-candleappstore-popup">
-            <!--<div id="extension-candleappstore-settings-close-container">X</div>-->
             <div id="extension-candleappstore-permissions-close-container" class="back-button icon-button" data-l10n-id="back-button" aria-label="Back"></div>
             <div class="extension-candleappstore-centered-page">
                 <p><span id="extension-candleappstore-permissions-title">This app</span> would like permission to read the state of and toggle your devices. Is that ok?</p>
@@ -189,20 +173,6 @@
                 </div>
             </div>
         </div>
-        
-        <!--
-        <div id="extension-candleappstore-busy-updating" class="extension-candleappstore-popup">
-            
-            <div id="extension-candleappstore-updating-close-container" class="back-button icon-button" data-l10n-id="back-button" aria-label="Back"></div>
-            <div class="extension-candleappstore-centered-page">
-                <p>Update in progress</p>
-                <div class="extension-privacy-manager-spinner">
-                    <div></div><div></div><div></div><div></div>
-                </div>
-            </div>
-        </div>
-        -->
-        
 
         <div id="extension-candleappstore-selected" class="extension-candleappstore-overlay">
             <div id="extension-candleappstore-selected-close-container" class="back-button icon-button" data-l10n-id="back-button" aria-label="Back"></div>
@@ -237,23 +207,6 @@
                         <div id="extension-candleappstore-selected-risk" class="extension-candleappstore-selected-risk"></div>
                         
                         
-
-                        <!--
-                        <div class="extension-candleappstore-stars-rating">
-                            <input type="radio" name="extension-candleappstore-rating-5" id="extension-candleappstore-stars-rating-5" class="extension-candleappstore-star">
-                            <label for="extension-candleappstore-rating-5"></label>
-                            <input type="radio" name="extension-candleappstore-rating-5" id="extension-candleappstore-stars-rating-4" class="extension-candleappstore-star">
-                            <label for="extension-candleappstore-rating-4"></label>
-                            <input type="radio" name="extension-candleappstore-rating-5" id="extension-candleappstore-stars-rating-3" class="extension-candleappstore-star">
-                            <label for="extension-candleappstore-rating-3"></label>
-                            <input type="radio" name="extension-candleappstore-rating-5" id="extension-candleappstore-stars-rating-2" class="extension-candleappstore-star">
-                            <label for="extension-candleappstore-rating-2"></label>
-                            <input type="radio" name="extension-candleappstore-rating-5" id="extension-candleappstore-stars-rating-1" class="extension-candleappstore-star">
-                            <label for="extension-candleappstore-rating-1"></label>
-                        </div>
-                        -->
-                    
-                        
                         <a href="#" target="_blank" class="extension-candleappstore-selected-license_url extension-candleappstore-selected-license">license</a>
                         <div class="extension-candleappstore-selected-privacy"></div>
                         <a target="_blank" class="extension-candleappstore-selected-policy_url">privacy policy</a>
@@ -265,19 +218,9 @@
                             <div class="extension-candleappstore-histogram-rating">
                               <span id="extension-candleappstore-histogram-average-rating" class="extension-candleappstore-histogram-rating-num"></span>
                           
-                              <div id="extension-candleappstore-stars-container"><!-- stars here --></div>
+                              <div id="extension-candleappstore-stars-container"></div>
                           
                           
-                              <!--
-                              <div class="extension-candleappstore-histogram-rating-stars">
-                                <span><i class="extension-candleappstore-histogram-active extension-candleappstore-histogram-icon-star">☆</i></span>
-                                <span><i class="extension-candleappstore-histogram-active extension-candleappstore-histogram-icon-star">☆</i></span>
-                                <span><i class="extension-candleappstore-histogram-active extension-candleappstore-histogram-icon-star">☆</i></span>
-                                <span><i class="extension-candleappstore-histogram-active extension-candleappstore-histogram-icon-star">☆</i></span>
-                                <span><i class="extension-candleappstore-histogram-icon-star">☆</i></span>
-                              </div>
-                              -->
-                              
                               <div class="extension-candleappstore-histogram-rating-users">
                                 <i class="extension-candleappstore-histogram-icon-user"></i> <span id="extension-candleappstore-histogram-total-rating-count">0</span> reviews
                               </div>
@@ -350,20 +293,6 @@
                     
                     <div class="extension-candleappstore-two-column">
                         <div>General rating</div>
-                        <!--
-                        <div id="extension-candleappstore-stars-rating" class="extension-candleappstore-stars-rating">
-                            <input type="radio" name="extension-candleappstore-rating-1" id="extension-candleappstore-stars-rating-5" class="extension-candleappstore-star">
-                            <label for="extension-candleappstore-rating-1"></label>
-                            <input type="radio" name="extension-candleappstore-rating-2" id="extension-candleappstore-stars-rating-4" class="extension-candleappstore-star">
-                            <label for="extension-candleappstore-rating-2"></label>
-                            <input type="radio" name="extension-candleappstore-rating-3" id="extension-candleappstore-stars-rating-3" class="extension-candleappstore-star">
-                            <label for="extension-candleappstore-rating-3"></label
-                            <input type="radio" name="extension-candleappstore-rating-4" id="extension-candleappstore-stars-rating-2" class="extension-candleappstore-star">
-                            <label for="extension-candleappstore-rating-4"></label>
-                            <input type="radio" name="extension-candleappstore-rating-5" id="extension-candleappstore-stars-rating-1" class="extension-candleappstore-star">
-                            <label for="extension-candleappstore-rating-5"></label>
-                        </div>
-                        -->
                         <div>
                             <select id="extension-candleappstore-rating-select">
                                 <option value="-1" selected>Please select</option>
@@ -416,13 +345,6 @@
                         <div></div><div></div><div></div><div></div>
                     </div>
                 </div>
-                <!--
-                <div class="extension-candleappstore-versions">
-                    <p>All recent versions</p>
-                    <div class="extension-candleappstore-versions-list">
-                    </div>
-                </div>
-                -->
             </div>
             
             
@@ -432,7 +354,7 @@
                 <p>Most addons need to be provided with additional information before they will function properly.</p>
                 
                 <div id="extension-candleappstore-post-install-settings-button-container" class="extension-candleappstore-options">
-                    <!--<button id="extension-candleappstore-post-install-settings-button" class="extension-candleappstore-button">View addon settings</button>-->
+                    
                 </div>
                 
             </div>
@@ -496,12 +418,6 @@
                     <h2>Sign up</h2>
                     <p>To create an account you must verify an email address.</p>
                 
-                    <!--
-                    <div class="extension-candleappstore-auth-form-group">
-                        <label for="username">Username</label> 
-                    <input type="text" id="extension-candleappstore-signup-username" name="username" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%; cursor: auto;">    
-                    </div>
-                    -->
 
                     <div class="extension-candleappstore-auth-form-group">
                         <label for="extension-candleappstore-signup-email">Email</label> 
@@ -536,8 +452,6 @@
                         <p class="extension-candleappstore-italic">If you are an app developer, sharing your Github username will allow you to take control over how you addons are presented.</p>
                     </div>
                     
-
-
                     
                     <div class="extension-candleappstore-align-right">
                         <button id="extension-candleappstore-signup-button" class="extension-candleappstore-button">Sign up</button>

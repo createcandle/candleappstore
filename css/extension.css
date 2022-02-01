@@ -43,10 +43,6 @@
 
 
 
-.extension-candleappstore-selected-opinion,
-.extension-candleappstore-selected-details{
-    display:none;
-}
 .extension-candleappstore-selected-details:not(:empty){
     display:block;
     margin-top:2rem;
@@ -62,6 +58,11 @@
     border-radius: 0.5rem;
 }
 
+
+.extension-candleappstore-selected-opinion:empty,
+.extension-candleappstore-selected-details:empty{
+    display:none;
+}
 
 .extension-candleappstore-selected-details:not(:empty)::before{
     content:"Details";
