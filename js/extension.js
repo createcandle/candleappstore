@@ -146,10 +146,10 @@
 
         // Compares the data from the internal API with the cloud data
         check_for_updates(){
-       //console.log("in check_for_updates");
+            //console.log("in check_for_updates");
             
             if(this.cloud_app_data.length > 0 && this.api_addons_data.length > 0){
-           //console.log("- both API and Cloud data had length");
+                //console.log("- both API and Cloud data had length");
                 
                 this.addons_to_update = [];
                 
@@ -168,15 +168,15 @@
                                 const api_version_parts = this.api_addons_data[i]['version'].split(".");
                                 
                                 if(this.api_addons_data[i].id == 'candleappstore'){
-                               //console.log("\n\nFound in cloud data");
+                                    //console.log("\n\nFound in cloud data");
                                 
-                               //console.log(this.api_addons_data[i]);
-                               //console.log(this.cloud_app_data[u]);
-                               //console.log("api_version_parts: ", api_version_parts);
+                                    //console.log(this.api_addons_data[i]);
+                                    //console.log(this.cloud_app_data[u]);
+                                    //console.log("api_version_parts: ", api_version_parts);
                                     
-                               //console.log("mayor: ", parseInt(api_version_parts[0]) , parseInt(this.cloud_app_data[u]['mayor_version']));
-                               //console.log("meso: ",  parseInt(api_version_parts[1]) , parseInt(this.cloud_app_data[u]['meso_version']));
-                               //console.log("minor: ", parseInt(api_version_parts[2]) , parseInt(this.cloud_app_data[u]['minor_version']));
+                                    //console.log("mayor: ", parseInt(api_version_parts[0]) , parseInt(this.cloud_app_data[u]['mayor_version']));
+                                    //console.log("meso: ",  parseInt(api_version_parts[1]) , parseInt(this.cloud_app_data[u]['meso_version']));
+                                    //console.log("minor: ", parseInt(api_version_parts[2]) , parseInt(this.cloud_app_data[u]['minor_version']));
                                 }
                                 
                                 
@@ -414,17 +414,17 @@
             
             
 			selected_close_button.addEventListener('click', (event) => {
-           //console.log("Selected app close button clicked");
+                //console.log("Selected app close button clicked");
                 selected.style.display = 'none';
 			});
             
 			settings_close_button.addEventListener('click', (event) => {
-           //console.log("Settings close button clicked");
+                //console.log("Settings close button clicked");
                 settings.style.display = 'none';
 			});
             
 			auth_close_button.addEventListener('click', (event) => {
-           //console.log("Auth close button clicked");
+                //console.log("Auth close button clicked");
                 auth.style.display = 'none';
 			});
             
@@ -521,7 +521,7 @@
             
             
             login_button.addEventListener('click', (event) => {
-           //console.log("login button clicked");
+                //console.log("login button clicked");
                 
                 const email = document.getElementById('extension-candleappstore-login-email').value;
                 const password = document.getElementById('extension-candleappstore-login-password').value;
@@ -636,8 +636,6 @@
             signup_button.addEventListener('click', (event) => {
                 //console.log("signup button clicked");
                 
-                
-                
                 //const username = document.getElementById('extension-candleappstore-signup-username').value;
                 const email = document.getElementById('extension-candleappstore-signup-email').value;
                 const check = document.getElementById('extension-candleappstore-signup-check').value;
@@ -695,7 +693,6 @@
                 const code = document.getElementById('extension-candleappstore-verify-code').value;
                 
                 if(code != ""){
-                    
                     
                     const verify_data = {
                         'action':'verify',
@@ -1269,8 +1266,8 @@
             
             return new Promise((myResolve, myReject) =>
             {
-           //console.log("url = ", url);
-           //console.log("parameters = ", parameters);
+                //console.log("url = ", url);
+                //console.log("parameters = ", parameters);
                 
                 //console.log(this);
                 
@@ -1293,7 +1290,7 @@
                         
     				}
     				else{
-                   //console.log('get_data: returned state was not "ok"');
+                        //console.log('get_data: returned state was not "ok"');
                         myReject({});
     				}
 
@@ -1324,7 +1321,7 @@
                     return result;
     			}).catch((e) => {
     				//console.log(("get getInstalledAddons info catch (error?)");
-               //console.log(e);
+                    //console.log(e);
     				pre.innerText = e.toString();
                     myReject();
     			});
@@ -1424,10 +1421,11 @@
                 //var cloud_available = false;
                 
                 
+                
                 if(page == 'installed'){
                     data = this.api_addons_data;
                     //console.log("this.api_addons_data = ", this.api_addons_data);
-                    data.sort((a, b) => (a.id.toLowerCase() > b.id.toLowerCase()) ? 1 : -1) // sort alphabetically
+                    data.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1) // sort alphabetically
                     
                 }
                 else if(page == 'shop'){
@@ -1436,7 +1434,7 @@
                 }
                 else if(page == 'updates'){
                     data = this.api_addons_data;
-                    data.sort((a, b) => (a.id.toLowerCase() > b.id.toLowerCase()) ? 1 : -1) // sort alphabetically
+                    data.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1) // sort alphabetically
                     output_list_element = document.getElementById('extension-candleappstore-updates-list');
                 }
                 
@@ -1494,7 +1492,7 @@
                             }
                         }
                         catch(e){
-                       //console.log("Error getting api data for addon: ", e);
+                            //console.log("Error getting api data for addon: ", e);
                         
                         }
                     
@@ -1534,10 +1532,16 @@
                     
                     
                             if(info == 'name' || info == 'description'){
-                        
+                                
                                 var t = document.createElement('span');
-                                t.innerHTML = linkify(data[i][info]); // removes links from descriptions, and turns them into actual links
-                            
+                                var text = linkify(data[i][info]); // removes links from descriptions, and turns them into actual links
+                                
+                                if(info == 'name'){
+                                    text += '<span class="extension-candleappstore-basic-version">' + data[i]['version'] + '</span>';
+                                }
+                                
+                                t.innerHTML = text;
+                                
                                 const selector_name = '.extension-candleappstore-basic-' + info;
                                 var target_element = clone.querySelectorAll( selector_name )[0];
                                 target_element.appendChild(t);
@@ -1780,7 +1784,7 @@
                                     }
                                 }
                                 else{
-                               //console.log("WHOA, this installed addon had no api_data!?: " + addon_id);
+                                    //console.log("WHOA, this installed addon had no api_data!?: " + addon_id);
                                     t = document.createTextNode("error");
                                     b.appendChild(t);
                                 }
@@ -1813,7 +1817,7 @@
                 							//console.log((result);
                                             
                                             if(typeof result.enabled != 'undefined'){
-                                           //console.log('addon has been switch to: ', result.enabled);
+                                                //console.log('addon has been switch to: ', result.enabled);
                                             }
                                             
                                             //console.log("ui_extension = " + ui_extension);
@@ -1915,8 +1919,8 @@
                                 var t = document.createTextNode("Update");
                                 b.appendChild(t);
             					b.addEventListener('click', (event) => {
-                               //console.log("update button clicked");
-                               //console.log(event);
+                                    //console.log("update button clicked");
+                                    //console.log(event);
                                     event.stopImmediatePropagation();
                                     
                                     if(confirm("Are you sure you want to update this addon?")){
@@ -1966,7 +1970,9 @@
                     						}).catch((e) => {
                     							//console.log(("update addon catch (error?)");
                                                 //console.log(e);
+                                                event.target.parentNode.parentNode.parentNode.classList.remove("extension-candleappstore-busy-updating");
                     							alert("Could not update. Connection error?");
+                                                
                     						});
                                             
                                         }
@@ -2012,7 +2018,7 @@
                         
                                     //this.get_installed_addons_data();
                                     /*
-                               //console.log("calling getAddonConfig for: " + addon_id);
+                                    //console.log("calling getAddonConfig for: " + addon_id);
                                     window.API.updateAddon( event.target.getAttribute('data-addon-id') )
                                     .then((result) => { 
             							//console.log(("get addon config result: ");
@@ -2023,7 +2029,7 @@
 
             						}).catch((e) => {
             							//console.log(("get addon config catch (error?)");
-                                   //console.log(e);
+                                        //console.log(e);
             							pre.innerText = e.toString();
             						});
                                     */

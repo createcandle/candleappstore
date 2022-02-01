@@ -306,6 +306,13 @@
 .extension-candleappstore-basic-name{
     font-weight:bold;
 }
+
+.extension-candleappstore-basic-version{
+    margin-left:1rem;
+    opacity:.5;
+    font-weight:normal;
+}
+
 .extension-candleappstore-basic-description{
     margin-bottom:1rem;
 }
