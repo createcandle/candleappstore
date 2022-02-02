@@ -712,7 +712,7 @@
                             auth_response.innerText = response['ok'];
                             review_response.innerText = response['ok'];
                             auth.style.display = 'none';
-                            alert("Congratulations, you are now logged in.")
+                            alert("You are now logged in.")
                             document.getElementById('extension-candleappstore-review-response').innerText = "";
                             if(response.hasOwnProperty('username')){
                                 //username.innerText = response['username'];
@@ -1344,7 +1344,7 @@
     				//console.log((body);
                 
     				if(body['state'] == true){
-                        pre.innerText = body['message'];
+                        //pre.innerText = body['message'];
                         this.permissions = body['permissions'];
                         
                         if(typeof body['body'] == "string"){
@@ -1362,7 +1362,7 @@
     	        }).catch((e) => {
     	  			//console.log("Error getting timer items: " + e.toString());
     				//console.log(("Error: " + e);
-    				pre.innerText = "remembering permission failed - connection error?";
+    				//pre.innerText = "remembering permission failed - connection error?";
     				//return {};
                     myReject({});
     	        });	
@@ -1536,7 +1536,7 @@
                                 var t = document.createElement('span');
                                 var text = linkify(data[i][info]); // removes links from descriptions, and turns them into actual links
                                 
-                                if(info == 'name'){
+                                if(page == 'installed' && info == 'name'){
                                     text += '<span class="extension-candleappstore-basic-version">' + data[i]['version'] + '</span>';
                                 }
                                 
@@ -1968,10 +1968,10 @@
                                                 }
                                                 
                     						}).catch((e) => {
-                    							//console.log(("update addon catch (error?)");
+                    							console.log(("update addon catch (error?): ", e);
                                                 //console.log(e);
                                                 event.target.parentNode.parentNode.parentNode.classList.remove("extension-candleappstore-busy-updating");
-                    							alert("Could not update. Connection error?");
+                    							//alert("Could not update. Connection error?");
                                                 
                     						});
                                             
@@ -2427,7 +2427,7 @@
     							//console.log(("installation catch (error?)");
                            //console.log(e);
     							//pre.innerText = e.toString();
-                                alert("Error: could not install. Could not connect to the controller.");
+                                //alert("Error: could not install. Could not connect to the controller.");
                                 document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
     						});
                         });
@@ -3444,7 +3444,7 @@
     				})
                     .catch((e) => {
     					//console.log(("get addon config catch (error?): ", e);
-    					alert("Error, could not load setting, sorry.");
+    					//alert("Error, could not load setting, sorry.");
     				});
 				})
                 .catch((e) => {
