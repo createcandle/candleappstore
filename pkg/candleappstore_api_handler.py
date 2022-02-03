@@ -3,13 +3,13 @@
 import os
 import re
 import json
-import copy
+#import copy
 import time
 from time import sleep
 #import socket
-from signal import SIGHUP
+#from signal import SIGHUP
 import requests
-import subprocess
+#import subprocess
 #import threading
 
 #from .util import valid_ip, arpa_detect_gateways
@@ -82,7 +82,7 @@ class CandleappstoreAPIHandler(APIHandler):
         try:
         
             if request.method != 'POST':
-                print("- was POST request, ignoring")
+                #print("- was POST request, ignoring")
                 return APIResponse(status=404)
             
             if request.path == '/ajax':
@@ -105,8 +105,9 @@ class CandleappstoreAPIHandler(APIHandler):
                     
                     
                 elif action == 'remember_permission':
-                    print('ajax handling permission change')
-                    #print("self.persistent_data = " + str(self.persistent_data))
+                    if self.DEBUG:
+                        print('ajax handling permission change')
+                        #print("self.persistent_data = " + str(self.persistent_data))
                     
                     state = False
                     message = "Error saving permission"
@@ -135,7 +136,7 @@ class CandleappstoreAPIHandler(APIHandler):
                     
                 
                 elif action == 'get_json':
-                    print('ajax handling get_json')
+                    #print('ajax handling get_json')
                     
                     json_data = '{"error":"response code was not 200"}'
                     try:
@@ -150,8 +151,8 @@ class CandleappstoreAPIHandler(APIHandler):
                             else:
                                 response = self.session.get(url)
                         
-                            print("response = " + str(response))
-                            print("response = " + str(response.text))
+                            #print("response = " + str(response))
+                            #print("response = " + str(response.text))
                             if response.status_code == 200:
                                 response.encoding = 'utf-8'
                                 json_data = response.text #json.loads(response.text)
@@ -190,9 +191,6 @@ class CandleappstoreAPIHandler(APIHandler):
             print("Error while filtering out privacy sensitive data: " + str(ex))
             return {"error":"Error while doing privacy filtering"}
         
-        # TODO DEBUG TEMPORARY
-        return self.adapter.persistent_data['animals']
-        #return new_animals
         
         
         

@@ -1968,7 +1968,7 @@
                                                 }
                                                 
                     						}).catch((e) => {
-                    							console.log(("update addon catch (error?): ", e);
+                    							console.log("update addon catch (error?): ", e);
                                                 //console.log(e);
                                                 event.target.parentNode.parentNode.parentNode.classList.remove("extension-candleappstore-busy-updating");
                     							//alert("Could not update. Connection error?");
