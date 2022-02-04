@@ -1677,6 +1677,13 @@
 }
 
 
+/* hide the remove button from the system addons list */
+
+#addon-settings .addon-settings-remove{
+    display:none;
+}
+
+
 @media screen and (max-width: 640px) {
 
     #extension-candleappstore-selected .extension-candleappstore-two-column{
