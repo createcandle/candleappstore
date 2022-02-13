@@ -89,6 +89,7 @@ class CandleappstoreAdapter(Adapter):
         #self.audio_controls = get_audio_controls()
         #print("audio controls: " + str(self.audio_controls))
 
+        self.developer = False
         self.running = True
         self.app_store_url = 'https://www.candlesmarthome.com/appstore/'
         
@@ -234,8 +235,15 @@ class CandleappstoreAdapter(Adapter):
             self.DEBUG = bool(config['Debugging'])
             if self.DEBUG:
                 print("Debugging enabled")        
+
+
+        if 'Show developer options' in config:
+            if self.DEBUG:
+                print("-Developer preference was in config: " + str(config['Show developer options']))
+            self.developer = bool(config['Show developer options'])  
         
         
+        # Currently not used anymore. Settings are now stored in persistence.json where possible.
         try:
             # Store the settings that were changed by the add-on.
             if store_updated_settings:

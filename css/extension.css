@@ -522,7 +522,9 @@
 .extension-candleappstore-hidden-setting{
     display:none;
 }
-
+.developer .extension-candleappstore-hidden-setting{
+    display:block;
+}
 
 
 /*  PERMISSIONS POPUP  */
@@ -1615,6 +1617,20 @@
 .extension-candleappstore-selected-install-button{
     margin-left:auto;
 }
+
+
+
+
+
+/*  hide developer options  */
+
+#update-settings-link,
+#authorization-settings-link,
+#experiment-settings-link,
+#developer-settings-link{
+    display:none;
+}
+
 
 
 
