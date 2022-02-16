@@ -196,7 +196,7 @@
                                 //console.log("local and cloud version ints : ", local_version_int, cloud_version_int);
                                 
                                 if( cloud_version_int > local_version_int){
-                               //console.log("an update is available for: " + this.api_addons_data[i].id);
+                                    //console.log("an update is available for: " + this.api_addons_data[i].id);
                                     this.addons_to_update.push(this.api_addons_data[i].id);
                                 }
                                 
@@ -232,7 +232,7 @@
                         
                     }
                     catch(e){
-                   //console.log("error looping over cloud data for find updates: ", e);
+                        console.log("error looping over cloud data for find updates: ", e);
                     }
                 
                 }
@@ -250,7 +250,7 @@
                 
             }
             else{
-           //console.log('- check for updates: one of the two data sources is empty');
+                //console.log('- check for updates: one of the two data sources is empty');
             }
             
             
@@ -404,7 +404,7 @@
                 this.extensions = result;
                 this.extensions_list = Object.keys(result);
 			}).catch((e) => {
-				//console.log("getExtensions catch (error?)");
+				console.log("getExtensions catch (error?): ", e);
                 //console.log(e);
 			});
             
@@ -523,7 +523,7 @@
                     }
                 })
                 .catch((e) => {
-					//console.log("candleappstore: error while test");
+					console.log("candleappstore: error while testing logged in state: ", e);
 					//pre.innerText = e.toString();
 				});
             });
@@ -1378,7 +1378,7 @@
                     
     					keys.forEach((info, index) => {
                             //console.log(info);
-                    
+                            
                     
                             if(info == 'name' || info == 'description'){
                                 
@@ -1695,8 +1695,8 @@
                                                     }
                                                 });
                                                 
-                                                if(spotted_in_menu == false){
-                                                    var really = confirm("The app will show up in the menu after you reload this page. Would you like to reload now?");
+                                                if(spotted_in_menu == false && addon_name_css != 'candle-theme'){
+                                                    var really = confirm("The app will show up in the main menu after you reload this page. Would you like to reload now?");
                                                     if (really) {
                                                         window.location.reload();
                                                     }
@@ -1976,8 +1976,6 @@
             const selected = document.getElementById('extension-candleappstore-selected');
             selected.style.display = 'none';
             
-            
-            
             document.getElementById('extension-candleappstore-filter-search-input').value = ''; // clear the search term, if there was one
             
             const url = "get_app.php?addon_id=" + addon_id
@@ -1989,10 +1987,8 @@
     				console.log("show_selected_app: GET APP response: ");
     				console.log(data);
                 }
-
                 
                 //this.show_selected_app(data_addon_id, response, target.getAttribute('data-installed') ); // data, and whether it is installed already
-                
                 
                 try{
                     //console.log("in show_selected_app");
@@ -2746,6 +2742,7 @@
                 advanced_form_container.style.display = "none";
                 
                 
+                
                 // Show settings overlay
                 const settings_container = document.getElementById('extension-candleappstore-settings');
                 settings_container.style.display = 'block';
@@ -2767,7 +2764,7 @@
     					//console.log(data);
                         //console.log(data['body']);
                 
-                        var spotted_advanced_setting = false;
+                        //var spotted_advanced_setting = false;
             
 
                         settings_container.classList.remove("extension-candleappstore-busy");
@@ -3024,6 +3021,10 @@
                                         d.classList.add('extension-candleappstore-hidden-setting'); 
                                     }
                         
+                                    if(info.toLowerCase() == 'background color' && this.developer == false){
+                                        input_type = 'color';
+                                    }
+                        
                                     s.type = input_type;
                         
                                     if(data[info] != undefined){
@@ -3222,7 +3223,7 @@
                     
                             }
                             catch(e){
-                                //console.log("Error popularing selected: " + e);
+                                console.log("Error populating selected: " + e);
                             }
                             
 
@@ -3232,9 +3233,11 @@
                             //console.log("is_required = " + is_required);
                             // split new settings items between normal and advanced area
                             if( advanced && !is_required){
-                                spotted_advanced_setting = true;
+                                //spotted_advanced_setting = true;
                                 advanced_form.appendChild(d);
-                                advanced_form_container.style.display = "block";
+                                if(!info.toLowerCase().startsWith('debug') || this.developer == true){
+                                    advanced_form_container.style.display = "block";
+                                }
                             }
                             else{
                                 form.appendChild(d);
@@ -3264,11 +3267,11 @@
                                 //console.log("EXTRACTING SETTING ITEM: " + info);
                     
                                 const css_element_id = 'extension-candleappstore-settings-setting-' + this.makeSafeForCSS(info);
-                           //console.log("target element id: --" + css_element_id + '--');
+                                //console.log("target element id: --" + css_element_id + '--');
                                 var target_element = document.getElementById( css_element_id );
                         
-                           //console.log("setting extraction target element:");
-                           //console.log(target_element);
+                                //console.log("setting extraction target element:");
+                                //console.log(target_element);
                         
                                 try{
                                     //if( typeof info == "boolean" ){
@@ -3288,19 +3291,19 @@
 
                                     }
                            
-                               //console.log("new_data[info] = " + new_data[info]);
+                                    //console.log("new_data[info] = " + new_data[info]);
                     
                                 }
                                 catch(e){
-                               //console.log("Error extracting setting value: " + e);
+                                    console.log("Error extracting setting value: " + e);
                                 }
                     
                             });
                     
                             if(missing_value == false){
                         
-                           //console.log("WILLL SAVE NEW ADDONS SETTINGS:");
-                           //console.log(new_data);
+                                //console.log("WILLL SAVE NEW ADDONS SETTINGS:");
+                                //console.log(new_data);
                         
                                 settings_container.classList.add("extension-candleappstore-busy");
                         
@@ -3313,7 +3316,7 @@
                         
             					}).catch((e) => {
             						//console.log("uninstallation catch (error?)");
-                               //console.log(e);
+                                    //console.log(e);
             						//pre.innerText = e.toString();
                                     document.getElementById("extension-candleappstore-settings").style.display = 'none';
             					});
@@ -3333,12 +3336,12 @@
             
     				})
                     .catch((e) => {
-    					//console.log("get addon config catch (error?): ", e);
+    					console.log("get addon config catch (error?): ", e);
     					//alert("Error, could not load setting, sorry.");
     				});
 				})
                 .catch((e) => {
-					//console.log("get addons overview error: ", e);
+					console.log("get addons overview error: ", e);
 				});
                 
                 
@@ -3348,7 +3351,7 @@
                 
             }
             catch(e){
-           //console.log("Error in show_addon_config: " + e);
+                console.log("Error in show_addon_config: " + e);
             }
             
         }

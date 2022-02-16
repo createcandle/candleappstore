@@ -525,6 +525,20 @@
 .developer .extension-candleappstore-hidden-setting{
     display:block;
 }
+.developer .extension-candleappstore-flex.extension-candleappstore-hidden-setting{
+    display:flex;
+}
+
+
+
+/*   color input  */
+.extension-candleappstore-settings-item input[type='color']{
+    width: 6rem;
+    height: 6rem;
+    margin: 0 1rem 0 4rem;
+    float: right;
+}
+
 
 
 /*  PERMISSIONS POPUP  */
