@@ -1864,6 +1864,9 @@
                                     //console.log(event);
                                     event.stopImmediatePropagation();
                                     
+                                    document.getElementById('extension-candleappstore-update-all-button').style.display = 'none';
+                                    
+                                    
                                     const this_addon_id = event.target.getAttribute('data-addon-id');
                                 
                                     //console.log("clicked on update button for: ", addon_id );
@@ -1908,6 +1911,9 @@
                                                 document.getElementById('extension-candleappstore-updates-list').innerHTML = "All your addons are up to date";
                                                 document.getElementById('extension-candleappstore-update-all-button').style.display = 'none';
                                             }
+                                            
+                                            document.getElementById('extension-candleappstore-update-all-button').style.display = 'block';
+                                            
                                             
                 						}).catch((e) => {
                 							console.log("update addon catch (error?): ", e);
@@ -3261,6 +3267,8 @@
                                         var permission_div = document.createElement("div");
                                         permission_div.appendChild(left);
                                         permission_div.appendChild(xs);
+                                        
+                                        permission_div.classList.add('extension-candleappstore-required-setting');
                                         permission_div.classList.add('extension-candleappstore-settings-item');
                                         permission_div.classList.add("extension-candleappstore-flex");
                                         permission_div.classList.add('extension-candleappstore-settings-permission-setting');
@@ -3362,7 +3370,7 @@
                                         var value = target_element.value;
                                 
                                         if( target_element.required && value == "" ){
-                                       //console.log("required value was not filled");
+                                            //console.log("required value was not filled");
                                             missing_value = true;
                                             target_element.classList.add("extension-candleappstore-settings-empty-warning"); 
                                         }
