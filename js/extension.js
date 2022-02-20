@@ -1268,7 +1268,7 @@
                 const random_addon_id_index = Math.floor(Math.random() * this.addons_to_update.length);
                 console.log('random_addon_id_index: ', random_addon_id_index);
                 const cloud_addon_data = this.get_cloud_addon_data(this.addons_to_update[random_addon_id_index]);
-                if(addon_data != null){
+                if(cloud_addon_data != null){
                     window.API.updateAddon( cloud_addon_data.addon_id, cloud_addon_data.download_url, cloud_addon_data.checksum )
                     .then((result) => {
                         console.log('update_all: addon updated succesfully: ', cloud_addon_data.addon_id);
