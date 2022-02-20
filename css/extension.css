@@ -585,7 +585,10 @@
 
 /*  BUTTONS  */
 
-#extension-candleappstore-update-all-button{ display:none}
+#extension-candleappstore-update-all-button{ 
+    margin: 2rem 0 2rem auto;
+    display:none
+}
 
 .extension-candleappstore-button{
     cursor:pointer;
@@ -823,6 +826,10 @@
 }
 
 
+.extension-candleappstore-busy-updating-all .extension-candleappstore-selected-update-button{
+    display:none;
+}
+
 .extension-candleappstore-busy-updating-all .extension-candleappstore-item,
 .extension-candleappstore-busy-updating{
     opacity:.3;
@@ -846,7 +853,9 @@
 
 
 
-
+#extension-candleappstore-bottom-button-container{
+    margin:2rem 0;
+}
 
 #extension-candleappstore-tabs-container > div{
 	/*display:none;*/

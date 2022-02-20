@@ -1254,7 +1254,7 @@
         update_all(){
             if(this.updating_all == false){
                 this.updating_all = true;
-                document.getElementById('extension-candleappstore-updates-list').classList.add("extension-candleappstore-busy-updating-all");
+                document.body.classList.add("extension-candleappstore-busy-updating-all");
                 document.getElementById('extension-candleappstore-update-all-button').style.display = 'none'; // superfluous, button already hides itself.
                 this.update_loop();
             }
@@ -1278,11 +1278,15 @@
                             document.getElementById('extension-candleappstore-tab-button-updates').classList.remove('extension-candleappstore-tab-button-updates-available');
                             document.getElementById('extension-candleappstore-updates-list').innerHTML = "All your addons are up to date";
                             document.getElementById('extension-candleappstore-update-all-button').style.display = 'none';
-                            document.getElementById('extension-candleappstore-updates-list').classList.remove("extension-candleappstore-busy-updating-all");
-                            this.updating_all = false
+                            document.body.classList.remove("extension-candleappstore-busy-updating-all");
+                            this.updating_all = false;
+                            if(confirm("Your addons have been updated. In order to see the latest versions you will need to reload this page. Would you like to do that now?")){
+                                window.location.reload(true); 
+                            }
                         }
                         else{
                             console.log('on to the next addon.');
+                            this.generate_overview('updates');
                             this.update_loop();
                         }
                 
@@ -1292,7 +1296,7 @@
                         
         				//alert("Could not update. Connection error?");
                         document.getElementById('extension-candleappstore-updates-list').innerHTML = "A connection error occured while updating all addons";
-                        document.getElementById('extension-candleappstore-updates-list').classList.remove("extension-candleappstore-busy-updating-all");
+                        document.body.classList.remove("extension-candleappstore-busy-updating-all");
                         document.getElementById('extension-candleappstore-update-all-button').style.display = 'block';
                         this.updating_all = false
                 
