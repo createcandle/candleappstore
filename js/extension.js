@@ -24,6 +24,7 @@
             this.username = "";
             this.permissions = {};
             this.received_cloud_data = false;
+            this.updating_all = false;
             
 			fetch(`/extensions/${this.id}/views/content.html`)
 	        .then((res) => res.text())
@@ -36,6 +37,10 @@
 	        })
 	        .catch((e) => console.error('Failed to fetch content:', e));
             
+            
+            
+            //document.getElementById('installed-addons-list').style.display = 'none';
+            document.getElementById('addon-main-settings').innerHTML += '<div id="extension-candleappstore-addons-page-redirect"><a href="/extensions/candleappstore" class="text-button">Return to Candle app store</a></div>';
             
             
             //console.log("local storage JWT: ", localStorage.getItem('jwt'));
@@ -161,7 +166,8 @@
             if(this.cloud_app_data.length > 0 && this.api_addons_data.length > 0){
                 //console.log("- both API and Cloud data had length");
                 
-                this.addons_to_update = [];
+                this.addons_to_update = []; // Holds only addon_id strings
+                this.addons_to_update_full = []; // holds complete dictionaries
                 
                 for(let i = 0; i < this.api_addons_data.length; i++){
                     //console.log("generating. item data: ", data[i]);
@@ -198,6 +204,7 @@
                                 if( cloud_version_int > local_version_int){
                                     //console.log("an update is available for: " + this.api_addons_data[i].id);
                                     this.addons_to_update.push(this.api_addons_data[i].id);
+                                    this.addons_to_update_full.push({'addon_id':this.api_addons_data[i].id,'url':this.api_addons_data[i].url})
                                 }
                                 
                                 
@@ -240,6 +247,7 @@
                 if(this.addons_to_update.length > 0){
                     //console.log("addons with updates: ", this.addons_to_update);
                     document.getElementById('extension-candleappstore-tab-button-updates').classList.add('extension-candleappstore-tab-button-updates-available');
+                    document.getElementById('extension-candleappstore-update-all-button').style.display = 'block';
                     this.generate_overview('updates');
                 }
                 else{
@@ -743,6 +751,18 @@
                 
 			});
             
+            
+            
+            // Update all button
+            document.getElementById("extension-candleappstore-update-all-button").addEventListener('click', (event) => {
+                console.log("update all button clicked");
+                this.update_all();
+                
+            });
+            
+            
+            
+            
             // SHOW REVIEW CONTAINER
             document.getElementById("extension-candleappstore-show-review-button").addEventListener('click', (event) => {
                 //console.log("show review container button clicked");
@@ -771,7 +791,7 @@
                         login_form.style.display = 'none';
                     }
                     else if(response.hasOwnProperty('error')){   
-                   //console.log(response['error']);
+                        //console.log(response['error']);
                     }
                     
                 });
@@ -1012,7 +1032,7 @@
                 
                 this.get_installed_addons_data()
                 .then((result) => { 
-               //console.log("in get_installed_addons_data.then");
+                    //console.log("in get_installed_addons_data.then");
                     this.generate_overview('installed');
     			}).catch((e) => {
     				//console.log("get_installed_addons_data catch (error?):", e);
@@ -1031,8 +1051,8 @@
                     //console.log("asking for data from the cloud");
                     // Get data for apps overview
                     this.get_data("get_apps.php").then(response => {
-                        console.log(" GET ALL APPS from CLOUD response:");
-                        console.log(response);
+                        //console.log(" GET ALL APPS from CLOUD response:");
+                        //console.log(response);
                 
                         //const parsed = JSON.parse(response);
                         //console.log(parsed);
@@ -1074,7 +1094,7 @@
                         
                     })
                     .catch((e) => {
-        				//console.log("candleappstore: could not get data for apps overview");
+        				console.log("candleappstore: error getting data for apps overview: ", e);
         				//pre.innerText = "Could not get latest apps data! " + e.toString();
         			});
                 }
@@ -1221,12 +1241,65 @@
         
         
         
+        
+        
+        
+        
+        
+        
+        //
+        //  UPDATE ALL
+        //
+        
+        update_all(){
+            if(this.updating_all == false){
+                this.updating_all = true;
+                document.getElementById('extension-candleappstore-updates-list').classList.add("extension-candleappstore-busy-updating-all");
+                document.getElementById('extension-candleappstore-update-all-button').style.display = 'none'; // superfluous, button already hides itself.
+                this.update_loop();
+            }
+        }
     
     
-    
-    
-    
-    
+        update_loop(){
+            console.log("in update_loop");
+            if(this.addons_to_update.length > 0 ){
+                
+                const random_addon_id_index = Math.floor(Math.random() * this.addons_to_update.length);
+                console.log('random_addon_id_index: ', random_addon_id_index);
+                const cloud_addon_data = this.get_cloud_addon_data(this.addons_to_update[random_addon_id_index]);
+                if(addon_data != null){
+                    window.API.updateAddon( cloud_addon_data.addon_id, cloud_addon_data.download_url, cloud_addon_data.checksum )
+                    .then((result) => {
+                        console.log('update_all: addon updated succesfully: ', cloud_addon_data.addon_id);
+                        this.addons_to_update = this.addons_to_update.filter(e => e !== cloud_addon_data.addon_id);
+                
+                        if(this.addons_to_update.length == 0 ){
+                            document.getElementById('extension-candleappstore-tab-button-updates').classList.remove('extension-candleappstore-tab-button-updates-available');
+                            document.getElementById('extension-candleappstore-updates-list').innerHTML = "All your addons are up to date";
+                            document.getElementById('extension-candleappstore-update-all-button').style.display = 'none';
+                            document.getElementById('extension-candleappstore-updates-list').classList.remove("extension-candleappstore-busy-updating-all");
+                            this.updating_all = false
+                        }
+                        else{
+                            console.log('on to the next addon.');
+                            this.update_loop();
+                        }
+                
+        			}).catch((e) => {
+        				console.log("update addons loop catch (error?): ", e);
+                        //console.log(e);
+                        
+        				//alert("Could not update. Connection error?");
+                        document.getElementById('extension-candleappstore-updates-list').innerHTML = "A connection error occured while updating all addons";
+                        document.getElementById('extension-candleappstore-updates-list').classList.remove("extension-candleappstore-busy-updating-all");
+                        document.getElementById('extension-candleappstore-update-all-button').style.display = 'block';
+                        this.updating_all = false
+                
+        			});
+                }
+            }
+        }
     
     
     
@@ -1828,6 +1901,8 @@
                                             
                                             if(this.addons_to_update.length == 0 ){
                                                 document.getElementById('extension-candleappstore-tab-button-updates').classList.remove('extension-candleappstore-tab-button-updates-available');
+                                                document.getElementById('extension-candleappstore-updates-list').innerHTML = "All your addons are up to date";
+                                                document.getElementById('extension-candleappstore-update-all-button').style.display = 'none';
                                             }
                                             
                 						}).catch((e) => {
@@ -2007,8 +2082,6 @@
                     document.getElementById("extension-candleappstore-selected-post-install").style.display = 'none';
                 
                     document.getElementById("extension-candleappstore-review-response").innerText = "";
-                    document.getElementById('extension-candleappstore-review-tip').style.display = 'block';
-
 
                     document.getElementById("extension-candleappstore-review-container").style.display = "none";
                     document.getElementById('extension-candleappstore-review-complete').style.display = "none";
@@ -2027,8 +2100,10 @@
                     
                     //console.log("this.installed: ", this.installed);
                     var installed = false;
+                    document.getElementById('extension-candleappstore-review-tip').style.display = 'none';
                     if(this.installed.indexOf(addon_id) != -1){
                         installed = true;
+                        document.getElementById('extension-candleappstore-review-tip').style.display = 'block';
                     }
                     
                     //console.log("installed: " + installed);
@@ -3343,9 +3418,6 @@
                 .catch((e) => {
 					console.log("get addons overview error: ", e);
 				});
-                
-                
-                
                 
                 
                 

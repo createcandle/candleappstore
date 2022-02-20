@@ -309,13 +309,16 @@
 
 .extension-candleappstore-basic-name{
     font-weight:bold;
-    margin-bottom:.3rem;
+    margin-bottom:.5rem;
+    font-size:2.6rem;
+    opacity:.9;
 }
 
 .extension-candleappstore-basic-version{
     margin-left:1rem;
     opacity:.5;
     font-weight:normal;
+    font-size:1.6rem;
 }
 
 
@@ -538,7 +541,9 @@
     margin: 0 1rem 0 4rem;
     float: right;
 }
-
+.extension-candleappstore-settings-item input[type='color'] + p{
+    margin-right:10rem;
+}
 
 
 /*  PERMISSIONS POPUP  */
@@ -579,6 +584,8 @@
 
 
 /*  BUTTONS  */
+
+#extension-candleappstore-update-all-button{ display:none}
 
 .extension-candleappstore-button{
     cursor:pointer;
@@ -742,6 +749,10 @@
 /*  TABS  */
 
 
+.extension-candleappstore-tab{
+    margin-bottom:40rem;
+}
+
 
 .extension-candleappstore-tab-buttons{
     display:flex;
@@ -782,6 +793,10 @@
 
 
 
+
+
+
+
 /*  UPDATES  */
 
 .extension-candleappstore-tab-button-updates-available::after{
@@ -808,6 +823,7 @@
 }
 
 
+.extension-candleappstore-busy-updating-all .extension-candleappstore-item,
 .extension-candleappstore-busy-updating{
     opacity:.3;
     /*background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.8));*/
@@ -1638,14 +1654,42 @@
 
 /*  hide developer options  */
 
+#addon-settings-link,
 #update-settings-link,
 #authorization-settings-link,
 #experiment-settings-link,
-#developer-settings-link{
+#developer-settings-link,
+#discover-addons-button,
+#installed-addons-list{
     display:none;
 }
 
+.developer #addon-settings-link,
+.developer #update-settings-link,
+.developer #authorization-settings-link,
+.developer #experiment-settings-link,
+.developer #developer-settings-link,
+.developer #discover-addons-button,
+.developer #installed-addons-list{
+    display:block;
+}
 
+
+
+/*  App store redirect on addons page  */
+
+#extension-candleappstore-addons-page-redirect{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#extension-candleappstore-addons-page-redirect > a{
+    font-size:1.6rem;
+    padding: 1rem 2rem;
+    text-decoration:none;
+    margin:6rem
+}
 
 
 /*  spinner  */
