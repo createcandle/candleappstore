@@ -913,7 +913,6 @@
 				{'action':'init'}
 			)
             .then((body) => {
-                console.log('appstore init response: ', body);
                 
                 // Debug?
                 if(typeof body.debug != 'undefined'){
@@ -1710,7 +1709,12 @@
                                             if(event.target.dataset.extension == false){
                                                 //console.log("false as boolean");
                                             }
-                                    
+                                            
+                                            if(result['enabled']){
+                                                window.location.reload(true); 
+                                            }
+                                            
+                                            /*
                                             if(result['enabled'] && event.target.dataset.extension == "true"){
                                                 //console.log('Checking if the addon is already in the main menu');
                                                 // Check if the addon is already in the main menu
@@ -1733,8 +1737,10 @@
                                                         window.location.reload();
                                                     }
                                                 }
-
                                             }
+                                            */
+                                            
+                                            
                                             //setTimeout(() =>{
                                                 //this.generate_overview('installed');
                                             //},1000);
@@ -1744,7 +1750,7 @@
                                                 //console.log("in get_installed_addons_data.then");
                                                 this.generate_overview('installed');
                                 			}).catch((e) => {
-                                				//console.log("init: get_installed_addons_data catch (error?):", e);
+                                				console.log("init: get_installed_addons_data catch (error?):", e);
                                 			});
                                             
                                 
@@ -1869,8 +1875,6 @@
                                             else{
                                                 document.getElementById('extension-candleappstore-update-all-button').style.display = 'block';
                                             }
-                                            //
-                                            
                                             
                 						}).catch((e) => {
                 							console.log("update addon catch (error?): ", e);

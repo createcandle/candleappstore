@@ -587,8 +587,13 @@
 
 #extension-candleappstore-update-all-button{ 
     margin: 2rem 0 2rem auto;
-    display:none
+    display:none;
 }
+
+.extension-candleappstore-updates-available #extension-candleappstore-update-all-button{ 
+    display:block;
+}
+
 
 .extension-candleappstore-button{
     cursor:pointer;
