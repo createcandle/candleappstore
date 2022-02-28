@@ -21,7 +21,7 @@
   },
   "homepage_url": "https://www.candlesmarthome.com/app_store",
   "id": "candleappstore",
-  "license": "MPL-2.0",
+  "license": "None",
   "manifest_version": 1,
   "name": "Candle App Store",
   "options": {
@@ -52,7 +52,7 @@
     }
   },
   "short_name": "candleapps",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "web_accessible_resources": [
     "css/*.css",
     "images/*.svg",

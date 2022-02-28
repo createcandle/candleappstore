@@ -1693,13 +1693,13 @@
     display:none;
 }
 
-.developer #addon-settings-link,
-.developer #update-settings-link,
-.developer #authorization-settings-link,
-.developer #experiment-settings-link,
-.developer #developer-settings-link,
-.developer #discover-addons-button,
-.developer #installed-addons-list{
+.developer #addon-settings-link:not(.hidden),
+.developer #update-settings-link:not(.hidden),
+.developer #authorization-settings-link:not(.hidden),
+.developer #experiment-settings-link:not(.hidden),
+.developer #developer-settings-link:not(.hidden),
+.developer #discover-addons-button:not(.hidden),
+.developer #installed-addons-list:not(.hidden){
     display:block;
 }
 
