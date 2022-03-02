@@ -1,4 +1,4 @@
-"""Candle app store adapter for WebThings Gateway."""
+"""Candle app store adapter for Candle controller."""
 
 from os import path
 import functools
