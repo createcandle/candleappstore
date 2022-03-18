@@ -763,7 +763,7 @@
 
 
 .extension-candleappstore-tab{
-    margin-bottom:40rem;
+    margin-bottom:50vh;
 }
 
 
@@ -1012,7 +1012,6 @@
 
 #extension-candleappstore-filter-container{
     flex-wrap:wrap;
-    padding:1rem;
     margin:2rem 0;
     justify-content:flex-end;
     gap:4rem;
@@ -1163,6 +1162,9 @@
 }
 
 
+#extension-candleappstore-list .extension-candleappstore-item:first-of-type .extension-candleappstore-basic-name{
+    font-size:4.5rem;
+}
 
 
 
@@ -1723,9 +1725,20 @@
 
 /*  spinner  */
 
+#extension-candleappstore-busy-loading-app{
+    width:100%;
+    text-align:center;
+    display:flex;
+    min-height:100%;
+    height:80vh;
+    align-items:center;
+    justify-content:center;
+}
 
-.extension-candleappstore-spinner {
-  display: inline-block;
+
+
+.extension-candleappstore-spinner{
+  display: block;
   position: relative;
   width: 80px;
   height: 80px;
@@ -1933,3 +1946,14 @@
 }
 
 
+@media screen and (min-width: 1225px) {
+    #extension-candleappstore-list .extension-candleappstore-item:first-of-type{
+        background-image: url(../images/background3.png)!important;
+    }
+}
+
+@media screen and (min-width: 1525px) {
+    #extension-candleappstore-list .extension-candleappstore-item:first-of-type{
+        background-image: url(../images/background4.png)!important;
+    }
+}

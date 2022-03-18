@@ -100,7 +100,7 @@ class CandleappstoreAPIHandler(APIHandler):
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state' : True, 'message' : 'initialisation complete', 'addons': self.adapter.persistent_data['addons'], 'app_store_url':self.adapter.app_store_url, 'installed': installed_addons, 'permissions': self.adapter.persistent_data['permissions'], 'developer':self.adapter.developer, 'debug':self.adapter.DEBUG}),
+                      content=json.dumps({'state' : True, 'message' : 'initialisation complete', 'addons': self.adapter.persistent_data['addons'], 'app_store_url':self.adapter.app_store_url, 'installed':installed_addons, 'permissions':self.adapter.persistent_data['permissions'], 'developer':self.adapter.developer, 'disable_uninstall':self.adapter.disable_uninstall, 'debug':self.adapter.DEBUG}),
                     )
                     
                     

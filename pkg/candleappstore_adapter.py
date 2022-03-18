@@ -93,6 +93,10 @@ class CandleappstoreAdapter(Adapter):
         self.running = True
         self.app_store_url = 'https://www.candlesmarthome.com/appstore/'
         
+        self.disable_uninstall = False
+        if os.path.isfile('/boot/disable_uninstall.txt'):
+            self.disable_uninstall = True
+        
         print("os.uname() = " + str(os.uname()))
 
         # Some paths

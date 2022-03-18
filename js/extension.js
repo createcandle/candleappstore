@@ -25,6 +25,7 @@
             this.permissions = {};
             this.received_cloud_data = false;
             this.updating_all = false;
+            this.disable_uninstall = false;
             
 			fetch(`/extensions/${this.id}/views/content.html`)
 	        .then((res) => res.text())
@@ -89,6 +90,14 @@
                     }
                     this.developer = body.developer;
                 }
+                
+                if(typeof body.disable_uninstall != 'undefined'){
+                    if(body.disable_uninstall){
+                        this.disable_uninstall = true;
+                    }
+                }
+                
+                
     
 			})
             .catch((e) => {
@@ -1222,9 +1231,12 @@
                             document.getElementById('extension-candleappstore-update-all-button').style.display = 'none';
                             document.body.classList.remove("extension-candleappstore-busy-updating-all");
                             this.updating_all = false;
-                            if(confirm("Your addons have been updated. In order to see the latest versions you will need to reload this page. Would you like to do that now?")){
-                                window.location.reload(true); 
-                            }
+                            
+                            //if(confirm("Your addons have been updated. In order to see the latest versions you will need to reload this page. Would you like to do that now?")){
+                                setTimeout(function(){
+                                    window.location.reload(true); // harsh, but no UI's without backends this way.
+                                }, 2000);
+                            //}
                         }
                         else{
                             console.log('on to the next addon.');
@@ -1710,9 +1722,13 @@
                                                 //console.log("false as boolean");
                                             }
                                             
-                                            if(result['enabled']){
-                                                window.location.reload(true); 
-                                            }
+                                            //if(result['enabled']){
+                                                setTimeout(function(){
+                                                    window.location.reload(true); // harsh, but no UI's without backends this way.
+                                                }, 2000);
+                                                
+                                            //}
+                                            
                                             
                                             /*
                                             if(result['enabled'] && event.target.dataset.extension == "true"){
@@ -2021,7 +2037,14 @@
             //console.log('show_selected_app');
             
             const selected = document.getElementById('extension-candleappstore-selected');
-            selected.style.display = 'none';
+            
+            
+            document.getElementById('extension-candleappstore-selected-main').style.display = 'none';
+            document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+            document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'none';
+            document.getElementById('extension-candleappstore-busy-loading-app').style.display = 'flex';
+            
+            selected.style.display = 'block';
             
             document.getElementById('extension-candleappstore-filter-search-input').value = ''; // clear the search term, if there was one
             
@@ -2038,6 +2061,8 @@
                 //this.show_selected_app(data_addon_id, response, target.getAttribute('data-installed') ); // data, and whether it is installed already
                 
                 try{
+                    
+                    document.getElementById('extension-candleappstore-busy-loading-app').style.display = 'none';
                     //console.log("in show_selected_app");
                     //console.log(data);
                 
@@ -2048,7 +2073,7 @@
                     selected.style.display = 'block';
                
                     document.getElementById('extension-candleappstore-screenshots').innerHTML = "";
-                    document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+                    
                 
                     document.getElementById("extension-candleappstore-selected-main").style.display = 'block';
                     document.getElementById("extension-candleappstore-selected-post-install").style.display = 'none';
@@ -2058,6 +2083,7 @@
                     document.getElementById("extension-candleappstore-review-container").style.display = "none";
                     document.getElementById('extension-candleappstore-review-complete').style.display = "none";
                     
+                    document.getElementById('extension-candleappstore-selected-main').style.display = 'block';
                     
                 
                     if(typeof data.error != 'undefined'){
@@ -2290,7 +2316,11 @@
                             //console.log(event);
                             event.stopImmediatePropagation();
                             event.target.style.display = 'none';
+                            
+                            //selected.style.display = 'none';
+                            
                             document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
+                            document.getElementById('extension-candleappstore-selected-main').style.display = 'none';
                             //console.log( "installing addon. parameters: ", data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] );
                         
                             window.API.installAddon( data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] )
@@ -2325,7 +2355,9 @@
                                     if(data['versions'][v]["has_ui"] == "1"){
                                         // TODO: ask the user if they want to check it out first?
                                         if(data['versions'][v]["addon_id"] == 'candle-theme'){
-                                            window.location.reload(true);
+                                            setTimeout(function(){
+                                                window.location.reload(true); // harsh, but no UI's without backends this way.
+                                            }, 2000);
                                         }
                                         else{
                                             console.log("this addon has a UI, so switching to that.");
@@ -2370,9 +2402,7 @@
                 
                     else if( installed && data['versions'][v]["addon_id"] != undefined ){
                     
-                        if(data['versions'][v]["addon_id"] != 'candleappstore'){
-                            
-                            
+                        if(data['versions'][v]["addon_id"] != 'candleappstore' && this.disable_uninstall == false){
                             
                             var b = document.createElement("button");
                             b.classList.add('extension-candleappstore-selected-uninstall-button');
@@ -2397,7 +2427,9 @@
                         
                                 var really = confirm("Are you sure you want to uninstall this addon?");
                                 if (really) {
-                                    document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
+                                    document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'block';
+                                    document.getElementById('extension-candleappstore-selected-main').style.display = 'none';
+                                    
                                     window.API.uninstallAddon( data['versions'][v]["addon_id"] )
                                     .then((result) => { 
             							if(this.debug){
@@ -2423,13 +2455,13 @@
                                             this.api_addons_data = result;
                                             this.generate_overview('installed'); // user might have come from either page
                                             this.generate_overview('shop');
-                                            document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+                                            document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'none';
                                             // post-uninstall here?
                                 
                             			}).catch((e) => {
                             				console.log("get getInstalledAddons info catch (error?): ", e);
                                             //console.log(e);
-                                            document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+                                            document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'none';
                             			});
                             
             						}).catch((e) => {
@@ -2611,10 +2643,10 @@
                                             var glasses = "";
                                             for (let s = 0; s < 5; s++) {
                                                 if( s < number){
-                                                    glasses += '👓';
+                                                    glasses += '<img src="/extensions/candleappstore/images/book.svg"/>';
                                                 }
                                                 else{
-                                                    glasses += '<span>👓</span>';
+                                                    glasses += '<span><img src="/extensions/candleappstore/images/book.svg"/></span>';
                                                 }
                                       
                                             }
@@ -2700,10 +2732,10 @@
                             var glasses = "";
                             for (let s = 0; s < 5; s++) {
                                 if( s < rounded_risk){
-                                    glasses += '&#128083;';
+                                    glasses += '<img src="/extensions/candleappstore/images/book.svg"/>';
                                 }
                                 else{
-                                    glasses += '<span>&#128083;</span>';
+                                    glasses += '<span><img src="/extensions/candleappstore/images/book.svg"/></span>';
                                 }
                           
                             }
@@ -3379,7 +3411,9 @@
             						//console.log("saved settings result for addon: " + addon_id);
             						//console.log(result); 
                                     document.getElementById("extension-candleappstore-settings").style.display = 'none';
-                                    window.location.reload(true);
+                                    setTimeout(function(){
+                                        window.location.reload(true); // harsh, but no UI's without backends this way.
+                                    }, 2000);
             					}).catch((e) => {
             						console.log("uninstallation catch (error?): ", e);
                                     document.getElementById("extension-candleappstore-settings").style.display = 'none';
