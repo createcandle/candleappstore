@@ -3170,7 +3170,7 @@
                                     //  ADDING EXTRA PERMISSION DROPDOWN FOR AUTHORIZATION TOKEN
                                     //
 
-                                    if(info.toLowerCase() == 'authorization token' || info.toLowerCase() == 'accessToken'){
+                                    if((info.toLowerCase() == 'authorization token' || info.toLowerCase() == 'accessToken') && is_required){
                                         
                                         var token_state = null;
                                         
@@ -3200,7 +3200,7 @@
                                         if(typeof data[info] != 'undefined'){
                                             if(data[info] != null){
                                                 if(data[info].length > 10){
-                                               //console.log("token is longer than 10 characters, so setting token state to 'full' (aka yes)");
+                                                    //console.log("token is longer than 10 characters, so setting token state to 'full' (aka yes)");
                                                     token_state = 'full';
                                                 }
                                             }
@@ -3319,8 +3319,6 @@
                                         form.prepend(permission_div);
                                     }
                                     
-                                    
-                                    
                                 }
                                 else{
                                     
@@ -3432,10 +3430,15 @@
                                 .then(() => { 
             						//console.log("saved settings result for addon: " + addon_id);
             						//console.log(result); 
-                                    document.getElementById("extension-candleappstore-settings").style.display = 'none';
+                                    
                                     setTimeout(function(){
-                                        window.location.reload(true); // harsh, but no UI's without backends this way.
+                                        document.getElementById("extension-candleappstore-settings").style.display = 'none';
                                     }, 2000);
+                                    
+                                    setTimeout(function(){
+                                        document.getElementById("extension-candleappstore-settings").style.display = 'none';
+                                    }, 5000);
+                                    
             					}).catch((e) => {
             						console.log("uninstallation catch (error?): ", e);
                                     document.getElementById("extension-candleappstore-settings").style.display = 'none';

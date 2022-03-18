@@ -50,9 +50,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "App store server"
-      ],
+      "required": [],
       "type": "object"
     }
   },
