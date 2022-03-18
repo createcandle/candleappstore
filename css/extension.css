@@ -546,6 +546,25 @@
 }
 
 
+
+/*  show advanced settings */
+
+body:not(.developer) #extension-candleappstore-show-advanced-settings-button{
+    background-color:rgba(0,0,0,.2);
+    border-radius:.5rem;
+    padding:1rem 2rem;
+    font-size:1.6rem;
+    font-weight:normal;
+    display:inline-block;
+    cursor:pointer;
+}
+
+body:not(.developer) #extension-candleappstore-show-advanced-settings-button + div{
+    display:none;
+}
+
+
+
 /*  PERMISSIONS POPUP  */
 
 #extension-candleappstore-permissions{

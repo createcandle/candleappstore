@@ -32,11 +32,15 @@ class CandleappstoreAPIHandler(APIHandler):
 
     def __init__(self, adapter, verbose=False):
         """Initialize the object."""
-        print("INSIDE API HANDLER INIT")
+        
         
         self.adapter = adapter
         #self.addon_name = 'hootspot-handler'
         self.DEBUG = self.adapter.DEBUG
+        
+        if self.DEBUG:
+            print("In candle App store addon api init")
+        
 
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': "candlecontroller1,0"})
@@ -52,7 +56,8 @@ class CandleappstoreAPIHandler(APIHandler):
             with open(manifest_fname, 'rt') as f:
                 manifest = json.load(f)
 
-            print("manifest id in candleappstore handler: " + str(manifest['id']))
+            if self.DEBUG:
+                print("manifest id in candleappstore handler: " + str(manifest['id']))
             APIHandler.__init__(self, manifest['id'])
             self.manager_proxy.add_api_handler(self)
             
@@ -145,7 +150,8 @@ class CandleappstoreAPIHandler(APIHandler):
                         
                             if 'parameters' in request.body:
                                 parameters = request.body['parameters']
-                                print("parameters = " + str(parameters))
+                                if self.DEBUG:
+                                    print("parameters = " + str(parameters))
                                 response = self.session.post(url, data = parameters)
 
                             else:
@@ -169,6 +175,29 @@ class CandleappstoreAPIHandler(APIHandler):
                       content=json.dumps({'state' : True, 'message' : 'tried to get json', 'body':json_data }),
                     )
                     
+ 
+                elif action == 'uninstall':
+                    if self.DEBUG:
+                        print("uninstall addon request")
+                    try:
+                        if self.adapter.keep_data_on_uninstall == False:
+                            if 'addon_id' in request.body:
+                                addon_id = str(request.body['addon_id'])
+                                data_dir_to_delete = os.path.join(self.adapter.user_profile['dataDir'], addon_id)
+                                if self.DEBUG:
+                                    print("uninstall data dir: " + str(data_dir_to_delete))
+                                if os.path.isdir(data_dir_to_delete):
+                                    os.system('sudo rm -rf ' + str(data_dir_to_delete))
+                                    if self.DEBUG:
+                                        print("data dir deleted")
+                                else:
+                                    print("error: uninstall: addon data dir did not exist?")
+                        else:
+                            if self.DEBUG:
+                                print("keeping data from addon that is being uninstalled")
+                            
+                    except Exception as ex:
+                        print("Uninstall addon error: " + str(ex))
  
                 else:
                     return APIResponse(status=404)

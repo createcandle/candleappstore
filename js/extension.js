@@ -322,17 +322,6 @@
 			
             
             // TABS
-            /*
-            document.getElementById('extension-candleappstore-tab-buttons-container').addEventListener('click', (event) => {
-                var active_tab = event.target.innerText.toLowerCase().replace(/\s/g , "-");
-                //console.log(active_tab);
-                if(event.target.classList[0] == "extension-candleappstore-main-tab-button"){
-                    //console.log("clicked on menu tab button");
-                    if(active_tab == "?"){active_tab = "help";}
-                    document.getElementById('extension-candleappstore-content').className = 'extension-candleappstore-active-tab-' + active_tab;
-                }
-            });
-            */
             
             var all_tabs = document.querySelectorAll('.extension-candleappstore-tab');
             var all_tab_buttons = document.querySelectorAll('.extension-candleappstore-main-tab-button');
@@ -2463,6 +2452,25 @@
                                             //console.log(e);
                                             document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'none';
                             			});
+                                        
+                                        
+                                        // remove data dir
+                                        if(this.debug){
+                                            console.log("will try to remove data dir for addon: ", addon_id);
+                                        }
+                            			window.API.postJson(
+                            				`/extensions/candleappstore/api/ajax`,
+                            				{'action':'uninstall','addon_id':addon_id}
+                            			)
+                                        .then((body) => {
+                                            if(this.debug){
+                                                console.log("Uninstall: removed addon data dir? ", body);
+                                            }
+                            			})
+                                        .catch((e) => {
+                            				console.log("candleappstore: remove addon data dir error: ", e);
+                            			});
+                                        
                             
             						}).catch((e) => {
             							console.log("uninstallation catch (error?)", e);
@@ -2832,8 +2840,22 @@
                 document.getElementById('extension-candleappstore-settings-options').style.display = 'block';
                 form.innerHTML = "";
                 advanced_form.innerHTML = "";
+                if(this.developer == false){
+                    advanced_form.style.display = 'none';
+                }
+                
                 settings_options_bar.innerHTML = "";
                 advanced_form_container.style.display = "none";
+                
+                
+                
+                
+                //extension-candleappstore-show-advanced-settings-button
+                
+                
+                document.getElementById('extension-candleappstore-show-advanced-settings-button').addEventListener('click', (event) => {
+                    document.getElementById('extension-candleappstore-advanced-settings-form').style.display = 'block';
+                });
                 
                 
                 

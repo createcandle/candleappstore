@@ -93,15 +93,19 @@ class CandleappstoreAdapter(Adapter):
         self.running = True
         self.app_store_url = 'https://www.candlesmarthome.com/appstore/'
         
+        # Uninstall
+        self.keep_data_on_uninstall = False
         self.disable_uninstall = False
         if os.path.isfile('/boot/disable_uninstall.txt'):
             self.disable_uninstall = True
         
-        print("os.uname() = " + str(os.uname()))
+        
+        
+        #print("os.uname() = " + str(os.uname()))
 
         # Some paths
-        print("self.user_profile:")
-        print(str(self.user_profile))
+        #print("self.user_profile:")
+        #print(str(self.user_profile))
         
         self.addon_path = os.path.join(self.user_profile['addonsDir'], self.addon_name)
         self.data_dir_path = os.path.join(self.user_profile['dataDir'], self.addon_name)
@@ -164,11 +168,13 @@ class CandleappstoreAdapter(Adapter):
         
         try:
             if 'unique_id' not in self.persistent_data: # to remember what the main candleappstore server is, for satellites.
-                print("unique_id was not in persistent data, adding it now.")
+                if self.DEBUG:
+                    print("unique_id was not in persistent data, adding it now.")
                 self.persistent_data['unique_id'] = generate_random_string(20)
                 self.save_persistent_data()
             if 'addons' not in self.persistent_data:
-                print("addons was not in persistent data, adding it now.")
+                if self.DEBUG:
+                    print("addons was not in persistent data, adding it now.")
                 self.persistent_data['addons'] = {}
             if 'permissions' not in self.persistent_data:
                 self.persistent_data['permissions'] = {}
@@ -241,6 +247,13 @@ class CandleappstoreAdapter(Adapter):
                 print("Debugging enabled")        
 
 
+        if 'Keep addon data when uninstalling' in config:
+            if self.DEBUG:
+                print("-Keep addon data when uninstalling preference was in config: " + str(config['Keep addon data when uninstalling']))
+            self.keep_data_on_uninstall = bool(config['Keep addon data when uninstalling'])
+        
+
+
         if 'Show developer options' in config:
             if self.DEBUG:
                 print("-Developer preference was in config: " + str(config['Show developer options']))
@@ -306,7 +319,8 @@ class CandleappstoreAdapter(Adapter):
 
     def scan_installed_addons(self):
         real_dirs = []
-        print("self.user_profile['addonsDir'] = " + str(self.user_profile['addonsDir']))
+        if self.DEBUG:
+            print("self.user_profile['addonsDir'] = " + str(self.user_profile['addonsDir']))
         try:
             raw_dirs = os.listdir( self.user_profile['addonsDir'] )
             for filename in raw_dirs:
@@ -364,7 +378,8 @@ class CandleappstoreAdapter(Adapter):
 #
 
     def unload(self):
-        print("Shutting down Candleappstore. Wave!")
+        if self.DEBUG:
+            print("Shutting down Candleappstore")
         
         self.save_persistent_data()
         self.running = False
