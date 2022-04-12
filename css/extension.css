@@ -1700,6 +1700,24 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 
 
+/*  DEVELOPER  */
+
+#extension-candleappstore-tab-button-developer{
+    display:none;
+}
+.developer #extension-candleappstore-tab-button-developer{
+    display:inline-block;
+}
+
+#extension-candleappstore-developer-addon-install-button{
+    background-color:orange;
+}
+
+#extension-candleappstore-developer input{
+    width: calc(100% - 4rem);
+    margin-bottom:2rem;
+    padding:1rem;
+}
 
 
 /*  hide developer options  */
@@ -1723,6 +1741,11 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 .developer #installed-addons-list:not(.hidden){
     display:block;
 }
+
+
+
+
+
 
 
 

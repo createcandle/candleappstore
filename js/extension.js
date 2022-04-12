@@ -695,10 +695,78 @@
             
             // Update all button
             document.getElementById("extension-candleappstore-update-all-button").addEventListener('click', (event) => {
-                console.log("update all button clicked");
+                //console.log("update all button clicked");
                 this.update_all();
                 
             });
+            
+            
+            //
+            //   DEVELOPER TAB
+            //
+            
+            // Developer - manual addon install button
+            document.getElementById("extension-candleappstore-developer-addon-install-button").addEventListener('click', (event) => {
+                console.log("manual addon install button clicked");
+                
+                
+                const addon_id = document.getElementById('extension-candleappstore-developer-addon-id').value;
+                const url = document.getElementById('extension-candleappstore-developer-addon-url').value;
+                const shasum = document.getElementById('extension-candleappstore-developer-addon-shasum').value;
+                
+                if(addon_id != "" && url != "" && shasum != ""){
+                    
+                    document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'block';
+                    
+                    window.API.installAddon( addon_id, url, shasum )
+                    .then((result) => { 
+        			
+                        console.log("manual installation result:");
+                        console.log(result);
+
+                        //this.api_addons_data = []; // Remove the existing data about addons so that it will be re-requested from the window.API
+                        
+                        if(typeof result.enabled != "undefined"){
+                            this.installed.push(addon_id);
+                            console.log("addon installed succesfully: " + addon_id);
+                            if(result.enabled == true){
+                                console.log("- addon seems to be enabled");
+                    
+                                if(confirm("Addon installed OK. Refresh the page?")){
+                                    document.getElementById('connectivity-scrim').classList.remove('hidden');
+                                    setTimeout(function(){
+                                        window.location.reload(true); // harsh, but no UI's without backends this way.
+                                    }, 2000);
+                                }
+                                //this.generate_overview('shop');
+                            }
+                            else{
+                                console.log("- Addon seems to be disabled?");
+                                alert("Addon was installed, but is not enabled yet.");
+                            }
+                        }
+                        else{
+                            //console.log("installation failed, severely");
+                            alert("Error: could not install. Check the javascript console for details.");
+                        }
+                        
+                        document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'none';
+                        
+            
+        			}).catch((e) => {
+        				console.log("installation catch (error?): ", e);
+                        //console.log(e);
+        				//pre.innerText = e.toString();
+                        //alert("Error: could not install. Could not connect to the controller.");
+                        document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'none';
+        			});
+                }
+                else{
+                    alert("missing parameters");
+                }
+                
+            });
+            
             
             
             
@@ -939,9 +1007,9 @@
                 // Show developer options
                 if(typeof body.developer != 'undefined'){
                     if(body.developer){
-                        document.getElementById('authorization-settings-link').style.display = 'block';
-                        document.getElementById('experiment-settings-link').style.display = 'block';
-                        document.getElementById('developer-settings-link').style.display = 'block';
+                        //document.getElementById('authorization-settings-link').style.display = 'block';
+                        //document.getElementById('experiment-settings-link').style.display = 'block';
+                        //document.getElementById('developer-settings-link').style.display = 'block';
                         document.body.classList.add('developer');
                     }
                     this.developer = body.developer;
@@ -1411,7 +1479,7 @@
                             if(info == 'name' || info == 'description'){
                                 
                                 var t = document.createElement('span');
-                                var text = linkify(data[i][info]); // removes links from descriptions, and turns them into actual links
+                                var text = linkify(data[i][info], true); // removes links from descriptions, and turns them into actual links
                                 
                                 if(page == 'installed' && info == 'name'){
                                     text += '<span class="extension-candleappstore-basic-version">' + data[i]['version'] + '</span>';
@@ -1712,6 +1780,7 @@
                                             }
                                             
                                             //if(result['enabled']){
+                                                document.getElementById('connectivity-scrim').classList.remove('hidden');
                                                 setTimeout(function(){
                                                     window.location.reload(true); // harsh, but no UI's without backends this way.
                                                 }, 2000);
@@ -2154,7 +2223,7 @@
                                             else if(info == 'description'){
                                            //console.log("adding description");
                                                 if(typeof data['versions'][v][info] != 'undefined'){
-                                                    target_element.innerHTML = linkify(data['versions'][v][info])
+                                                    target_element.innerHTML = linkify(data['versions'][v][info], true)
                                                 }
                                             }
                                             else if(info == 'tags'){
@@ -2840,9 +2909,9 @@
                 document.getElementById('extension-candleappstore-settings-options').style.display = 'block';
                 form.innerHTML = "";
                 advanced_form.innerHTML = "";
-                if(this.developer == false){
-                    advanced_form.style.display = 'none';
-                }
+                //if(this.developer == false){
+                //    advanced_form.style.display = 'none';
+                //}
                 
                 settings_options_bar.innerHTML = "";
                 advanced_form_container.style.display = "none";
@@ -3582,8 +3651,40 @@
 	}
     
     
-    function linkify(inputText) {
+    
+    function linkify(string, output_domains){ // output_domains should be a boolean. If false it shows LINK, otherwise the domain as the link text
+        //console.log("linkify: output_domains: ", output_domains);
         
+        var show_domains = false;
+        if ( typeof output_domains !== 'undefined' ){
+            show_domains = output_domains;
+        }
+        
+        string = string.replace('(gateway >= 0.9.0 only)', '');
+        
+        // URL's
+        var urls = string.match(/(((ftp|https?):\/\/)[\-\w@:%_\+.~#?,&\/\/=]+)/g);
+        if (urls) {
+            urls.forEach(function (url) {
+                var link_text = "LINK";
+                if(show_domains){
+                    link_text = url.replace('http://','').replace('https://','').replace('www.','').split(/[/?#]/)[0];
+                    //console.log("urlParts: ", urlParts);
+                    //link_text = urlParts[0];
+                }
+                string = string.replace(url, '<a target="_blank" href="' + url + '">' + link_text + "</a>");
+            });
+        }
+        
+        // Email addresses
+        var replacePattern3 = /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim;
+        string = string.replace(replacePattern3, '<a href="mailto:$1">EMAIL</a>');
+        
+        return string; //.replace("(", "<br/>(");
+    }
+    
+    /*
+    function linkify(inputText) {
         
         inputText = inputText.replace('(gateway >= 0.9.0 only)', '');
         
@@ -3603,7 +3704,7 @@
 
         return replacedText;
     }
-
+    */
 	new Candleappstore();
 	
 })();

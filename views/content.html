@@ -8,6 +8,7 @@
             <button id="extension-candleappstore-tab-button-installed" class="extension-candleappstore-main-tab-button extension-candleappstore-tab-selected">Installed</button>
             <button id="extension-candleappstore-tab-button-updates" class="extension-candleappstore-main-tab-button extension-candleappstore-hidden">Updates</button>
             <button id="extension-candleappstore-tab-button-shop" class="extension-candleappstore-main-tab-button extension-candleappstore-hidden">Shop</button>
+            <button id="extension-candleappstore-tab-button-developer" class="extension-candleappstore-main-tab-button">Developer</button>
             <button id="extension-candleappstore-tab-button-help" class="extension-candleappstore-main-tab-button">?</button>
         </div>
 		
@@ -114,7 +115,35 @@
 			</div>
 
 			
-			
+            <div id="extension-candleappstore-tab-developer" class="extension-candleappstore-tab extension-candleappstore-hidden">
+                <div id="extension-candleappstore-developer" class="extension-candleappstore-centered-page">
+                    <h2>Developer tools</h2>
+                    <p>Here you can find some features that aid in developing addons.</p>
+                    <p></p>
+					
+                    <div class="extension-candleappstore-vlak">
+                        <h4>Manual addon installation</h4>
+                        <p>Provide the addon ID, a link to the tar.gz file, and the shasum.</p>
+                        <input type="text" id="extension-candleappstore-developer-addon-id" name="extension-candleappstore-developer-addon-url" autocomplete="off" placeholder="Addon ID"> 
+                        <input type="text" id="extension-candleappstore-developer-addon-url" name="extension-candleappstore-developer-addon-url" autocomplete="off" placeholder="URL">  
+                        <input type="text" id="extension-candleappstore-developer-addon-shasum" name="extension-candleappstore-developer-addon-shasum" autocomplete="off" placeholder="Shasum">  
+                        
+                        <div class="extension-candleappstore-bottom-button-container">
+                            <button id="extension-candleappstore-developer-addon-install-button" class="extension-candleappstore-button">Install</button>
+                        </div>
+                        
+                        <div id="extension-candleappstore-developer-busy-installing-app" style="display:none">
+                            <div class="extension-privacy-manager-spinner">
+                                <div></div><div></div><div></div><div></div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            
+            
 
 
 			<div id="extension-candleappstore-tab-help" class="extension-candleappstore-tab extension-candleappstore-hidden">
