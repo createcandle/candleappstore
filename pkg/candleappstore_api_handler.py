@@ -93,17 +93,21 @@ class CandleappstoreAPIHandler(APIHandler):
             if request.path == '/ajax':
                 
                 action = str(request.body['action'])    
-                 if self.DEBUG:
+                if self.DEBUG:
                      print("ajax action = " + str(action))
                 
                 
                 if action == 'init':
-                     if self.DEBUG:
-                         print('ajax handling init')
-                         print("self.adapter.persistent_data = " + str(self.adapter.persistent_data))
+                    if self.DEBUG:
+                        print('ajax handling init')
+                        print("self.adapter.persistent_data = " + str(self.adapter.persistent_data))
                     
-                    installed_addons = self.adapter.scan_installed_addons()
-                    
+                    installed_addons = []
+                    try:
+                        installed_addons = self.adapter.scan_installed_addons()
+                    except Exception as ex:
+                        print("Error getting installed addons list: " + str(ex))
+                        
                     return APIResponse(
                       status=200,
                       content_type='application/json',
