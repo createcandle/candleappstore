@@ -93,12 +93,14 @@ class CandleappstoreAPIHandler(APIHandler):
             if request.path == '/ajax':
                 
                 action = str(request.body['action'])    
-                print("ajax action = " + str(action))
+                 if self.DEBUG:
+                     print("ajax action = " + str(action))
                 
                 
                 if action == 'init':
-                    print('ajax handling init')
-                    print("self.adapter.persistent_data = " + str(self.adapter.persistent_data))
+                     if self.DEBUG:
+                         print('ajax handling init')
+                         print("self.adapter.persistent_data = " + str(self.adapter.persistent_data))
                     
                     installed_addons = self.adapter.scan_installed_addons()
                     
@@ -175,10 +177,25 @@ class CandleappstoreAPIHandler(APIHandler):
                       content=json.dumps({'state' : True, 'message' : 'tried to get json', 'body':json_data }),
                     )
                     
- 
+
+                elif action == 'get_installed_dirs':
+                    addon_dirs = []
+                    try:
+                        addon_dirs = self.adapter.scan_installed_addons()
+                    except Exception as ex:
+                        print("Getting installed addon dirs error: " + str(ex))
+                        
+                    return APIResponse(
+                      status=200,
+                      content_type='application/json',
+                      content=json.dumps({'state':True, 'installed':addon_dirs }),
+                    )
+                    
+
                 elif action == 'uninstall':
                     if self.DEBUG:
                         print("uninstall addon request")
+                    state = False
                     try:
                         if self.adapter.keep_data_on_uninstall == False:
                             if 'addon_id' in request.body:
@@ -188,8 +205,10 @@ class CandleappstoreAPIHandler(APIHandler):
                                     print("uninstall data dir: " + str(data_dir_to_delete))
                                 if os.path.isdir(data_dir_to_delete):
                                     os.system('sudo rm -rf ' + str(data_dir_to_delete))
+                                    state = True
                                     if self.DEBUG:
                                         print("data dir deleted")
+                                        
                                 else:
                                     print("error: uninstall: addon data dir did not exist?")
                         else:
@@ -198,6 +217,18 @@ class CandleappstoreAPIHandler(APIHandler):
                             
                     except Exception as ex:
                         print("Uninstall addon error: " + str(ex))
+                        
+                    addon_dirs = []
+                    try:
+                        addon_dirs = self.adapter.scan_installed_addons()
+                    except Exception as ex:
+                        print("Getting installed addon dirs error: " + str(ex))
+                        
+                    return APIResponse(
+                      status=200,
+                      content_type='application/json',
+                      content=json.dumps({'state' : state, 'message' : 'addon data should be deleted', 'installed':addon_dirs }),
+                    )
  
                 else:
                     return APIResponse(status=404)

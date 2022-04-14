@@ -21,6 +21,7 @@
             this.cloud_app_data = []; // list of available apps, comes from the web via app store addon. #TODO: buffer this data locally to protect privacy
             this.api_addons_data = []; // has data about the settings of all addons, comes from gateway API.
             this.addons_to_update = []; // if adddons with new versions are spotted, their ID's will be added to this list.
+            this.addon_dirs = []: // reflects actual directories on the disk
             this.extensions = []; // holds all the data about installed addons data that extend the UI (css and js files)
             this.extensions_list = [];
             this.selector = "";
@@ -2434,9 +2435,10 @@
                                 
                                 if(typeof result.enabled != "undefined"){
                                     console.log("addon installed succesfully");
+                                    this.installed.push(data['versions'][v]["addon_id"]);
                                     if(result.enabled == true){
                                         console.log("- addon is enabled");
-                                        this.installed.push(data['versions'][v]["addon_id"]);
+                                        
                                     
                                         //this.generate_overview('shop');
                                     }
@@ -2550,6 +2552,11 @@
                                             if(this.debug){
                                                 console.log("Uninstall: removed addon data dir? ", body);
                                             }
+                                            if(typeof body.addon_dirs != 'undefined'){
+                                                this.installed = body.addon_dirs;
+                                            }
+                                            
+                                            
                             			})
                                         .catch((e) => {
                             				console.log("candleappstore: remove addon data dir error: ", e);
