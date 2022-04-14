@@ -4,6 +4,9 @@
 	      	super('candleappstore');
 			//console.log("Adding candleappstore addon to menu");
       		
+            console.log("API: ", window.API);
+            
+            
 			this.addMenuEntry('Candle app store');
 	
             //const page = require('page');
@@ -374,6 +377,7 @@
 			selected_close_button.addEventListener('click', (event) => {
                 //console.log("Selected app close button clicked");
                 selected.style.display = 'none';
+                document.getElementById('extension-candleappstore-installation-failed').style.display = 'none';
 			});
             
 			settings_close_button.addEventListener('click', (event) => {
@@ -754,7 +758,7 @@
                         
             
         			}).catch((e) => {
-        				console.log("installation catch (error?): ", e);
+        				console.log("manual installation catch (error?): ", e);
                         //console.log(e);
         				//pre.innerText = e.toString();
                         //alert("Error: could not install. Could not connect to the controller.");
@@ -2073,8 +2077,47 @@
         
         
         
+        // Update after install (turned into separate function to avoid nested api calls)
         
-        
+        update_after_install(addon_data){
+            
+            window.API.getInstalledAddons()
+            .then((result) => { 
+				console.log("update_after_install: get_installed_addons_data: result: ");
+				//console.log(result);
+                this.api_addons_data = result;
+                this.generate_overview('shop');
+                
+                if(addon_data["has_ui"] == "1"){
+                    // TODO: ask the user if they want to check it out first?
+                    if(addon_data["addon_id"] == 'candle-theme'){
+                        setTimeout(function(){
+                            window.location.reload(true); // harsh, but no UI's without backends this way.
+                        }, 2000);
+                    }
+                    else{
+                        console.log("this addon has a UI, so switching to that.");
+                        window.location.pathname = '/extensions/' + addon_data["addon_id"];
+                    }
+                }
+                
+                if(addon_data["addon_id"] != 'zigbee2mqtt-adapter'){
+                    document.getElementById("extension-candleappstore-selected-post-install").style.display = 'block'; 
+                }
+                else{
+                    window.location.pathname = '/extensions/zigbee2mqtt-adapter';
+                }
+                
+                //document.getElementById("extension-candleappstore-post-install-settings-button").setAttribute("data-addon_id", data['versions'][v]["addon_id"]);
+                document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+            
+			}).catch((e) => {
+				console.log("get getInstalledAddons info catch (error?): ", e);
+                //console.log(e);
+                document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+			});
+            
+        }
         
         
         
@@ -2379,22 +2422,26 @@
                             
                             document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
                             document.getElementById('extension-candleappstore-selected-main').style.display = 'none';
-                            //console.log( "installing addon. parameters: ", data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] );
-                        
+                            if(this.debug){
+                                console.log( "installing addon. parameters: ", data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] );
+                            }
                             window.API.installAddon( data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] )
                             .then((result) => { 
     							if(this.debug){
                                     console.log("installation result: ", result);
                                 }
                                 this.api_addons_data = []; // Remove the existing data about addons so that it will be re-requested from the window.API
-                                this.installed.push(data['versions'][v]["addon_id"]);
+                                
                                 if(typeof result.enabled != "undefined"){
+                                    console.log("addon installed succesfully");
                                     if(result.enabled == true){
-                                        //console.log("installed succesfully");
+                                        console.log("- addon is enabled");
+                                        this.installed.push(data['versions'][v]["addon_id"]);
                                     
                                         //this.generate_overview('shop');
                                     }
                                     else{
+                                        console.log("- addon is NOT enabled");
                                         //console.log("installed ok, but is disabled?");
                                     }
                                 }
@@ -2403,49 +2450,17 @@
                                     alert("Error: could not install.");
                                 }
                             
-                                window.API.getInstalledAddons()
-                                .then((result) => { 
-                    				//console.log("get_installed_addons_data: result: ");
-                    				//console.log(result);
-                                    this.api_addons_data = result;
-                                    this.generate_overview('shop');
-                                    
-                                    if(data['versions'][v]["has_ui"] == "1"){
-                                        // TODO: ask the user if they want to check it out first?
-                                        if(data['versions'][v]["addon_id"] == 'candle-theme'){
-                                            setTimeout(function(){
-                                                window.location.reload(true); // harsh, but no UI's without backends this way.
-                                            }, 2000);
-                                        }
-                                        else{
-                                            console.log("this addon has a UI, so switching to that.");
-                                            window.location.pathname = '/extensions/' + data['versions'][v]["addon_id"];
-                                        }
-                                    }
-                                    
-                                    if(data['versions'][v]["addon_id"] != 'zigbee2mqtt-adapter'){
-                                        document.getElementById("extension-candleappstore-selected-post-install").style.display = 'block'; 
-                                    }
-                                    else{
-                                        window.location.pathname = '/extensions/zigbee2mqtt-adapter';
-                                    }
-                                    
-                                    //document.getElementById("extension-candleappstore-post-install-settings-button").setAttribute("data-addon_id", data['versions'][v]["addon_id"]);
-                                    document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
-                                
-                    			}).catch((e) => {
-                    				console.log("get getInstalledAddons info catch (error?): ", e);
-                                    //console.log(e);
-                                    document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
-                    			});
+                                this.update_after_install(data['versions'][v]);
 
 
     						}).catch((e) => {
     							console.log("installation catch (error?): ", e);
+                                
                                 //console.log(e);
     							//pre.innerText = e.toString();
                                 //alert("Error: could not install. Could not connect to the controller.");
                                 document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+                                document.getElementById("extension-candleappstore-installation-failed").style.display = 'block';
     						});
                         });
                         //console.log("adding install button");
