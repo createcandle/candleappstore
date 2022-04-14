@@ -21,7 +21,7 @@
             this.cloud_app_data = []; // list of available apps, comes from the web via app store addon. #TODO: buffer this data locally to protect privacy
             this.api_addons_data = []; // has data about the settings of all addons, comes from gateway API.
             this.addons_to_update = []; // if adddons with new versions are spotted, their ID's will be added to this list.
-            this.addon_dirs = []: // reflects actual directories on the disk
+            this.addon_dirs = []; // reflects actual directories on the disk
             this.extensions = []; // holds all the data about installed addons data that extend the UI (css and js files)
             this.extensions_list = [];
             this.selector = "";
