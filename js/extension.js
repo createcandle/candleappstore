@@ -4,7 +4,7 @@
 	      	super('candleappstore');
 			//console.log("Adding candleappstore addon to menu");
       		
-            console.log("API: ", window.API);
+            //console.log("API: ", window.API);
             
             
 			this.addMenuEntry('Candle app store');
@@ -220,7 +220,7 @@
         }
 
         
-        // Returns an item from the large cloud data list of addons. It does not have details.
+        // Returns a single item from the large cloud data list of addons. It does not have details.
         get_cloud_addon_data(desired_addon_id){
             //console.log("in get_cloud_addon_data. this.cloud_app_data: ", this.cloud_app_data);
             //console.log("looking for: ", desired_addon_id);
@@ -1409,6 +1409,8 @@
                 var highest_highlight_level = 0;
                 if(page == 'shop'){highest_highlight_level = 5;}
                 
+                var shown_as_installed_list = []; // used to check if all the dirs in the addons folder are represented in the output
+                
                 for(let current_highlight_level = highest_highlight_level; current_highlight_level >= 0; current_highlight_level--){
                     //console.log("x");
                     //console.log("current_highlight_level: ", current_highlight_level );
@@ -1435,11 +1437,12 @@
                         }
                         catch(e){
                             console.log("Error getting api data for addon: ", e);
-                        
                         }
                     
-                        // Addons that are under heavy development are only available if developer mode is active
+                        
                         if(page == 'shop' || page == 'updates'){
+                            
+                            // Addons that are under heavy development are only available if developer mode is active
                             if(data[i]['stable'] == 0 && this.developer == false){
                                 continue;
                             }
@@ -1627,12 +1630,14 @@
                             else{
                                 //console.log('in shop page, but this item was already installed, so skipping.');
                             }
-                            
-                            
-                    
-                    
                     
                         }
+                        
+                        
+                        
+                        
+                        
+                        
                         else{
                             // This parts only deals with addons that are installed.
                             if(current_highlight_level == 0){ // this makes it so that it only runs through this on the first iteration. Items in the shop are done in 5 levels instead.
@@ -1695,7 +1700,7 @@
                                 //installed_list.appendChild(clone);
                     
                     
-                                //console.log("ui_extension?: ", ui_extension);
+                    
                     
                                 //
                                 // PLAY/PAUSE BUTTON
@@ -1828,6 +1833,7 @@
                                             .then((result) => { 
                                                 //console.log("in get_installed_addons_data.then");
                                                 this.generate_overview('installed');
+                                                //return;
                                 			}).catch((e) => {
                                 				console.log("init: get_installed_addons_data catch (error?):", e);
                                 			});
@@ -2037,11 +2043,11 @@
                                 }
                                 
                                 
-                                
                                 //console.log("completed generating an installed element: ", clone);
                                 //console.log("should append to output list now, which is: ", output_list_element);
                                 if(page == 'installed'){
                                     output_list_element.appendChild(clone);
+                                    shown_as_installed_list.push(addon_id);
                                 }
                                 else if(page == 'updates'){
                                     if(this.addons_to_update.indexOf(addon_id) != -1){
@@ -2053,16 +2059,71 @@
                                     }
                                 }
                                 
-                                
                             }
-                        }
+                            
+                        } // end of else
                         
                         //console.log("\n\nNEXT!");
                 
                 
                     } // end of for loop that loops over all addons
                     
+                    
+                    
                 } // of of for loop with 5 highlight levels
+                
+                // Check if all addon directories are output in the list
+                var not_shown_addons_list = [];
+                if(page == 'installed'){
+                    console.log("shown_as_installed_list: ", shown_as_installed_list);
+                    console.log("installed dirs: ", this.installed);
+                    for(var p = 0; p < this.installed.length; p++){
+                        
+                        if(shown_as_installed_list.indexOf( this.installed[p] ) == -1){
+                            console.log("Spotted an addon that was not shown in the installed list, but should have been: ", this.installed[p]);
+                            not_shown_addons_list.push( this.installed[p] );
+                        }
+                    }
+                }
+                
+                if(not_shown_addons_list.length > 0){
+                    console.log("not_shown_addons_list: ", not_shown_addons_list);
+                    /*
+                    this.get_installed_addons_data()
+                    .then((result) => { 
+                        //console.log("in get_installed_addons_data.then");
+                        this.generate_overview('installed');
+                        
+                        
+                        for(var q = 0; q < not_shown_addons_list.length; q++){
+                            console.log("NOW SHOWN ADDON, SHOULD BE FIXED: ", not_shown_addons_list[q]);
+                    
+                    
+                            window.API.setAddonSetting( not_shown_addons_list[q], true)
+                            .then((result) => {
+        						console.log("enabled overlooked addon result: ");
+        						console.log(result);
+                        
+                                if(typeof result.enabled != 'undefined'){
+                                    console.log('addon has been switched to: ', result.enabled);
+                                }
+
+        					}).catch((e) => {
+        						//console.log("Error enabling/disabling addon: ", this_addon_id);
+                                console.log("Error switching on overlooked addon; ", e);
+        					});
+                    
+                        }
+                        
+                        
+                        
+                        //return;
+        			}).catch((e) => {
+        				console.log("overlooked fix: get_installed_addons_data catch (error?):", e);
+        			});
+                    */
+                }
+                
                 
                 
                 
@@ -2139,7 +2200,6 @@
             //console.log('show_selected_app');
             
             const selected = document.getElementById('extension-candleappstore-selected');
-            
             
             document.getElementById('extension-candleappstore-selected-main').style.display = 'none';
             document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
@@ -3233,7 +3293,7 @@
                                     if(info.toLowerCase() == 'background color' && this.developer == false){
                                         input_type = 'color';
                                     }
-                        
+                                    
                                     s.type = input_type;
                         
                                     if(data[info] != undefined){
@@ -3490,7 +3550,16 @@
                                     }
                                     else{
                                         var value = target_element.value;
-                                
+                                        //console.log("value: ", value);
+                                        // If the background color is black, set the background to none.
+                                        if(css_element_id == 'extension-candleappstore-settings-setting-backgroundcolor'){
+                                            //console.log("checking color value: ", value);
+                                            if(value == '#000000' || value == '#ffffff'){
+                                                //console.log('setting background color from black to none');
+                                                value = "";
+                                            }
+                                        }
+                                        
                                         if( target_element.required && value == "" ){
                                             //console.log("required value was not filled");
                                             missing_value = true;
@@ -3515,6 +3584,7 @@
                                 //console.log(new_data);
                         
                                 settings_container.classList.add("extension-candleappstore-busy");
+                                document.getElementById('connectivity-scrim').classList.remove('hidden');
                         
                                 //window.API.setAddonConfig( addon_id, JSON.stringify(new_data) )
                                 window.API.setAddonConfig( addon_id, new_data )
@@ -3522,6 +3592,12 @@
             						//console.log("saved settings result for addon: " + addon_id);
             						//console.log(result); 
                                     
+                                    
+                                    setTimeout(function(){
+                                        window.location.reload(true); // harsh, but no UI's without backends this way.
+                                    }, 2000);
+                                    
+                                    /*
                                     setTimeout(function(){
                                         document.getElementById("extension-candleappstore-settings").style.display = 'none';
                                     }, 2000);
@@ -3529,10 +3605,13 @@
                                     setTimeout(function(){
                                         document.getElementById("extension-candleappstore-settings").style.display = 'none';
                                     }, 5000);
+                                    */
                                     
             					}).catch((e) => {
             						console.log("uninstallation catch (error?): ", e);
+                                    alert("There was a connection error while saving the settings.");
                                     document.getElementById("extension-candleappstore-settings").style.display = 'none';
+                                    document.getElementById('connectivity-scrim').classList.add('hidden');
             					});
                         
                             }
