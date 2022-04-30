@@ -75,6 +75,7 @@ class CandleappstoreAdapter(Adapter):
         print("Starting Candleappstore addon")
         #print(str( os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib') ))
         self.pairing = False
+        self.ready = False
         self.DEBUG = False
         self.DEV = False
         self.addon_name = 'candleappstore'
@@ -92,6 +93,10 @@ class CandleappstoreAdapter(Adapter):
         self.developer = False
         self.running = True
         self.app_store_url = 'https://www.candlesmarthome.com/appstore/'
+        
+        self.exhibit_mode = False
+        if os.path.isfile('/boot/exhibit_mode.txt'):
+            self.exhibit_mode = True
         
         # Uninstall
         self.keep_data_on_uninstall = False
@@ -191,9 +196,6 @@ class CandleappstoreAdapter(Adapter):
         #self.ssid = self.candleappstore_name + " " + self.persistent_data['unique_id'] + "_nomap"
         #print("ssid = " + str(self.ssid))
         
-        
-
-
         #
         # Create UI
         #
@@ -209,7 +211,7 @@ class CandleappstoreAdapter(Adapter):
 
         print("end of candle app store adapter init")
 
-        
+        self.ready = True
         
         
 #

@@ -76,11 +76,12 @@
 
 .extension-candleappstore-selected-settings{
     font-style:italic;
+    margin-bottom:4rem;
 }
 
 .extension-candleappstore-selected-settings:not(:empty)::before{
     content:"This addon has the following settings: ";
-    display:inline-block;
+    display:block;
     margin-right:1rem;
     font-weight: normal;
     font-style:normal;
@@ -244,7 +245,7 @@
 
 .extension-candleappstore-item-delete-button:hover{
 	opacity:1;
-	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	/*box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);*/
 }
 
 
@@ -278,7 +279,7 @@
 
 .extension-candleappstore-item:hover{
     /*box-shadow: inset 0rem -1rem white;*/
-    box-shadow: inset 0rem 0rem 100rem rgba(0,0,0,.5);
+    box-shadow: inset 0rem 0rem 100rem rgba(0,0,0,.3);
 }
 
 #extension-candleappstore-list .extension-candleappstore-item:first-of-type{
@@ -312,6 +313,10 @@
     margin-bottom:.5rem;
     font-size:2.6rem;
     opacity:.9;
+}
+
+.extension-candleappstore-basic-name > span:first-letter{
+  text-transform: capitalize;
 }
 
 .extension-candleappstore-basic-version{
@@ -618,7 +623,8 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     cursor:pointer;
 }
 .extension-candleappstore-button:hover{
-    box-shadow:1px 1px black;
+    /*box-shadow:1px 1px black;*/
+    opacity:1;
 }
 
 #extension-candleappstore-selected.installed .extension-candleappstore-install-button{
@@ -1059,6 +1065,10 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 	margin: 4rem auto;
 }
 
+.kiosk .extension-candleappstore-centered-page{
+    margin-bottom:50vh;
+}
+
 .extension-candleappstore-centered-error{
 	text-align:center;
 }
@@ -1312,6 +1322,12 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     display:none;
 }
 
+#extension-candleappstore-screenshots img{
+    margin:2rem 0;
+}
+#extension-candleappstore-screenshots img + img{
+    margin-top:1rem;
+}
 
 /*
 .extension-candleappstore-domains h4{
@@ -1991,6 +2007,10 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 @media screen and (min-width: 1225px) {
     #extension-candleappstore-list .extension-candleappstore-item:first-of-type{
         background-image: url(../images/background3.png)!important;
+    }
+    
+    #extension-candleappstore-selected-main{
+        padding:4rem;
     }
 }
 

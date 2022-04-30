@@ -16,6 +16,8 @@
             
             this.debug = false;
             this.developer = false;
+            this.exhibit_mode = false;
+            
             this.apps_overview = {};
             this.installed = []; // has data about folders in the addons folder. Comes from app store addon, and is then updated if addons are installed or uninstalled.
             this.cloud_app_data = []; // list of available apps, comes from the web via app store addon. #TODO: buffer this data locally to protect privacy
@@ -50,6 +52,8 @@
             
             //console.log("local storage JWT: ", localStorage.getItem('jwt'));
                         
+            
+            document.getElementById('add-adapters-hint-anchor').href = '/candleappstore';
             
             //
             // PRE-INIT
@@ -92,7 +96,16 @@
                         }
                         document.body.classList.add('developer');
                     }
-                    this.developer = body.developer;
+                    if(document.body.classList.contains('developer')){
+                        this.developer = true;
+                        console.log("early init: developer = true");
+                    }
+                }
+                
+                if(typeof body.exhibit_mode != 'undefined'){
+                    if(body.exhibit_mode){
+                        this.exhibit_mode = true;
+                    }
                 }
                 
                 if(typeof body.disable_uninstall != 'undefined'){
@@ -100,7 +113,6 @@
                         this.disable_uninstall = true;
                     }
                 }
-                
                 
     
 			})
@@ -714,6 +726,7 @@
             document.getElementById("extension-candleappstore-developer-addon-install-button").addEventListener('click', (event) => {
                 console.log("manual addon install button clicked");
                 
+                if(this.exhibit_mode){return;}
                 
                 const addon_id = document.getElementById('extension-candleappstore-developer-addon-id').value;
                 const url = document.getElementById('extension-candleappstore-developer-addon-url').value;
@@ -817,6 +830,8 @@
             
             review_save_button.addEventListener('click', (event) => {
                 //console.log("review save button clicked");
+                
+                if(this.exhibit_mode){return;}
                 
                 review_response.innerHTML = "";
                 auth_response.innerHTML = "";
@@ -1017,7 +1032,11 @@
                         //document.getElementById('developer-settings-link').style.display = 'block';
                         document.body.classList.add('developer');
                     }
-                    this.developer = body.developer;
+                    if(document.body.classList.contains('developer')){
+                        this.developer = true;
+                        console.log("developer = true");
+                    }
+                    
                 }
                 
                 
@@ -1751,7 +1770,9 @@
                                     event.stopImmediatePropagation();
                                     //if (event.target.tagName.toLowerCase() === 'label') {
                                     //console.log( addon_id );
-                        
+                                    
+                                    
+                                    
                                     const this_addon_id = event.target.getAttribute('data-addon_id')
                         
                                     var should_enable = null;
@@ -1766,6 +1787,9 @@
                                     }
                                     
                                     if(should_enable != null){
+                                        if(this.developer == false){
+                                            document.getElementById('connectivity-scrim').classList.remove('hidden');
+                                        }
                                         //console.log("SWITCHING ADDON: " + this_addon_id + ", TO NEW STATE: " + should_enable);
                                         event.target.innerText = "....";
                                         window.API.setAddonSetting( this_addon_id, should_enable)
@@ -1774,8 +1798,8 @@
                 							//console.log(result);
                                             
                                             if(typeof result.enabled != 'undefined'){
-                                                console.log('addon has been switched to: ', result.enabled);
-                                                console.log("event.target.dataset.extension: ", event.target.dataset.extension);
+                                                //console.log('addon has been switched to: ', result.enabled);
+                                                //console.log("event.target.dataset.extension: ", event.target.dataset.extension);
                                             }
                                             
                                             //console.log("ui_extension = " + ui_extension);
@@ -1790,11 +1814,11 @@
                                             }
                                             
                                             //if(result['enabled']){
-                                                document.getElementById('connectivity-scrim').classList.remove('hidden');
+                                            if(this.developer == false){    
                                                 setTimeout(function(){
                                                     window.location.reload(true); // harsh, but no UI's without backends this way.
                                                 }, 2000);
-                                                
+                                            }
                                             //}
                                             
                                             
@@ -1851,10 +1875,12 @@
                                             else{
                                                 event.target.innerText = "Stop";
                                             }
+                                            document.getElementById('connectivity-scrim').classList.add('hidden');
                 							//pre.innerText = e.toString();
                 						});
                                     }
                                     else{
+                                        //document.getElementById('connectivity-scrim').classList.add('hidden');
                                         alert("There is something wrong with this app. You could try re-installing it.");
                                     }
                         
@@ -2075,19 +2101,19 @@
                 // Check if all addon directories are output in the list
                 var not_shown_addons_list = [];
                 if(page == 'installed'){
-                    console.log("shown_as_installed_list: ", shown_as_installed_list);
-                    console.log("installed dirs: ", this.installed);
+                    //console.log("shown_as_installed_list: ", shown_as_installed_list);
+                    //console.log("installed dirs: ", this.installed);
                     for(var p = 0; p < this.installed.length; p++){
                         
                         if(shown_as_installed_list.indexOf( this.installed[p] ) == -1){
-                            console.log("Spotted an addon that was not shown in the installed list, but should have been: ", this.installed[p]);
+                            console.log("Candle App store: warning, spotted an addon that was not shown in the installed list, but should have been: ", this.installed[p]);
                             not_shown_addons_list.push( this.installed[p] );
                         }
                     }
                 }
                 
                 if(not_shown_addons_list.length > 0){
-                    console.log("not_shown_addons_list: ", not_shown_addons_list);
+                    //console.log("not_shown_addons_list: ", not_shown_addons_list);
                     /*
                     this.get_installed_addons_data()
                     .then((result) => { 
@@ -2367,7 +2393,7 @@
                                                 screenshot1.onload = function() {
                                                     this.style.opacity = 1;
                                                 };
-                                                screenshot1.src = 'https://www.candlesmarthome.com/appstore/images/' + String(addon_id) + '/screenshot.png';
+                                                screenshot1.src = 'https://www.candlesmarthome.com/appstore/images/' + String(addon_id) + '/screenshot.jpg';
                                                 target_element.appendChild(screenshot1);
                                             
                                                 var screenshot2 = document.createElement('img');
@@ -2375,7 +2401,7 @@
                                                 screenshot2.onload = function() {
                                                     this.style.opacity = 1;
                                                 };
-                                                screenshot2.src = 'https://www.candlesmarthome.com/appstore/images/' + String(addon_id) + '/screenshot.jpg';
+                                                screenshot2.src = 'https://www.candlesmarthome.com/appstore/images/' + String(addon_id) + '/screenshot.png';
                                                 target_element.appendChild(screenshot2);
                                 
                                                 //document.getElementById('extension-candleappstore-screenshots').appendChild(img);
@@ -2476,7 +2502,11 @@
     					b.addEventListener('click', (event) => {
                             //console.log("install button clicked");
                             //console.log(event);
+                            
                             event.stopImmediatePropagation();
+                            
+                            if(this.exhibit_mode){return;}
+                            
                             event.target.style.display = 'none';
                             
                             //selected.style.display = 'none';
@@ -2550,7 +2580,9 @@
                                //console.log(event);
                                 event.stopImmediatePropagation();
                                 //console.log( data['versions'][v]["addon_id"] );
-                        
+                                
+                                if(this.exhibit_mode){return;}
+                                
                                 const addon_id = data['versions'][v]["addon_id"];
                         
                                 
@@ -3526,7 +3558,9 @@
                             //console.log("settings save button clicked");
                             //console.log(event);
                             event.stopImmediatePropagation();
-                    
+                            
+                            if(this.exhibit_mode){return;}
+                            
                             //const addon_id = data[i]["addon_id"];
                     
                             // extract new settings
@@ -3584,7 +3618,10 @@
                                 //console.log(new_data);
                         
                                 settings_container.classList.add("extension-candleappstore-busy");
-                                document.getElementById('connectivity-scrim').classList.remove('hidden');
+                                if(this.developer == false){
+                                    document.getElementById('connectivity-scrim').classList.remove('hidden');
+                                }
+                                
                         
                                 //window.API.setAddonConfig( addon_id, JSON.stringify(new_data) )
                                 window.API.setAddonConfig( addon_id, new_data )
