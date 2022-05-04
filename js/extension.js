@@ -714,9 +714,19 @@
             document.getElementById("extension-candleappstore-update-all-button").addEventListener('click', (event) => {
                 //console.log("update all button clicked");
                 this.update_all();
-                
             });
             
+            // Go to "add things" screen when addon was just installed
+            //document.getElementById('extension-candleappstore-post-install-settings-add-things-button').addEventListener('click', AddThingScreen.show.bind(AddThingScreen));
+            
+            /*
+            document.getElementById('extension-candleappstore-post-install-settings-add-things-button').addEventListener('click', (event) => {
+			    const things_menu_button = document.getElementById("things-menu-item");
+                if(things_menu_button != null){
+                    things_menu_button.click();
+                }
+            });
+            */
             
             //
             //   DEVELOPER TAB
@@ -2276,7 +2286,7 @@
                 
                     if(typeof data.error != 'undefined'){
                         //console.log("There was an arror showing the app. Maybe server gave a bad response?");
-                        alert("Sorry, there was a error. Details could not be loaded. It could be a connection error, or - less likely - an unknown app.");
+                        console.log("There was a error. Details could not be loaded. It could be a connection error, or - less likely - an unknown app.");
                         selected.style.display = 'none';
                         return;
                     }
@@ -2514,8 +2524,12 @@
                             document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
                             document.getElementById('extension-candleappstore-selected-main').style.display = 'none';
                             if(this.debug){
+                                console.log("data['versions'][v]: ", data['versions'][v]);
                                 console.log( "installing addon. parameters: ", data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] );
                             }
+                            
+                            document.getElementById('extension-candleappstore-busy-installing-name').innerText = data['versions'][v]["addon_id"];
+                            
                             window.API.installAddon( data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] )
                             .then((result) => { 
     							if(this.debug){
