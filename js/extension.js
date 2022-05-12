@@ -3079,7 +3079,7 @@
                         if(this.debug){
     					    console.log("get addon config result: ", data);
                         }
-    					console.log(data);
+    					//console.log(data);
                         //console.log(data['body']);
                 
                         //var spotted_advanced_setting = false;
@@ -3156,22 +3156,22 @@
                         }
                 
                         const settings_keys = Object.keys(addon_settings_props);
-                        //console.log("addon_settings_props:");
-                        //console.log(addon_settings_props);
+                        if(this.debug){
+                            console.log("addon_settings_props:");
+                            console.log(addon_settings_props);
+                        }
                         //console.log("all props: " + settings_keys);
                         //console.log("addon_settings_required = " + addon_settings_required);
                 
-                        /*
-                        settings_keys.forEach((info, index) => {
-                            if()
-                        });
-                        */
                 
                         var stop_processing = false;
                 
                         // Looping over the fields defined in the api_data schema
                         settings_keys.forEach((info, index) => {
-                            //console.log("ADDING SETTING ITEM: " + info);
+                            if(this.debug){
+                                console.log("ADDING SETTING ITEM: " + info);
+                            }
+                            
                             var advanced = false;
                             var is_required = false;
                     
