@@ -2123,8 +2123,10 @@
                 }
                 
                 if(not_shown_addons_list.length > 0){
-                    //console.log("not_shown_addons_list: ", not_shown_addons_list);
+                    console.log("not_shown_addons_list: ", not_shown_addons_list);
+                    
                     /*
+                    // Enabling this creates a loop
                     this.get_installed_addons_data()
                     .then((result) => { 
                         //console.log("in get_installed_addons_data.then");
@@ -2132,7 +2134,7 @@
                         
                         
                         for(var q = 0; q < not_shown_addons_list.length; q++){
-                            console.log("NOW SHOWN ADDON, SHOULD BE FIXED: ", not_shown_addons_list[q]);
+                            console.log("NOW SHOWN ADDON, SHOULD GET FIXED: ", not_shown_addons_list[q]);
                     
                     
                             window.API.setAddonSetting( not_shown_addons_list[q], true)
@@ -2158,6 +2160,7 @@
         				console.log("overlooked fix: get_installed_addons_data catch (error?):", e);
         			});
                     */
+                    
                 }
                 
                 
@@ -3224,7 +3227,9 @@
                     
                             //d.appendChild(p);
                     
-                    
+                            if(this.debug){
+                                console.log("appstore: creating input: ", addon_settings_props[info]);
+                            }
                             
                             
                             try{
@@ -3309,7 +3314,7 @@
                             
                                 }
                                 
-                                // STRING
+                                // STRING OR NUMBER
                                 
                                 else if( addon_settings_props[info]['type'] == 'string' || addon_settings_props[info].hasOwnProperty('string') || addon_settings_props[info]['type'] == 'integer' || addon_settings_props[info]['type'] == 'number'){
                                     //console.log("string spotted");
@@ -3325,8 +3330,34 @@
                         
                                     var input_type = 'text';
                                     if(addon_settings_props[info]['type'] != "string"){
-                                        if(addon_settings_props[info]['type'] == "integer"){
+                                        if(addon_settings_props[info]['type'] == "integer" || addon_settings_props[info]['type'] == "number"){
                                             input_type = "number";
+                                            if(typeof addon_settings_props[info]['minimum'] != 'undefined' && typeof addon_settings_props[info]['maximum'] != 'undefined'){
+                                                input_type = "range";
+                                                
+                                                var sv = document.createElement("div");
+                                                sv.id = css_element_id + "-value";
+                                                sv.classList.add('extension-candleappstore-range-input-value');
+                                                
+                                                if(data[info] != undefined){
+                                                    sv.innerText = data[info];
+                                                }
+                                                d.appendChild(sv);
+                                                
+                                                //console.log("- range. minimum: ", addon_settings_props[info]['minimum']);
+                                                //console.log("- range. maximum: ", addon_settings_props[info]['maximum']);
+                                                s.min = addon_settings_props[info]['minimum'];
+                                                s.max = addon_settings_props[info]['maximum'];
+                                                if(addon_settings_props[info]['type'] == "integer"){
+                                                    s.step = 1;
+                                                }
+                                                s.addEventListener('input', (event) => {
+                                                    //console.log('range value changed:', event, s.id, css_element_id);
+                                                    //console.log(s.value);
+                                                    document.getElementById(css_element_id + "-value").innerText = s.value;
+                                                });
+                                            }
+                                            
                                         }
                                         else{
                                             input_type = addon_settings_props[info]['type'];
@@ -3345,6 +3376,7 @@
                                     if(data[info] != undefined){
                                         s.value = data[info];
                                     }
+                                    // TODO get the initial default value and set it to that instead
                         
                         
                                     if(is_required){
@@ -3581,12 +3613,12 @@
                             var missing_value = false;
                             var new_data = {};
                             settings_keys.forEach((info, index) => {
-                                //console.log("EXTRACTING SETTING ITEM: " + info);
+                                //console.log("EXTRACTING SETTING ITEM: ", info);
                     
                                 const css_element_id = 'extension-candleappstore-settings-setting-' + this.makeSafeForCSS(info);
                                 //console.log("target element id: --" + css_element_id + '--');
                                 var target_element = document.getElementById( css_element_id );
-                        
+                                //console.log("target_element: ", target_element);
                                 //console.log("setting extraction target element:");
                                 //console.log(target_element);
                         
@@ -3596,9 +3628,37 @@
                                         new_data[info] = target_element.checked;
                             
                                     }
+                                    
+                                    else if( addon_settings_props[info]['type'] == 'number'){
+                                        
+                                        var value = target_element.value;
+                                        if(this.debug){
+                                            console.log("number value: ", value);
+                                        }
+                                        if( target_element.required && isNaN(value) ){
+                                            if(this.debug){
+                                                console.log("Warning, required number value was not filled: ", value);
+                                            }
+                                            missing_value = true;
+                                            target_element.classList.add("extension-candleappstore-settings-empty-warning"); 
+                                        }
+                                        new_data[info] = value;
+                                        
+                                    }
+                                    
+                                    else if( addon_settings_props[info]['type'] == 'range'){
+                                        var value = target_element.value;
+                                        if(this.debug){
+                                            console.log("range value: ", value);
+                                        }
+                                        new_data[info] = value;
+                                    }
+                                    
                                     else{
                                         var value = target_element.value;
-                                        //console.log("value: ", value);
+                                        if(this.debug){
+                                            console.log(addon_settings_props[info]['type'] + " value: ", value);
+                                        }
                                         // If the background color is black, set the background to none.
                                         if(css_element_id == 'extension-candleappstore-settings-setting-backgroundcolor'){
                                             //console.log("checking color value: ", value);
@@ -3609,7 +3669,9 @@
                                         }
                                         
                                         if( target_element.required && value == "" ){
-                                            //console.log("required value was not filled");
+                                            if(this.debug){
+                                                console.log("Warning, required value was not filled");
+                                            }
                                             missing_value = true;
                                             target_element.classList.add("extension-candleappstore-settings-empty-warning"); 
                                         }
