@@ -2367,7 +2367,9 @@
             
             document.getElementById('extension-candleappstore-filter-search-input').value = ''; // clear the search term, if there was one
             
-            document.getElementById("extension-candleappstore-selected-opinion").innerHTML = "";
+            if(document.getElementById("extension-candleappstore-selected-opinion") != null){
+                document.getElementById("extension-candleappstore-selected-opinion").innerHTML = "";
+            }
             
             const url = "get_app.php?addon_id=" + addon_id
             //console.log(url);
