@@ -14,9 +14,14 @@
     
 	      	this.content = '';
             
+            this.kiosk = false;
             this.debug = false;
             this.developer = false;
+            this.get_log_tail = false;
             this.exhibit_mode = false;
+            this.interval = null;
+            this.current_page = "installed";
+            this.busy_polling = false;
             
             this.apps_overview = {};
             this.installed = []; // has data about folders in the addons folder. Comes from app store addon, and is then updated if addons are installed or uninstalled.
@@ -44,6 +49,11 @@
 	        })
 	        .catch((e) => console.error('Failed to fetch content:', e));
             
+            
+            if(document.getElementById('virtualKeyboardChromeExtension') != null){
+                document.body.classList.add('kiosk');
+                this.kiosk = true;
+            }
             
             
             //document.getElementById('installed-addons-list').style.display = 'none';
@@ -95,6 +105,7 @@
                             document.getElementById('developer-settings-link').style.display = 'block';
                         }
                         document.body.classList.add('developer');
+                        this.get_log_tail = true;
                     }
                     if(document.body.classList.contains('developer')){
                         this.developer = true;
@@ -272,13 +283,16 @@
 
 		hide() {
 			//console.log("candleappstore hide called");
+            
 			try{
 				clearInterval(this.interval);
+                this.interval == null
 				//console.log("interval cleared");
 			}
 			catch(e){
 				//console.log("no interval to clear? " + e);
 			}
+            
 		}
 		
 
@@ -302,11 +316,12 @@
             
 			try{
 				clearInterval(this.interval);
+                this.interval == null
 			}
 			catch(e){
 				//console.log("no interval to clear?: " + e);
 			}
-			
+            
 			
             /*
             //function loadJSON(callback) {   
@@ -348,6 +363,8 @@
                     var desired_tab = event.target.innerText.toLowerCase().replace(/\s/g , "-");
                     if(desired_tab == '?'){desired_tab = 'help';}
                     //console.log("desired tab: " + desired_tab);
+                    
+                    this.current_page = desired_tab;
                     
                     for(var j=0; j<all_tabs.length;j++){
                         all_tabs[j].classList.add('extension-candleappstore-hidden');
@@ -796,6 +813,19 @@
             });
             
             
+            // Copy log line to clipboard
+            document.getElementById("extension-candleappstore-developer-log-tail").addEventListener('click', (event) => {
+                console.log("clicked on live log. event: ", event);
+                
+                var range = document.createRange();
+                //range.selectNode(document.getElementById(element_id));
+                range.selectNode(event.target);
+                window.getSelection().removeAllRanges(); // clear current selection
+                window.getSelection().addRange(range); // to select text
+                document.execCommand("copy");
+                window.getSelection().removeAllRanges();// to deselect
+            
+            });
             
             
             
@@ -928,10 +958,15 @@
             //  SHOP FILTERS
             //
             
-            document.getElementById('extension-candleappstore-filter-search-input').addEventListener('input', (event) => {
+            document.getElementById('extension-candleappstore-filter-search-input').addEventListener('change', (event) => {
                 //console.log('search input changed');
                 this.generate_overview('shop');
 			});
+            document.getElementById('extension-candleappstore-filter-search-input').addEventListener('blur', (event) => {
+                console.log('search input blurred');
+                this.generate_overview('shop');
+			});
+            
             
             document.getElementById('extension-candleappstore-filter-privacy-select').addEventListener('change', (event) => {
                 //console.log('privacy filter changed');
@@ -1146,6 +1181,98 @@
 			});
             
 
+
+            // Create interval
+            if(this.interval == null){
+    			this.interval = setInterval(() => {
+                    
+                    // The search field doesn't properly trigger from the virtual keyboard, so in this situation we check its contents every second
+                    if(this.kiosk && this.current_page == 'shop'){
+                        
+                        this.generate_overview('shop');
+                    }
+    
+                    // Create a live updating display of the internal log
+                    if(this.get_log_tail && this.current_page == 'developer' && this.busy_polling == false){
+                        this.busy_polling = true;
+                        
+                        try{
+                            // /poll
+            		        window.API.postJson(
+            		          `/extensions/${this.id}/api/ajax`,
+                                {'action':'poll'}
+
+            		        ).then((body) => {
+                                if(this.debug){
+                                    console.log("candle store poll response: ", body);
+                                }
+                                if(typeof body.tail != 'undefined'){
+                                    
+                                    const filter_text = document.getElementById('extension-candleappstore-developer-log-tail-filter').value;
+                                    
+                                    var filtered_lines = [];
+                                    if(filter_text.length > 1){
+                                        for(var f = 0; f < body.tail.length; f++){
+                                            if(body.tail[f].indexOf(filter_text) > -1){
+                                                filtered_lines.push(body.tail[f]);
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        filtered_lines = body.tail;
+                                    }
+                                    
+                                    var filtered_html = "";
+                                    for(var f = 0; f < filtered_lines.length; f++){
+                                        
+                                        //filtered_html += '<span>' + filtered_lines[f] + '</span><br/>';
+                                        
+                                        var chunked_line = "";
+                                        const line_array = filtered_lines[f].split(":");
+                                        
+                                        // add a new span tag after each colon
+                                        for(var x = 0; x < line_array.length; x++){
+                                            chunked_line += '<span>' + line_array[x];
+                                            
+                                            // Restore the colon
+                                            if(x < line_array.length - 1){
+                                                chunked_line += ':';
+                                            }
+                                        }
+                                        
+                                        
+                                        // Add lots of closing spans
+                                        for(var x = 0; x < line_array.length; x++){
+                                            chunked_line += '</span>';
+                                        }
+                                        filtered_html += chunked_line + "<br/>";
+                                        
+                                        
+                                    }
+                                    
+                                    document.getElementById('extension-candleappstore-developer-log-tail').innerHTML = filtered_html;
+                                }
+                                this.busy_polling = false;
+        
+            		        }).catch((e) => {
+            		  			console.log("Error polling: ", e);
+                                this.busy_polling = false;
+            		        });
+        
+                        }
+                        catch(e){
+                            console.log("Error doing poll: ", e);
+                            this.busy_polling = false;
+                        }
+                    }
+                    
+                    
+	
+    			}, 1000);
+            }
+
+
+
 		} // end of show()
 		
 	
@@ -1155,15 +1282,6 @@
     
     
     
-    
-    
-    
-		/*
-		hide(){
-			clearInterval(this.interval);
-			this.view.innerHTML = "";
-		}
-		*/
         
         // Ask python to request some app server data
         get_data = (url, parameters) =>
@@ -1278,7 +1396,7 @@
                     myReject({});
     	        });	
             });
-        };
+        }
         
         
         
@@ -2248,6 +2366,8 @@
             selected.style.display = 'block';
             
             document.getElementById('extension-candleappstore-filter-search-input').value = ''; // clear the search term, if there was one
+            
+            document.getElementById("extension-candleappstore-selected-opinion").innerHTML = "";
             
             const url = "get_app.php?addon_id=" + addon_id
             //console.log(url);
@@ -3861,6 +3981,9 @@
             return this.shade(this.int_to_rgba(this.hash(str)), -30);
 
         }
+        
+        
+        
         
 	}
     

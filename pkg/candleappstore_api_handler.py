@@ -2,6 +2,7 @@
 
 import os
 import re
+import sys
 import json
 #import copy
 import time
@@ -9,7 +10,7 @@ from time import sleep
 #import socket
 #from signal import SIGHUP
 import requests
-#import subprocess
+import subprocess
 #import threading
 
 #from .util import valid_ip, arpa_detect_gateways
@@ -193,6 +194,22 @@ class CandleappstoreAPIHandler(APIHandler):
                       status=200,
                       content_type='application/json',
                       content=json.dumps({'state':True, 'installed':addon_dirs }),
+                    )
+                    
+                    
+                elif action == 'poll':
+                    tail_lines = []
+                    try:
+                        tail_output = subprocess.check_output(['tail','-n100','/home/pi/.webthings/log/run-app.log']).decode(sys.stdout.encoding)
+                        tail_lines = tail_output.splitlines()
+                    except Exception as ex:
+                        print("Error getting log tail: " + str(ex))
+                        tail_lines = ["error getting tail: " + str(ex)];
+                        
+                    return APIResponse(
+                      status=200,
+                      content_type='application/json',
+                      content=json.dumps({'state':True, 'tail':tail_lines }),
                     )
                     
 

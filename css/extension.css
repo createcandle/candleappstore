@@ -116,6 +116,7 @@
     background-color:rgba(0,0,0,.1);
     padding:2rem;
     box-sizing:border-box;
+    margin:2rem 0;
 }
 
 
@@ -1764,6 +1765,25 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     width: calc(100% - 4rem);
     margin-bottom:2rem;
     padding:1rem;
+}
+
+#extension-candleappstore-developer-log-tail > span{
+    display:inline-block;
+    margin-bottom:1rem;
+    opacity:.8;
+    cursor:copy;
+}
+
+#extension-candleappstore-developer-log-tail span:hover{
+    opacity:1;
+}
+
+#extension-candleappstore-developer-log-tail span:hover span:not(:hover){
+    text-decoration:underline;
+}
+
+.extension-candleappstore-developer-log-hover:hover{
+    text-decoration:underline;
 }
 
 

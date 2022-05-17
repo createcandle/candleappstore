@@ -17,14 +17,14 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
 import re
 import json
 import time
-import queue
-import signal
+#import queue
+#import signal
 import socket
-import asyncio
-import logging
+#import asyncio
+#import logging
 import requests
-import threading
-import selectors
+#import threading
+#import selectors
 import subprocess
 from subprocess import call, Popen
 #from collections import namedtuple
@@ -208,6 +208,15 @@ class CandleappstoreAdapter(Adapter):
                 print("Extension API handler initiated")
         except Exception as e:
             print("Failed to start API handler (this only works on gateway version 0.10 or higher). Error: " + str(e))
+
+
+        # create or remove developer.txt from /boot
+        if self.developer:
+            os.system('sudo touch /boot/developer.txt')
+        else:
+            if os.path.isfile('/boot/developer.txt'):
+                os.system('sudo rm /boot/developer.txt')
+
 
         print("end of candle app store adapter init")
 
