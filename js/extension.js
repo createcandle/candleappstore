@@ -2446,6 +2446,10 @@
                     if(typeof data['versions'] != 'undefined'){
                         const keys = Object.keys(data['versions'][v]);
                 
+                        if(this.debug){
+                            console.log("data['versions'][v]: ", data['versions'][v]);
+                        }
+                
             			keys.forEach((info, index) => {
                             try{
                                 try{
@@ -2495,7 +2499,12 @@
                                                 //console.log("adding tags");
                                                 target_element.innerHTML = "";
                                                 if(typeof data['versions'][v][info] != 'undefined'){
-                                                    const tags_array = data['versions'][v][info].split(",");
+                                                    var tags_array = data['versions'][v][info].split(",");
+                                                    
+                                                    if(this.developer && typeof data['versions'][v]['primary_type'] != 'undefined'){
+                                                        tags_array.push(data['versions'][v]['primary_type']);
+                                                    }
+                                                    
                                                     //console.log("tags array: ", tags_array);
                                                     for (var j = 0; j < tags_array.length; j++) {
                                                         if(tags_array[j].length > 2){
