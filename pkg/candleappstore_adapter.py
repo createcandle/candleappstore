@@ -213,6 +213,7 @@ class CandleappstoreAdapter(Adapter):
         # create or remove developer.txt from /boot
         if self.developer:
             os.system('sudo touch /boot/developer.txt')
+            os.system('sudo systemctl start rsyslog.service')
         else:
             if os.path.isfile('/boot/developer.txt'):
                 os.system('sudo rm /boot/developer.txt')
