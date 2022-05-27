@@ -372,6 +372,8 @@
                     }
                     document.querySelector('#extension-candleappstore-tab-button-' + desired_tab).classList.add('extension-candleappstore-tab-selected'); // show tab
                     document.querySelector('#extension-candleappstore-tab-' + desired_tab).classList.remove('extension-candleappstore-hidden'); // show tab
+                    
+                    document.getElementById('extension-candleappstore-view').scrollTop = 0;
                 });
             };
             
@@ -402,7 +404,7 @@
             //console.log("installedlist:");
             //console.log(installedlist);
             
-            
+            document.getElementById('extension-candleappstore-view').scrollTop = 0;
             
 			selected_close_button.addEventListener('click', (event) => {
                 //console.log("Selected app close button clicked");
