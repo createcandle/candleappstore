@@ -7,7 +7,7 @@
             //console.log("API: ", window.API);
             
             
-			this.addMenuEntry('Candle app store');
+			this.addMenuEntry('Candle store');
 	
             //const page = require('page');
             //console.log(page);
@@ -124,6 +124,9 @@
                         this.disable_uninstall = true;
                     }
                 }
+                
+                // Make sure menu button is always visible. Can be hidden if the user returns from a complex addon settings page using their browser's back button.
+                //document.getElementById('menu-button').classList.remove('hidden');
                 
     
 			})
@@ -372,8 +375,6 @@
                     }
                     document.querySelector('#extension-candleappstore-tab-button-' + desired_tab).classList.add('extension-candleappstore-tab-selected'); // show tab
                     document.querySelector('#extension-candleappstore-tab-' + desired_tab).classList.remove('extension-candleappstore-hidden'); // show tab
-                    
-                    document.getElementById('extension-candleappstore-view').scrollTop = 0;
                 });
             };
             
@@ -404,22 +405,25 @@
             //console.log("installedlist:");
             //console.log(installedlist);
             
-            document.getElementById('extension-candleappstore-view').scrollTop = 0;
+            
             
 			selected_close_button.addEventListener('click', (event) => {
                 //console.log("Selected app close button clicked");
                 selected.style.display = 'none';
                 document.getElementById('extension-candleappstore-installation-failed').style.display = 'none';
+                document.getElementById('extension-candleappstore-view').style.zIndex = 'auto';
 			});
             
 			settings_close_button.addEventListener('click', (event) => {
                 //console.log("Settings close button clicked");
                 settings.style.display = 'none';
+                document.getElementById('extension-candleappstore-view').style.zIndex = 'auto';
 			});
             
 			auth_close_button.addEventListener('click', (event) => {
                 //console.log("Auth close button clicked");
                 auth.style.display = 'none';
+                document.getElementById('extension-candleappstore-view').style.zIndex = 'auto';
 			});
             
             
@@ -1086,7 +1090,6 @@
                     
                 }
                 
-                
                 this.get_installed_addons_data()
                 .then((result) => { 
                     //console.log("in get_installed_addons_data.then");
@@ -1095,6 +1098,7 @@
     			    console.log("Candle app store API init request error: ", e);
     			});
                 
+                //document.getElementById('menu-button').classList.remove('hidden');
 
 			})
             .catch((e) => {
@@ -1484,6 +1488,7 @@
         //  GENERATE OVERVIEW
         //
     
+        // Create lists of addons in different flavours
         generate_overview(page){
             try{
                 //const data = this.cloud_app_data; // this is data from the appstore server
@@ -2525,8 +2530,6 @@
                                                     //console.log("no tags present");
                                                 }
                                     
-                            
-                                                //clone.getElementsByClassName("extension-internet-radio-item-tags")[0].innerText = items[item].tags;
                                             }
                                 
                                             else if(info == 'screenshots'){
@@ -3136,6 +3139,7 @@
                     console.log("Error in adding ratings to selected app display: ", e);
                 }   
                 
+                document.getElementById('extension-candleappstore-view').style.zIndex = '3';
                 
             })
             .catch((e) => {
@@ -3159,7 +3163,7 @@
         
         show_addon_config(addon_id){ // ingests .schema data from self.api_addon_data
             try{
-           //console.log("in show_addon_config for: " + addon_id);
+                //console.log("in show_addon_config for: " + addon_id);
                 
                 // Clean up from previous addon settings
                 const pre = document.getElementById('extension-candleappstore-response-data');
@@ -3179,7 +3183,6 @@
                 
                 settings_options_bar.innerHTML = "";
                 advanced_form_container.style.display = "none";
-                
                 
                 
                 
@@ -3496,6 +3499,16 @@
                                             input_type = addon_settings_props[info]['type'];
                                         }
                                     }
+                                    else{
+                                        // ugly way of creating a password field
+                                        // https://github.com/WebThingsIO/gateway/issues/2918
+                                        if(typeof addon_settings_props[info]['writeOnly'] != 'undefined'){
+                                            if(addon_settings_props[info]['writeOnly'] == true){
+                                                input_type = 'password'
+                                            }
+                                        }
+                                    }
+                                    
                                     if(info.toLowerCase() == 'authorization token' || info.toLowerCase() == 'accessToken'){
                                         d.classList.add('extension-candleappstore-hidden-setting'); 
                                     }
@@ -3883,6 +3896,8 @@
 					console.log("get addons overview error: ", e);
 				});
                 
+                // get a z-index above the main menu button while overlay with back button is active
+                document.getElementById('extension-candleappstore-view').style.zIndex = '3';
                 
                 
             }
