@@ -26,7 +26,7 @@ This list is likely not complete, but should give an indication.
 
 Some addons are easy to use by beginners, while others may require more technical skill.
 
-- Beginner friendly. The addon works great out of the box. Having an attractive and easy to use UI what follows the existing design conventions is a plus (assuming a UI extension makes sense). The addon settings are easy to understand, and if something goes wrong or is missing (like a usb stick), the user is clearly informed.
+- Beginner friendly. The addon works great out of the box. Having an attractive and easy to use UI what follows the existing design conventions is a plus (assuming a UI extension makes sense). The addon settings are easy to understand, and if something goes wrong or is missing (like a usb stick), the user is clearly informed. It integrates well with voice control.
 - Tinkerer. The addons requires some technical knowledge to set up, but it's not too difficult to figure out. For example, an API code might need to be added to the settings before it will work. How easy is it for someone to figure this out? Does the addon help people take these steps, through explanation in the settings or github?
 - Expert. You understand quite a bit about how smart homes work, and you know what a lot of the jargon is, and who the players are. 
 - Hardcore. You have no problem using the linux command line, and can even troubleshoot a broken system.
