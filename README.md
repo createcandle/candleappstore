@@ -9,6 +9,13 @@ https://www.candlesmarthome.com
 
 Addons can have 5 privacy levels. Addons are rated manually by Candle, or by the community through their reviews.
 
+0. unknown
+1 to 2: bad
+2 to 3: poor
+3 to 4: ok
+4 and above: great
+
+
 Factors that are taken into account:
 - Data minimisation. Is data stored, and if so, are there options or built-in efforts to limit this?
 - Privacy design. Are there features to improve privacy? Are there mitigations for corporate surveillance and/or coveillance?
