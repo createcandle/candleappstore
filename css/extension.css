@@ -56,6 +56,7 @@
     padding-bottom:3rem;
     background-color: rgba(255,255,255,.1);
     border-radius: 0.5rem;
+    line-height:2.5rem;
 }
 
 
@@ -179,11 +180,18 @@
     word-wrap:break-word;
 }
 
+#extension-candleappstore-view p,
+#extension-candleappstore-view li{
+    line-height:2.5rem;
+}
+
 #extension-candleappstore-view textarea{
     width:calc(100% - 2rem);
     min-height:10rem;
     padding:1rem;
     margin: 1rem 0;
+    font-size:1.6rem;
+    font-family: sans-serif;
 }
 
 
@@ -382,14 +390,17 @@
     right:0rem;
     bottom:0rem;
     background: #305068;
-    padding:11rem 2rem 2rem 2rem;
+    padding:2rem;
     box-sizing:border-box;
 }
 
 #extension-candleappstore-selected .extension-candleappstore-centered-page{
     background-color:rgba(0,0,0,.1);
     border-radius:.5rem;
+    padding:2rem;
 }
+
+
 
 /*
 #extension-candleappstore-settings.extension-candleappstore-busy{
@@ -523,11 +534,16 @@
     /*box-sizing: border-box;*/
 }
 
+#extension-candleappstore-filter-search-container{
+    flex-grow:1;
+}
+
 #extension-candleappstore-filter-search-input{
     padding:0.8rem 1rem;
     border-radius:.5rem;
     border:none;
     font-size:1.6rem;
+    width:100%;
 }
 
 #extension-candleappstore-settings p{
@@ -754,6 +770,7 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 #extension-candleappstore-view select,
 #extension-candleappstore-view input{
     z-index:1;
+    max-width:100%;
 }
    
 
@@ -831,7 +848,7 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 .extension-candleappstore-tab-buttons{
     display:flex;
     flex-wrap:wrap;
-	margin-top: 2rem;
+	margin-top: 4rem;
 	background-color: rgba(255,255,255,.1);
 	border-radius: .7rem;
 	font-size:0;
@@ -962,7 +979,7 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 #extension-candleappstore-auth{
     display:none;
-    z-index:30;
+    z-index:101;
 }
 
 #extension-candleappstore-auth-state-container{
@@ -1066,10 +1083,16 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     display:none;
 }
 
+#extension-candleappstore-auth-response{
+    text-align: center;
+    margin: 2rem;
+    font-style: italic;
+}
+
+
 
 
 /*  SHOP FILTER  */
-
 
 #extension-candleappstore-filter-container,
 #extension-candleappstore-filter-container > div{
@@ -1078,7 +1101,7 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 #extension-candleappstore-filter-container{
     flex-wrap:wrap;
-    margin:2rem 0;
+    margin:4rem 0 2rem 0;
     justify-content:flex-end;
     gap:4rem;
 }
@@ -1092,6 +1115,14 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     flex-shrink:0;
 }
 
+#extension-candleappstore-filtered-out-tip{
+    width:100%;
+    padding:6rem;
+    text-align:center;
+    opacity:.6;
+    font-style: italic;
+}
+
 
 
 
@@ -1101,9 +1132,25 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 .extension-candleappstore-centered-error,
 .extension-candleappstore-centered-page{
-	padding:2rem;
+	padding:2rem 0;
 	max-width:80rem;
+    margin: 4rem auto;
 }
+
+/*
+#extension-candleappstore-tabs-container .extension-candleappstore-centered-page{
+    max-width: 60rem;
+    margin: 2rem auto;
+}
+
+#extension-candleappstore-auth .extension-candleappstore-centered-page{
+    max-width:60rem;
+}
+
+#extension-candleappstore-settings .extension-candleappstore-centered-page{
+    max-width:80rem;
+}
+*/
 
 .kiosk .extension-candleappstore-centered-page{
     margin-bottom:50vh;
@@ -1925,21 +1972,24 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 
 @media screen and (max-width: 640px) {
-
+    /*
     #extension-candleappstore-selected .extension-candleappstore-two-column{
         flex-direction:column-reverse;
     }
+    */
     #extension-candleappstore-selected .extension-candleappstore-two-column > *{
         width:100%;
         flex-grow:1;
     }
     
+    /*
     #extension-candleappstore-auth, 
     #extension-candleappstore-settings, 
     #extension-candleappstore-selected{
         padding-left:0;
         padding-right:0;
     }
+    */
 
     #extension-candleappstore-selected .extension-candleappstore-centered-page{
         background-color:transparent;
@@ -2015,6 +2065,13 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     	padding: 1rem 1.5rem;
     }
     
+    
+    #extension-candleappstore-auth,
+    #extension-candleappstore-settings,
+    #extension-candleappstore-selected{
+        padding: 11rem 8rem 2rem 8rem;
+    }
+    
 }
 
 /*
@@ -2035,7 +2092,6 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 	
 	#extension-candleappstore-content-container{
 		height:auto;
-		width: calc(100% - 3rem);
 	}
 	
     #extension-candleappstore-auth,
@@ -2043,6 +2099,11 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     #extension-candleappstore-selected{
         padding: 11rem 6rem 2rem 9rem;
     }
+    /*
+    #extension-candleappstore-tabs-container .extension-candleappstore-centered-page{
+        max-width: none;
+    }
+    */
     
     .extension-candleappstore-item{
         flex-wrap:inherit;
@@ -2076,11 +2137,12 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     #extension-candleappstore-view button:not(.text-button){
         padding:1rem 2rem;
     }
-    
+    /*
     .extension-candleappstore-centered-error,
     .extension-candleappstore-centered-page{
     	margin: 4rem auto;
     }
+    */
 	
 }
 
@@ -2092,6 +2154,12 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     
     #extension-candleappstore-selected-main{
         padding:4rem;
+    }
+}
+
+@media screen and (min-width: 1325px) {
+    #extension-candleappstore-list .extension-candleappstore-item:first-of-type{
+        background-image: url(../images/background33.png)!important;
     }
 }
 

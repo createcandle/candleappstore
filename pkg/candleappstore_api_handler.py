@@ -83,8 +83,8 @@ class CandleappstoreAPIHandler(APIHandler):
 
         request -- APIRequest object
         """
-        if self.DEBUG:
-            print("> > >  REQUEST < < <")
+        #if self.DEBUG:
+        #    print("> > >  REQUEST < < <")
         try:
         
             if request.method != 'POST':
@@ -94,8 +94,8 @@ class CandleappstoreAPIHandler(APIHandler):
             if request.path == '/ajax':
                 
                 action = str(request.body['action'])    
-                if self.DEBUG:
-                     print("ajax action = " + str(action))
+                #if self.DEBUG:
+                #     print("ajax action = " + str(action))
                 
                 
                 if action == 'init':
