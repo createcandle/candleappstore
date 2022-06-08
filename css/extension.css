@@ -1791,6 +1791,10 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     display:flex;
 }
 
+#extension-candleappstore-view #extension-candleappstore-selected-options button{
+    font-size:3rem;
+}
+
 .extension-candleappstore-selected-install-button,
 .extension-candleappstore-selected-uninstall-button{
     margin-top:2rem;

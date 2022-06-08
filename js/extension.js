@@ -2784,6 +2784,9 @@
                         }
                         else{
                             console.log('this addon is already being installed');
+                            document.getElementById('extension-candleappstore-busy-installing-name').innerText = data['versions'][v]["addon_id"];
+                            document.getElementById("extension-candleappstore-busy-installing").style.display = 'block';
+                            document.getElementById('extension-candleappstore-selected-main').style.display = 'none';
                         }
                     
                     }
