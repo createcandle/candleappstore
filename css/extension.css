@@ -27,6 +27,39 @@
 	margin:0 auto;
 }
 
+#extension-candleappstore-view {
+  	height: 100vh; /*calc(100% - 7.6rem);*/
+  	box-sizing: border-box;
+	overflow: auto;
+    /*
+	position: absolute;
+	top: 7.6rem;
+	left: 0;
+    */
+	padding: 2rem;
+}
+
+
+#extension-candleappstore-content {
+	display:flex;
+	flex-direction: column;
+	overflow: auto;
+  	/*position: relative;*/
+  	text-align: left;
+  	font-size: 1.6rem;
+  	color: #fff;
+	height:auto;
+    max-width: 100rem;
+    margin: 0 auto;
+}
+
+#extension-candleappstore-content img{
+	max-width:100%;
+}
+
+
+
+
 .extension-candleappstore-selected-description{
     font-style:italic;
     margin-top:1rem;
@@ -113,6 +146,7 @@
     flex-grow: 1;
 }
 
+#extension-hotspot-debug-warning,
 .extension-candleappstore-vlak{
     background-color:rgba(0,0,0,.1);
     padding:2rem;
@@ -120,6 +154,9 @@
     margin:2rem 0;
 }
 
+#extension-hotspot-debug-warning{
+    background-color:red;
+}
 
 .extension-candleappstore-vlak.extension-candleappstore-basic-info > *{
     display:block;
@@ -280,6 +317,9 @@
 
 .extension-candleappstore-basic-description{
     opacity:.8;
+}
+.extension-candleappstore-basic-description > p{
+    line-height:2.2rem;
 }
 
 #extension-candleappstore-list .extension-candleappstore-item{
@@ -779,35 +819,6 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
   	background-image: url('../images/menu-icon.svg');
 }
 
-#extension-candleappstore-view {
-  	height: 100%; /*calc(100% - 7.6rem);*/
-  	box-sizing: border-box;
-	overflow: auto;
-    /*
-	position: absolute;
-	top: 7.6rem;
-	left: 0;
-    */
-	padding: 2rem;
-}
-
-
-#extension-candleappstore-content {
-	display:flex;
-	flex-direction: column;
-	overflow: auto;
-  	/*position: relative;*/
-  	text-align: left;
-  	font-size: 1.6rem;
-  	color: #fff;
-	height:auto;
-    max-width: 100rem;
-    margin: 0 auto;
-}
-
-#extension-candleappstore-content img{
-	max-width:100%;
-}
 
 .extension-candleappstore-response-data{
 	text-align:center;
@@ -965,8 +976,28 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 }
 
 
+/*  BROKEN ADDONS  */
 
+#extension-candleappstore-broken-addons-container{
+    margin-top:6rem;
+}
 
+.extension-candleappstore-broken-addon-item{
+    background-color:red;
+    color:white;
+    border-radius:.5rem;
+    margin:1rem 0;
+    padding:1rem 2rem;
+    cursor:pointer;
+    opacity:.8;
+}
+.extension-candleappstore-broken-addon-item:hover{
+    opacity:1;
+}
+
+#extension-candleappstore-broken-addons-tip{
+    text-align:center;
+}
 
 
 

@@ -94,6 +94,7 @@ class CandleappstoreAdapter(Adapter):
         self.running = True
         self.app_store_url = 'https://www.candlesmarthome.com/appstore/'
         
+        # Exhibit mode
         self.exhibit_mode = False
         if os.path.isfile('/boot/exhibit_mode.txt'):
             self.exhibit_mode = True
@@ -155,7 +156,8 @@ class CandleappstoreAdapter(Adapter):
                 unique_id = generate_random_string(4)
                 self.persistent_data = { 'unique_id':unique_id, 'addons':{} }
             except Exception as ex:
-                print("Error creating initial persistence variable: " + str(ex))
+                if self.DEBUG:
+                    print("Error creating initial persistence variable: " + str(ex))
         
         
 
@@ -184,7 +186,8 @@ class CandleappstoreAdapter(Adapter):
             if 'permissions' not in self.persistent_data:
                 self.persistent_data['permissions'] = {}
         except Exception as ex:
-            print("Error fixing missing values in persistent data: " + str(ex))
+            if self.DEBUG:
+                print("Error fixing missing values in persistent data: " + str(ex))
         
         
         # LOAD CONFIG
@@ -219,7 +222,8 @@ class CandleappstoreAdapter(Adapter):
                 os.system('sudo rm /boot/developer.txt')
 
 
-        print("end of candle app store adapter init")
+        if self.DEBUG:
+            print("end of candle app store adapter init")
 
         self.ready = True
         
@@ -323,7 +327,8 @@ class CandleappstoreAdapter(Adapter):
                     if self.DEBUG:
                         print("-Authorization token is present in the config data.")
         except Exception as ex:
-            print("Error loading api token from settings: " + str(ex))
+            if self.DEBUG:
+                print("Error loading api token from settings: " + str(ex))
 
 
 
@@ -331,15 +336,16 @@ class CandleappstoreAdapter(Adapter):
 
     def scan_installed_addons(self):
         real_dirs = []
-        if self.DEBUG:
-            print("self.user_profile['addonsDir'] = " + str(self.user_profile['addonsDir']))
+        #if self.DEBUG:
+        #    print("self.user_profile['addonsDir'] = " + str(self.user_profile['addonsDir']))
         try:
             raw_dirs = os.listdir( self.user_profile['addonsDir'] )
             for filename in raw_dirs:
                 if os.path.isdir( os.path.join(self.user_profile['addonsDir'],filename) ):
                     real_dirs.append(filename)
         except Exception as ex:
-            print("could not get list of actually installed addons directories: " + str(ex))
+            if self.DEBUG:
+                print("could not get list of actually installed addons directories: " + str(ex))
             
         return real_dirs
 
@@ -352,7 +358,8 @@ class CandleappstoreAdapter(Adapter):
             if self.DEBUG:
                 print("User removed Candleappstore device")
         except:
-            print("Could not remove things from devices")
+            if self.DEBUG:
+                print("Could not remove things from devices")
 
 
 

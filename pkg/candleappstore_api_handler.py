@@ -107,7 +107,8 @@ class CandleappstoreAPIHandler(APIHandler):
                     try:
                         installed_addons = self.adapter.scan_installed_addons()
                     except Exception as ex:
-                        print("Error getting installed addons list: " + str(ex))
+                        if self.DEBUG:
+                            print("Error getting installed addons list: " + str(ex))
                         
                     return APIResponse(
                       status=200,
@@ -137,7 +138,8 @@ class CandleappstoreAPIHandler(APIHandler):
                             state = True
                             message = "Permission preference has been saved"
                     except Exception as ex:
-                        print("Error saving new permmission: " + str(ex))
+                        if self.DEBUG:
+                            print("Error saving new permmission: " + str(ex))
                     
                     
                     return APIResponse(
@@ -171,7 +173,8 @@ class CandleappstoreAPIHandler(APIHandler):
                                 json_data = response.text #json.loads(response.text)
                                 
                     except Exception as ex:
-                        print("error doing request: " + str(ex));
+                        if self.DEBUG:
+                            print("error doing request: " + str(ex));
                             
                     #print("self.persistent_data = " + str(self.persistent_data))
                     
@@ -188,7 +191,8 @@ class CandleappstoreAPIHandler(APIHandler):
                     try:
                         addon_dirs = self.adapter.scan_installed_addons()
                     except Exception as ex:
-                        print("Getting installed addon dirs error: " + str(ex))
+                        if self.DEBUG:
+                            print("Getting installed addon dirs error: " + str(ex))
                         
                     return APIResponse(
                       status=200,
@@ -200,10 +204,14 @@ class CandleappstoreAPIHandler(APIHandler):
                 elif action == 'poll':
                     tail_lines = []
                     try:
-                        tail_output = subprocess.check_output(['tail','-n100','/home/pi/.webthings/log/run-app.log']).decode(sys.stdout.encoding)
-                        tail_lines = tail_output.splitlines()
+                        if os.path.isfile('/home/pi/.webthings/log/run-app.log'):
+                            tail_output = subprocess.check_output(['tail','-n100','/home/pi/.webthings/log/run-app.log']).decode(sys.stdout.encoding)
+                            tail_lines = tail_output.splitlines()
+                        else:
+                            tail_lines = ["The internal log file doesn't exist (yet). The Privacy Manager addon might be set to automatically delete the internal logs as part of its privacy protection services."]
                     except Exception as ex:
-                        print("Error getting log tail: " + str(ex))
+                        if self.DEBUG:
+                            print("Error getting log tail: " + str(ex))
                         tail_lines = ["error getting tail: " + str(ex)];
                         
                     return APIResponse(
@@ -221,6 +229,7 @@ class CandleappstoreAPIHandler(APIHandler):
                         if self.adapter.keep_data_on_uninstall == False:
                             if 'addon_id' in request.body:
                                 addon_id = str(request.body['addon_id'])
+                                
                                 data_dir_to_delete = os.path.join(self.adapter.user_profile['dataDir'], addon_id)
                                 if self.DEBUG:
                                     print("uninstall data dir: " + str(data_dir_to_delete))
@@ -231,19 +240,38 @@ class CandleappstoreAPIHandler(APIHandler):
                                         print("data dir deleted")
                                         
                                 else:
-                                    print("error: uninstall: addon data dir did not exist?")
+                                    if self.DEBUG:
+                                        print("error: uninstall addon: data dir did not exist?")
+                                    
+                                addon_dir_to_delete = os.path.join(self.adapter.user_profile['addonsDir'], addon_id)
+                                if self.DEBUG:
+                                    print("uninstall addon dir: " + str(addon_dir_to_delete))
+                                if os.path.isdir(addon_dir_to_delete):
+                                    os.system('sudo rm -rf ' + str(addon_dir_to_delete))
+                                    state = True
+                                    if self.DEBUG:
+                                        print("addon dir deleted")
+                                        
+                                else:
+                                    if self.DEBUG:
+                                        print("uninstall addon: addon dir did not exist. This is normal.")
+                                    
+                                state = True
+                                    
                         else:
                             if self.DEBUG:
                                 print("keeping data from addon that is being uninstalled")
                             
                     except Exception as ex:
-                        print("Uninstall addon error: " + str(ex))
+                        if self.DEBUG:
+                            print("Uninstall addon error: " + str(ex))
                         
                     addon_dirs = []
                     try:
                         addon_dirs = self.adapter.scan_installed_addons()
                     except Exception as ex:
-                        print("Getting installed addon dirs error: " + str(ex))
+                        if self.DEBUG:
+                            print("Getting installed addon dirs error: " + str(ex))
                         
                     return APIResponse(
                       status=200,
@@ -257,8 +285,9 @@ class CandleappstoreAPIHandler(APIHandler):
             else:
                 return APIResponse(status=404)
                 
-        except Exception as e:
-            print("Failed to handle UX extension API request: " + str(e))
+        except Exception as ex:
+            if self.DEBUG:
+                print("Failed to handle UX extension API request: " + str(ex))
             return APIResponse(
               status=500,
               content_type='application/json',
@@ -266,15 +295,3 @@ class CandleappstoreAPIHandler(APIHandler):
             )
 
 
-
-        
-        except Exception as ex:
-            print("Error while filtering out privacy sensitive data: " + str(ex))
-            return {"error":"Error while doing privacy filtering"}
-        
-        
-        
-        
-
-        
-        

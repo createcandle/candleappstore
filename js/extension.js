@@ -37,7 +37,6 @@
             this.permissions = {};
             this.received_cloud_data = false;
             this.updating_all = false;
-            this.disable_uninstall = false;
             
 			fetch(`/extensions/${this.id}/views/content.html`)
 	        .then((res) => res.text())
@@ -117,12 +116,6 @@
                 if(typeof body.exhibit_mode != 'undefined'){
                     if(body.exhibit_mode){
                         this.exhibit_mode = true;
-                    }
-                }
-                
-                if(typeof body.disable_uninstall != 'undefined'){
-                    if(body.disable_uninstall){
-                        this.disable_uninstall = true;
                     }
                 }
                 
@@ -766,7 +759,7 @@
                 console.log("manual addon install button clicked");
                 
                 if(this.exhibit_mode){
-                    alert("cannot install, exhibit mode is active");
+                    alert("Sorry, cannot install, exhibit mode is active");
                     return;
                 }
                 
@@ -888,6 +881,7 @@
                 
                 if(this.exhibit_mode){
                     console.log("reviews cannot be added while in exhibit mode");
+                    alert("Sorry, reviews cannot be added in exhibit mode");
                     return;
                 }
                 
@@ -978,14 +972,16 @@
             //  SHOP FILTERS
             //
             
-            document.getElementById('extension-candleappstore-filter-search-input').addEventListener('input', (event) => {
+            document.getElementById('extension-candleappstore-filter-search-input').addEventListener('keyup', (event) => {
                 console.log('search input changed');
                 this.generate_overview('shop');
 			});
+            
             document.getElementById('extension-candleappstore-filter-search-input').addEventListener('blur', (event) => {
                 console.log('search input blurred');
                 this.generate_overview('shop');
 			});
+            
             
             
             document.getElementById('extension-candleappstore-filter-privacy-select').addEventListener('change', (event) => {
@@ -1002,6 +998,19 @@
                 //console.log('expert filter changed');
                 this.generate_overview('shop');
 			});
+            
+            document.getElementById('extension-candleappstore-broken-addons-list').addEventListener('click', (event) => {
+                //console.log('event.target', event.target);
+                
+                if(typeof event.target.dataset.addon_id != 'undefined'){
+                    //console.log("addon_id: ", event.target.dataset.addon_id);
+                    event.target.style.display = 'none';
+                    this.manual_uninstall(event.target.dataset.addon_id);
+                }
+                
+			});
+            
+            
             
             // Useful info about the system and what addons it may be able to install
             /*
@@ -1147,7 +1156,7 @@
                 else{
                     //console.log("asking for data from the cloud");
                     // Get data for apps overview
-                    this.get_data("get_apps.php").then(response => {
+                    this.get_data("get_apps.json").then(response => {
                         //console.log(" GET ALL APPS from CLOUD response:");
                         //console.log(response);
                 
@@ -1177,7 +1186,7 @@
                 else{
                     //console.log("asking for data from the cloud");
                     // Get data for apps overview
-                    this.get_data("get_apps.php").then(response => {
+                    this.get_data("get_apps.json").then(response => {
                         //console.log(" GET ALL APPS from CLOUD response:");
                         //console.log(response);
                 
@@ -1442,11 +1451,11 @@
     
     
         update_loop(){
-            console.log("in update_loop");
+            //console.log("in update_loop");
             if(this.addons_to_update.length > 0 ){
                 
                 const random_addon_id_index = Math.floor(Math.random() * this.addons_to_update.length);
-                console.log('random_addon_id_index: ', random_addon_id_index);
+                //console.log('random_addon_id_index: ', random_addon_id_index);
                 const cloud_addon_data = this.get_cloud_addon_data(this.addons_to_update[random_addon_id_index]);
                 if(cloud_addon_data != null){
                     window.API.updateAddon( cloud_addon_data.addon_id, cloud_addon_data.download_url, cloud_addon_data.checksum )
@@ -1468,7 +1477,7 @@
                             //}
                         }
                         else{
-                            console.log('on to the next addon.');
+                            //console.log('on to the next addon.');
                             this.generate_overview('updates');
                             this.update_loop();
                         }
@@ -2283,8 +2292,22 @@
                     }
                 }
                 
+                // Show list of broken addons
                 if(not_shown_addons_list.length > 0){
                     console.log("not_shown_addons_list: ", not_shown_addons_list);
+                    
+                    document.getElementById('extension-candleappstore-broken-addons-list').innerHTML = "";
+                    
+                    for(var b = 0; b < not_shown_addons_list.length; b++){
+                        var broken_item_el = document.createElement('div');
+                        broken_item_el.appendChild(document.createTextNode("Delete " + not_shown_addons_list[b]));
+                        broken_item_el.classList.add('extension-candleappstore-broken-addon-item');
+                        broken_item_el.dataset.addon_id = not_shown_addons_list[b];
+                        document.getElementById('extension-candleappstore-broken-addons-list').appendChild(broken_item_el);
+                    }
+                    document.getElementById('extension-candleappstore-broken-addons-container').style.display = 'block';
+                    
+                    
                     
                     /*
                     // Enabling this creates a loop
@@ -2323,7 +2346,9 @@
                     */
                     
                 }
-                
+                else{
+                    document.getElementById('extension-candleappstore-broken-addons-container').style.display = "none";
+                }
                 
                 
                 
@@ -2381,6 +2406,31 @@
             
         }
         
+        
+        
+        manual_uninstall(addon_id){
+            // remove data dir
+            if(this.debug){
+                console.log("will try to manually uninstall addon: ", addon_id);
+            }
+    		window.API.postJson(
+    			`/extensions/candleappstore/api/ajax`,
+    			{'action':'uninstall','addon_id':addon_id}
+    		)
+            .then((body) => {
+                if(this.debug){
+                    console.log("Manual uninstall: removed addon? ", body);
+                }
+                if(typeof body.addon_dirs != 'undefined'){
+                    this.installed = body.addon_dirs;
+                }
+                document.getElementById('extension-candleappstore-broken-addons-tip').style.display = 'block';
+            
+    		})
+            .catch((e) => {
+    			console.log("candleappstore: error calling manually delete addon: ", e);
+    		});
+        }
         
         
         
@@ -2704,6 +2754,7 @@
                             
                                 if(this.exhibit_mode){
                                     console.log("not installing - exhibit mode active");
+                                    alert("Sorry, cannot install while in exhibit mode");
                                     return;
                                 }
                             
@@ -2796,7 +2847,7 @@
                 
                     else if( installed && data['versions'][v]["addon_id"] != undefined ){
                     
-                        if(data['versions'][v]["addon_id"] != 'candleappstore' && this.disable_uninstall == false){
+                        if(data['versions'][v]["addon_id"] != 'candleappstore'){
                             
                             var b = document.createElement("button");
                             b.classList.add('extension-candleappstore-selected-uninstall-button');
@@ -2810,7 +2861,12 @@
                                 event.stopImmediatePropagation();
                                 //console.log( data['versions'][v]["addon_id"] );
                                 
-                                if(this.exhibit_mode){return;}
+                                if(this.exhibit_mode){
+                                    console.log("Cannot uninstall while in exhibit mode");
+                                    alert("Sorry, cannot uninstall while in exhibit mode");
+                                    return;
+                                    
+                                }
                                 
                                 const addon_id = data['versions'][v]["addon_id"];
                         
@@ -3829,7 +3885,11 @@
                             //console.log(event);
                             event.stopImmediatePropagation();
                             
-                            if(this.exhibit_mode){return;}
+                            if(this.exhibit_mode){
+                                console.log("Cannot change settings while in exhibit mode");
+                                alert("Sorry, cannot change settings while in exhibit mode");
+                                return;
+                            }
                             
                             //const addon_id = data[i]["addon_id"];
                     
