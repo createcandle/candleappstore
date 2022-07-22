@@ -3943,7 +3943,7 @@
                                     else{
                                         var value = target_element.value;
                                         if(this.debug){
-                                            console.log("fell through");
+                                            console.log("fell through, likely a string type");
                                             console.log(addon_settings_props[info]['type'] + " value: ", value);
                                         }
                                         // If the background color is black, set the background to none.
