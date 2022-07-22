@@ -3439,7 +3439,7 @@
                         // Looping over the fields defined in the api_data schema
                         settings_keys.forEach((info, index) => {
                             if(this.debug){
-                                console.log("ADDING SETTING ITEM: " + info);
+                                console.log("appstore debug: adding setting item: " + info);
                             }
                             
                             var advanced = false;
@@ -3498,7 +3498,7 @@
                             //d.appendChild(p);
                     
                             if(this.debug){
-                                console.log("appstore: creating input: ", addon_settings_props[info]);
+                                console.log("appstore debug: creating input: ", addon_settings_props[info]);
                             }
                             
                             
@@ -3907,6 +3907,9 @@
                                 //console.log(target_element);
                         
                                 try{
+                                    if(this.debug){
+                                        console.log("addon_settings_props[info]['type']: ", addon_settings_props[info]['type']);
+                                    }
                                     //if( typeof info == "boolean" ){
                                     if( addon_settings_props[info]['type'] == 'boolean'){                                
                                         new_data[info] = target_element.checked;
@@ -3914,8 +3917,7 @@
                                     }
                                     
                                     else if( addon_settings_props[info]['type'] == 'number'){
-                                        
-                                        var value = target_element.value;
+                                        var value = parseFloat(target_element.value);
                                         if(this.debug){
                                             console.log("number value: ", value);
                                         }
@@ -3931,7 +3933,7 @@
                                     }
                                     
                                     else if( addon_settings_props[info]['type'] == 'range'){
-                                        var value = target_element.value;
+                                        var value = parseFloat(target_element.value);
                                         if(this.debug){
                                             console.log("range value: ", value);
                                         }
@@ -3941,6 +3943,7 @@
                                     else{
                                         var value = target_element.value;
                                         if(this.debug){
+                                            console.log("fell through");
                                             console.log(addon_settings_props[info]['type'] + " value: ", value);
                                         }
                                         // If the background color is black, set the background to none.
@@ -3982,7 +3985,10 @@
                                     document.getElementById('connectivity-scrim').classList.remove('hidden');
                                 }
                                 
-                        
+                                if(this.debug){
+                                    console.log("saving config for: ", addon_id);
+                                    console.log("new config data: ", new_data);
+                                }
                                 //window.API.setAddonConfig( addon_id, JSON.stringify(new_data) )
                                 window.API.setAddonConfig( addon_id, new_data )
                                 .then(() => { 
@@ -4005,7 +4011,7 @@
                                     */
                                     
             					}).catch((e) => {
-            						console.log("uninstallation catch (error?): ", e);
+            						console.log("setAddonConfig catch (error?): ", e);
                                     alert("There was a connection error while saving the settings.");
                                     document.getElementById("extension-candleappstore-settings").style.display = 'none';
                                     document.getElementById('connectivity-scrim').classList.add('hidden');
