@@ -39,7 +39,7 @@
         },
         "Show developer options": {
           "type": "boolean",
-          "description": "Advanced. If you are a developer (programmer) working on Candle or just need more control, then you can show the developer options. You can also make them visible by going to the settings page and clicking on the gear icon 4 times."
+          "description": "Advanced. If you are a developer (programmer) working on Candle or just need more control, then you can show the developer options. You can also make them visible by going to the settings page and clicking on the gear icon 4 times. Some developer features, such as the internal logs, will also require a reboot to change."
         },
         "Keep addon data when uninstalling": {
           "type": "boolean",
@@ -55,7 +55,7 @@
     }
   },
   "short_name": "candleapps",
-  "version": "0.4.16",
+  "version": "0.4.17",
   "web_accessible_resources": [
     "css/*.css",
     "images/*.svg",
