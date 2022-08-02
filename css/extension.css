@@ -2117,9 +2117,9 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 @media screen and (min-width: 1025px) {
 	#extension-candleappstore-view{
-		left:9.6rem;
+		/*left:9.6rem;
 		top: 0;
-		height:100vh; 
+		height:100vh; */
 		/*position:absolute;
 		width: calc(100% - 9.6rem);
 		padding-right:9.6rem;*/

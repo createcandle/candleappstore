@@ -1473,7 +1473,7 @@
                             //if(confirm("Your addons have been updated. In order to see the latest versions you will need to reload this page. Would you like to do that now?")){
                                 setTimeout(function(){
                                     window.location.reload(true); // harsh, but no UI's without backends this way.
-                                }, 2000);
+                                }, 2500);
                             //}
                         }
                         else{
@@ -1982,7 +1982,7 @@
                                             if(this.developer == false){    
                                                 setTimeout(function(){
                                                     window.location.reload(true); // harsh, but no UI's without backends this way.
-                                                }, 2000);
+                                                }, 2500);
                                             }
                                             //}
                                             
@@ -3992,13 +3992,13 @@
                                 //window.API.setAddonConfig( addon_id, JSON.stringify(new_data) )
                                 window.API.setAddonConfig( addon_id, new_data )
                                 .then(() => { 
-            						//console.log("saved settings result for addon: " + addon_id);
-            						//console.log(result); 
-                                    
+            						if(this.debug){
+                                        console.log("saved settings result for addon: " + addon_id);
+                                    }
                                     
                                     setTimeout(function(){
                                         window.location.reload(true); // harsh, but no UI's without backends this way.
-                                    }, 2000);
+                                    }, 3000);
                                     
                                     /*
                                     setTimeout(function(){
@@ -4012,9 +4012,9 @@
                                     
             					}).catch((e) => {
             						console.log("setAddonConfig catch (error?): ", e);
-                                    alert("There was a connection error while saving the settings.");
                                     document.getElementById("extension-candleappstore-settings").style.display = 'none';
                                     document.getElementById('connectivity-scrim').classList.add('hidden');
+                                    alert("There was a connection error while saving the settings.");
             					});
                         
                             }
