@@ -323,7 +323,7 @@
 				//console.log("no interval to clear?: " + e);
 			}
             
-			
+			document.getElementById('menu-button').classList.remove('hidden');
             /*
             //function loadJSON(callback) {   
             function loadJSON() {   
@@ -2770,7 +2770,7 @@
                                     console.log( "installing addon. parameters: ", data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] );
                                 }
                             
-                                document.getElementById('extension-candleappstore-busy-installing-name').innerText = data['versions'][v]["addon_id"];
+                                document.getElementById('extension-candleappstore-busy-installing-name').innerText = data['versions'][v]["addon_id"].replace('-',' ').replace('adapter',' ').replace('addons',' ');
                             
                                 window.API.installAddon( data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] )
                                 .then((result) => { 
