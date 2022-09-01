@@ -1080,7 +1080,7 @@
                 }
                 
                 if(this.debug){
-                    console.log("App Store INIT response: ", body);
+                    console.log("App Store debug: INIT response: ", body);
                 }
                 
                 // Received data from Candle server?
@@ -1233,7 +1233,7 @@
 
             		        ).then((body) => {
                                 if(this.debug){
-                                    console.log("candle store poll response: ", body);
+                                    console.log("Appstoe debug: candle store poll response: ", body);
                                 }
                                 if(typeof body.tail != 'undefined'){
                                     
@@ -2419,7 +2419,7 @@
     		)
             .then((body) => {
                 if(this.debug){
-                    console.log("Manual uninstall: removed addon? ", body);
+                    console.log("Appstore debug: Manual uninstall: removed addon? ", body);
                 }
                 if(typeof body.addon_dirs != 'undefined'){
                     this.installed = body.addon_dirs;
@@ -2478,8 +2478,7 @@
             this.get_data(url)
             .then(data => {
                 if(this.debug){
-    				console.log("show_selected_app: GET APP response: ");
-    				console.log(data);
+    				console.log("appstore debug: show_selected_app: GET APP response: ", data);
                 }
                 
                 //this.show_selected_app(data_addon_id, response, target.getAttribute('data-installed') ); // data, and whether it is installed already
@@ -2770,7 +2769,7 @@
                                     console.log( "installing addon. parameters: ", data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] );
                                 }
                             
-                                document.getElementById('extension-candleappstore-busy-installing-name').innerText = data['versions'][v]["addon_id"].replace('-',' ').replace('adapter',' ').replace('addons',' ');
+                                document.getElementById('extension-candleappstore-busy-installing-name').innerText = data['versions'][v]["addon_id"].replace('-',' ').replace('-adapter',' ').replace('-addon',' ');
                             
                                 window.API.installAddon( data['versions'][v]["addon_id"], data['versions'][v]["download_url"], data['versions'][v]["checksum"] )
                                 .then((result) => { 
@@ -3309,8 +3308,10 @@
                 
                 document.getElementById("extension-candleappstore-settings-title").innerText = "";
                 document.getElementById('extension-candleappstore-settings-options').style.display = 'block';
+                document.getElementById('extension-candleappstore-settings-geo-tip').style.display = 'none';
                 form.innerHTML = "";
                 advanced_form.innerHTML = "";
+                
                 //if(this.developer == false){
                 //    advanced_form.style.display = 'none';
                 //}
@@ -3416,6 +3417,12 @@
                         }
     
                 
+                
+                        if(addon_id == 'weather-adapter'){
+                            document.getElementById('extension-candleappstore-settings-geo-tip').style.display = 'block';
+                        }
+                        
+                
                         //console.log("addon_settings_schema:", addon_settings_schema);
                 
                         const addon_settings_props = addon_settings_schema['properties'];
@@ -3470,6 +3477,12 @@
                             var t = document.createTextNode(info);
                             l.appendChild(t); // append text to label
                 
+                            if(info.indexOf('atitude') != -1 || info.indexOf('ontitude') != -1 || info.toLowerCase() == 'lat' || info.toLowerCase() == 'lon'){
+                                if(this.debug){
+                                    console.log("detected lat/lon input, inout name: ", info);
+                                }
+                                document.getElementById('extension-candleappstore-settings-geo-tip').style.display = 'block';
+                            }
                             
                             //s.classList.add('extension-candleappstore-nice-name-span');      
                             //var t = document.createTextNode(data[i][info]);

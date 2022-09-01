@@ -901,6 +901,15 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 
 
+/*   CONFIG  */
+
+#extension-candleappstore-settings-geo-tip{
+    font-style:italic;
+    background-color:rgba(0,0,0,.1);
+    border-radius:.5rem;
+    padding:2rem;
+}
+
 
 
 
