@@ -1233,7 +1233,7 @@
 
             		        ).then((body) => {
                                 if(this.debug){
-                                    console.log("Appstoe debug: candle store poll response: ", body);
+                                    console.log("Appstore debug: candle store poll response: ", body);
                                 }
                                 if(typeof body.tail != 'undefined'){
                                     
