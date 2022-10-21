@@ -51,4 +51,10 @@ https://github.com/createcandle/addons-list
 
 
 
+## Manual installation
+
+The easiets way is to install the SeaShell addon, and then execute this command in it:
+
+`git clone https://github.com/createcandle/candleappstore.git /home/pi/.webthings/addons/candleappstore`
+
 
