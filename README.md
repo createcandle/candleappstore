@@ -57,4 +57,5 @@ The easiets way is to install the SeaShell addon, and then execute this command 
 
 `git clone https://github.com/createcandle/candleappstore.git /home/pi/.webthings/addons/candleappstore`
 
+Then reboot your controller and it will show up in the addons list.
 
