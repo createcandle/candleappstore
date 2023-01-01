@@ -4,6 +4,7 @@ An app store addon for the Candle Controller. It is a core component of the Cand
 
 https://www.candlesmarthome.com
 
+![Candle store screenshot](screenshot.jpg?raw=true "Candle store screenshot")
 
 ## Privacy levels
 
