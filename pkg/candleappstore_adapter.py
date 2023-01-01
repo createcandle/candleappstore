@@ -1,4 +1,4 @@
-"""Candleappstore adapter for WebThings Gateway."""
+"""Candleappstore adapter for Candle Controller / WebThings Gateway."""
 
 # A future release will no longer show privacy sensitive information via the debug option. 
 # For now, during early development, it will be available. Please be considerate of others if you use this in a home situation.
@@ -49,7 +49,6 @@ try:
     #pass
 except Exception as ex:
     print("Unable to load CandleappstoreAPIHandler (which is used for UI extention): " + str(ex))
-
 
 
 _TIMEOUT = 3
@@ -126,7 +125,12 @@ class CandleappstoreAdapter(Adapter):
             print("Error: could not make sure data dir exists: " + str(ex))
             
 
-        # Get persistent data
+        # Cached files paths
+        self.cached_get_apps_path = os.path.join(self.data_dir_path,'get_apps.json')
+
+
+        
+        # determine the persistent data path
         try:
             self.persistence_file_path = os.path.join(self.data_dir_path, 'persistence.json')
             if self.DEBUG:
@@ -139,26 +143,25 @@ class CandleappstoreAdapter(Adapter):
                 print("Double error making persistence file path")
                 self.persistence_file_path = "/home/pi/.webthings/data/candleappstore/persistence.json"
         
-        if self.DEBUG:
-            print("Current working directory: " + str(os.getcwd()))
         
+        
+        
+        # Get persistent data
+        self.persistent_data = {}
         first_run = False
         try:
-            with open(self.persistence_file_path) as f:
-                self.persistent_data = json.load(f)
-                if self.DEBUG:
-                    print("Persistence data was loaded succesfully.")
-                        
+            if os.path.exists(self.persistence_file_path):
+                with open(self.persistence_file_path) as f:
+                    self.persistent_data = json.load(f)
+                    if self.DEBUG:
+                        print("Persistence data was loaded succesfully.")
+            else:
+                print("warning, no persistent data was found. If you just installed the add-on then this is normal.")
+                first_run = True
+                
         except Exception as ex:
             first_run = True
-            print("Could not load persistent data (if you just installed the add-on then this is normal): " + str(ex))
-            try:
-                unique_id = generate_random_string(4)
-                self.persistent_data = { 'unique_id':unique_id, 'addons':{} }
-            except Exception as ex:
-                if self.DEBUG:
-                    print("Error creating initial persistence variable: " + str(ex))
-        
+            print("Error loading persistent data: " + str(ex))
         
 
         #time.sleep(3) # give the network some more time to settle
@@ -179,12 +182,15 @@ class CandleappstoreAdapter(Adapter):
                     print("unique_id was not in persistent data, adding it now.")
                 self.persistent_data['unique_id'] = generate_random_string(20)
                 self.save_persistent_data()
-            if 'addons' not in self.persistent_data:
-                if self.DEBUG:
-                    print("addons was not in persistent data, adding it now.")
-                self.persistent_data['addons'] = {}
+            #if 'addons' not in self.persistent_data: # TODO: is this used for anything?
+            #    if self.DEBUG:
+            #        print("addons was not in persistent data, adding it now.")
+            #    self.persistent_data['addons'] = {}
             if 'permissions' not in self.persistent_data:
                 self.persistent_data['permissions'] = {}
+            if 'meta_updated_time' not in self.persistent_data:
+                self.persistent_data['meta_updated_time'] = 0
+                
         except Exception as ex:
             if self.DEBUG:
                 print("Error fixing missing values in persistent data: " + str(ex))
@@ -215,15 +221,48 @@ class CandleappstoreAdapter(Adapter):
 
         # create or remove developer.txt from /boot
         if self.developer:
+            if self.DEBUG:
+                print("creating developer.txt file")
             os.system('sudo touch /boot/developer.txt')
             os.system('sudo systemctl start rsyslog.service')
         else:
             if os.path.isfile('/boot/developer.txt'):
+                if self.DEBUG:
+                    print("removing developer.txt file")
                 os.system('sudo rm /boot/developer.txt')
 
 
+
+        # get data required to find optimal packages to install
+
+        self.bits = 32
+        try:
+            bits_check = shell('getconf LONG_BIT')
+            self.bits = int(bits_check)
+            if self.DEBUG:
+                print("System bits: " + str(self.bits))
+        except Exception as ex:
+            print("error getting bits of system: " + str(ex))
+
+        
+        self.python_version = '3.9'
+        try:
+            python_check = shell('python3 --version')
+            python_check = python_check.replace("Python ", "")
+            python_version_parts = python_check.split('.')
+            if len(python_version_parts) == 3:
+                self.python_version = str(python_version_parts[0]) + "." + str(python_version_parts[1])
+            if self.DEBUG:
+                print("Python version: " + str(self.python_version))
+        except Exception as ex:
+            print("error getting Python version system: " + str(ex))
+
+
+
+
         if self.DEBUG:
-            print("end of candle app store adapter init")
+            print("Current working directory: " + str(os.getcwd()))
+            print("End of candle app store adapter init")
 
         self.ready = True
         
@@ -296,7 +335,6 @@ class CandleappstoreAdapter(Adapter):
             print("Error! Failed to store overridden settings in database: " + str(ex))
         
         
-        
         # Candleappstore name
         try:
             if 'Candleappstore name' in config:
@@ -305,7 +343,6 @@ class CandleappstoreAdapter(Adapter):
                 self.candleappstore_name = str(config['Candleappstore name'])
         except Exception as ex:
             print("Error loading candleappstore name from config: " + str(ex))
-        
         
         
         # Candleappstore password
@@ -331,9 +368,6 @@ class CandleappstoreAdapter(Adapter):
                 print("Error loading api token from settings: " + str(ex))
 
 
-
-
-
     def scan_installed_addons(self):
         real_dirs = []
         #if self.DEBUG:
@@ -350,11 +384,10 @@ class CandleappstoreAdapter(Adapter):
         return real_dirs
 
 
- 
     def remove_thing(self, device_id):
         try:
             obj = self.get_device(device_id)        
-            self.handle_device_removed(obj)                     # Remove candleappstore thing from device dictionary
+            self.handle_device_removed(obj) # Remove candleappstore thing from device dictionary
             if self.DEBUG:
                 print("User removed Candleappstore device")
         except:

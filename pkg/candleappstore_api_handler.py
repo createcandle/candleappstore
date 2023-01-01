@@ -99,9 +99,9 @@ class CandleappstoreAPIHandler(APIHandler):
                 
                 
                 if action == 'init':
-                    if self.DEBUG:
-                        print('ajax handling init')
-                        print("self.adapter.persistent_data = " + str(self.adapter.persistent_data))
+                    #if self.DEBUG:
+                    #    print('ajax handling init')
+                    #    print("self.adapter.persistent_data = " + str(self.adapter.persistent_data))
                     
                     installed_addons = []
                     try:
@@ -113,7 +113,20 @@ class CandleappstoreAPIHandler(APIHandler):
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state' : True, 'message' : 'initialisation complete', 'addons': self.adapter.persistent_data['addons'], 'app_store_url':self.adapter.app_store_url, 'installed':installed_addons, 'permissions':self.adapter.persistent_data['permissions'], 'developer':self.adapter.developer, 'disable_uninstall':self.adapter.disable_uninstall, 'exhibit_mode':self.adapter.exhibit_mode, 'debug':self.adapter.DEBUG}),
+                      content=json.dumps({'state' : True, 
+                                          'message' : 'initialisation complete', 
+                                          #'addons': self.adapter.persistent_data['addons'], # doesn't seem used by anything
+                                          'meta_updated_time': self.adapter.persistent_data['meta_updated_time'], 
+                                          'app_store_url':self.adapter.app_store_url, 
+                                          'installed':installed_addons, 
+                                          'permissions':self.adapter.persistent_data['permissions'], 
+                                          'developer':self.adapter.developer, 
+                                          'disable_uninstall':self.adapter.disable_uninstall, 
+                                          'exhibit_mode':self.adapter.exhibit_mode, 
+                                          'bits':self.adapter.bits,
+                                          'python_version':self.adapter.python_version,
+                                          'debug':self.adapter.DEBUG
+                                      }),
                     )
                     
                     
@@ -149,13 +162,49 @@ class CandleappstoreAPIHandler(APIHandler):
                     )
                     
                 
+                # Download something from the candle webserver
                 elif action == 'get_json':
                     #print('ajax handling get_json')
                     
                     json_data = '{"error":"response code was not 200"}'
                     try:
                         if 'url' in request.body:
-                            url = self.adapter.app_store_url + str(request.body['url'])
+                            
+                            filename = str(request.body['url'])
+                            url = self.adapter.app_store_url + filename
+                            
+                            meta = {'updated_time':0} # this will be replaced with the cloud version if the filename is get_apps.json
+                            try:
+                                if filename == 'get_apps.json':
+                                    if self.DEBUG:
+                                        print("user requested get_apps.json")
+                                    # is there a cached version of get_apps.json available?
+                                    cached_get_apps_exists = os.path.exists(self.cached_get_apps_path)
+                                    if cached_get_apps_exists:
+                                        
+                                        # Quickly check if there is a new version of the addons overview available
+                                        meta_response = self.session.get(self.adapter.app_store_url + 'meta.json')
+                                        print("meta response: " + str(meta_response.text))
+                                        meta = json.loads(meta_response.text)
+                            
+                                        if meta['updated_time'] == self.adapter.persistent_data['meta_updated_time']:
+                                            if self.DEBUG:
+                                                print("Cached get_apps exists, and packages data in the cloud are still the same, so returning locally cached data instead")
+                                            full_response = self.session.get(self.adapter.app_store_url + 'meta.json')
+                                            with open(self.cached_get_apps_path) as cached_file:
+                                                json_data = cached_file.read()
+                                                
+                                                return APIResponse(
+                                                  status=200,
+                                                  content_type='application/json',
+                                                  content=json.dumps({'state' : True, 'message' : 'locally cached get_apps.json', 'body':json_data }),
+                                                )
+                                                
+                                        
+                            except Exception as ex:
+                                if self.DEBUG:
+                                    print("get_json: error checking meta_updated_time: " + str(ex))
+                            
                         
                             if 'parameters' in request.body:
                                 parameters = request.body['parameters']
@@ -172,11 +221,17 @@ class CandleappstoreAPIHandler(APIHandler):
                                 response.encoding = 'utf-8'
                                 json_data = response.text #json.loads(response.text)
                                 
+                                # remember the time when the get_apps.json cache was refreshed, for future comparison with meta.json on candle server
+                                if filename == 'get_apps.json':
+                                    self.adapter.persistent_data['meta_updated_time'] = meta['updated_time']
+                                
                     except Exception as ex:
                         if self.DEBUG:
                             print("error doing request: " + str(ex));
                             
                     #print("self.persistent_data = " + str(self.persistent_data))
+                    
+                    
                     
                     
                     return APIResponse(
