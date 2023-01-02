@@ -157,11 +157,13 @@
         // Compares the data from the internal API with the cloud data
         check_for_updates(){
             if(this.debug){
-                console.log("Candle store: in check_for_updates");
+                console.log("Candle store: in check_for_updates. this.cloud_app_data and this.api_addons_data: ", this.cloud_app_data, this.api_addons_data);
             }
             
             if(this.cloud_app_data.length > 0 && this.api_addons_data.length > 0){
-                //console.log("- both API and Cloud data had length");
+                if(this.debug){
+                    console.log("- both API and Cloud data arrays had non-zero length");
+                }
                 
                 this.addons_to_update = []; // Holds only addon_id strings
                 this.addons_to_update_full = []; // holds complete dictionaries
@@ -257,7 +259,9 @@
                 
             }
             else{
-                //console.log('- check for updates: one of the two data sources is empty');
+                if(this.debug){
+                    console.log('- check for updates: one of the two data sources is empty');
+                }
             }
             
             
@@ -1271,7 +1275,6 @@
                 if(this.debug){
                     console.log("Candle Store debug: INIT response: ", body);
                 }
-                console.log("Candle Store debug: INIT response: ", body);
                 
                 // Received data from Candle server?
 				if( body['state'] != true ){
