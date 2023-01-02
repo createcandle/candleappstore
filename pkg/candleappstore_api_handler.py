@@ -171,6 +171,8 @@ class CandleappstoreAPIHandler(APIHandler):
                         if 'url' in request.body:
                             
                             filename = str(request.body['url'])
+                            if self.DEBUG:
+                                print("get_json: filename: " + str(filename))
                             url = self.adapter.app_store_url + filename
                             
                             meta = {'updated_time':0} # this will be replaced with the cloud version if the filename is get_apps.json
@@ -184,13 +186,13 @@ class CandleappstoreAPIHandler(APIHandler):
                                         
                                         # Quickly check if there is a new version of the addons overview available
                                         meta_response = self.session.get(self.adapter.app_store_url + 'meta.json')
-                                        print("meta response: " + str(meta_response.text))
+                                        if self.DEBUG:
+                                            print("meta.json response: " + str(meta_response.text))
                                         meta = json.loads(meta_response.text)
                             
                                         if meta['updated_time'] == self.adapter.persistent_data['meta_updated_time']:
                                             if self.DEBUG:
                                                 print("Cached get_apps exists, and packages data in the cloud are still the same, so returning locally cached data instead")
-                                            full_response = self.session.get(self.adapter.app_store_url + 'meta.json')
                                             with open(self.cached_get_apps_path) as cached_file:
                                                 json_data = cached_file.read()
                                                 
@@ -224,6 +226,8 @@ class CandleappstoreAPIHandler(APIHandler):
                                 # remember the time when the get_apps.json cache was refreshed, for future comparison with meta.json on candle server
                                 if filename == 'get_apps.json':
                                     self.adapter.persistent_data['meta_updated_time'] = meta['updated_time']
+                                    with open(self.cached_get_apps_path, 'w') as cache_file:
+                                        cache_file.write(response.text)
                                 
                     except Exception as ex:
                         if self.DEBUG:
