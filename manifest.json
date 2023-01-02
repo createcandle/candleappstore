@@ -23,7 +23,7 @@
   "id": "candleappstore",
   "license": "None",
   "manifest_version": 1,
-  "name": "Candle App Store",
+  "name": "Candle Store",
   "options": {
     "default": {
       "App store server":"https://www.candlesmarthome.com/appstore",
@@ -55,7 +55,7 @@
     }
   },
   "short_name": "candleapps",
-  "version": "0.4.19",
+  "version": "0.5.0",
   "web_accessible_resources": [
     "css/*.css",
     "images/*.svg",
