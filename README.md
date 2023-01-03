@@ -1,6 +1,6 @@
-# Candle App Store
+# Candle Store
 
-An app store addon for the Candle Controller. It is a core component of the Candle smart home controller. It is one of the first app stores ever to let users filter by privacy protection level.
+An "app store" addon for the Candle Controller, which allows you to install other addons. It is a core component of the Candle smart home controller. It is one of the first app stores ever to let users filter by privacy protection level.
 
 https://www.candlesmarthome.com
 
