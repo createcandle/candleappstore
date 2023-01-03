@@ -1399,7 +1399,7 @@
                 else{
                     //console.log("asking for data from the cloud");
                     // Get data for apps overview
-                    this.get_data("get_all.json").then(response => {
+                    this.get_data("get_apps.json").then(response => {
                         //console.log(" GET ALL APPS from CLOUD response:");
                         //console.log(response);
                 
