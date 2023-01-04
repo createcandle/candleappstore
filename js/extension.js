@@ -45,6 +45,8 @@
             this.received_cloud_data = false;
             this.updating_all = false;
             
+            this.not_shown_addons_list = [];
+            
 			fetch(`/extensions/${this.id}/views/content.html`)
 	        .then((res) => res.text())
 	        .then((text) => {
@@ -1786,6 +1788,7 @@
                 //const data = this.api_addons_data
                 var data = [];
                 
+                
                 document.getElementById('extension-candleappstore-view').style.zIndex = 'auto';
                 
                 if(typeof page == 'undefined'){
@@ -2435,7 +2438,7 @@
                                             }
                                             
                 						}).catch((e) => {
-                							console.log("update addon catch (error?): ", e);
+                							console.error("update addon catch (error?): ", e);
                                             //console.log(e);
                                             event.target.parentNode.parentNode.parentNode.classList.remove("extension-candleappstore-busy-updating");
                                             document.getElementById('extension-candleappstore-update-all-button').style.display = 'block';
@@ -2555,83 +2558,90 @@
                 }
                 
                 // Check if all addon directories are output in the list
-                var not_shown_addons_list = [];
+                
                 if(page == 'installed'){
+                    this.not_shown_addons_list = [];
                     //console.log("shown_as_installed_list: ", shown_as_installed_list);
                     //console.log("installed dirs: ", this.installed);
                     for(var p = 0; p < this.installed.length; p++){
                         
                         if(shown_as_installed_list.indexOf( this.installed[p] ) == -1){
                             console.log("Candle App store: warning, spotted an addon that was not shown in the installed list, but should have been: ", this.installed[p]);
-                            not_shown_addons_list.push( this.installed[p] );
+                            this.not_shown_addons_list.push( this.installed[p] );
                         }
+                    }
+                    // Show list of broken addons
+                    if(this.not_shown_addons_list.length > 0){
+                        if(this.debug){
+                            console.log("candle store: this.not_shown_addons_list: ", this.not_shown_addons_list);
+                        }
+                    
+                        document.getElementById('extension-candleappstore-broken-addons-list').innerHTML = "";
+                    
+                        for(var b = 0; b < this.not_shown_addons_list.length; b++){
+                            var broken_item_el = document.createElement('div');
+                            broken_item_el.appendChild(document.createTextNode("Delete " + this.not_shown_addons_list[b]));
+                            broken_item_el.classList.add('extension-candleappstore-broken-addon-item');
+                            broken_item_el.dataset.addon_id = this.not_shown_addons_list[b];
+                            document.getElementById('extension-candleappstore-broken-addons-list').appendChild(broken_item_el);
+                        }
+                        document.getElementById('extension-candleappstore-broken-addons-container').style.display = 'block';
+                    
+                    
+                    
+                        /*
+                        // Enabling this creates a loop
+                        this.get_installed_addons_data()
+                        .then((result) => { 
+                            //console.log("in get_installed_addons_data.then");
+                            this.generate_overview('installed');
+                        
+                        
+                            for(var q = 0; q < not_shown_addons_list.length; q++){
+                                console.log("NOW SHOWN ADDON, SHOULD GET FIXED: ", this.not_shown_addons_list[q]);
+                    
+                    
+                                window.API.setAddonSetting( this.not_shown_addons_list[q], true)
+                                .then((result) => {
+            						console.log("enabled overlooked addon result: ");
+            						console.log(result);
+                        
+                                    if(typeof result.enabled != 'undefined'){
+                                        console.log('addon has been switched to: ', result.enabled);
+                                    }
+
+            					}).catch((e) => {
+            						//console.log("Error enabling/disabling addon: ", this_addon_id);
+                                    console.log("Error switching on overlooked addon; ", e);
+            					});
+                    
+                            }
+                        
+                        
+                        
+                            //return;
+            			}).catch((e) => {
+            				console.log("overlooked fix: get_installed_addons_data catch (error?):", e);
+            			});
+                        */
+                    
+                    }
+                    else{
+                        if(this.debug){
+                            console.log("candle store: this.not_shown_addons_list.length: ", this.not_shown_addons_list.length);
+                        }
+                        document.getElementById('extension-candleappstore-broken-addons-container').style.display = "none";
                     }
                 }
                 
-                // Show list of broken addons
-                if(not_shown_addons_list.length > 0){
-                    console.log("not_shown_addons_list: ", not_shown_addons_list);
-                    
-                    document.getElementById('extension-candleappstore-broken-addons-list').innerHTML = "";
-                    
-                    for(var b = 0; b < not_shown_addons_list.length; b++){
-                        var broken_item_el = document.createElement('div');
-                        broken_item_el.appendChild(document.createTextNode("Delete " + not_shown_addons_list[b]));
-                        broken_item_el.classList.add('extension-candleappstore-broken-addon-item');
-                        broken_item_el.dataset.addon_id = not_shown_addons_list[b];
-                        document.getElementById('extension-candleappstore-broken-addons-list').appendChild(broken_item_el);
-                    }
-                    document.getElementById('extension-candleappstore-broken-addons-container').style.display = 'block';
-                    
-                    
-                    
-                    /*
-                    // Enabling this creates a loop
-                    this.get_installed_addons_data()
-                    .then((result) => { 
-                        //console.log("in get_installed_addons_data.then");
-                        this.generate_overview('installed');
-                        
-                        
-                        for(var q = 0; q < not_shown_addons_list.length; q++){
-                            console.log("NOW SHOWN ADDON, SHOULD GET FIXED: ", not_shown_addons_list[q]);
-                    
-                    
-                            window.API.setAddonSetting( not_shown_addons_list[q], true)
-                            .then((result) => {
-        						console.log("enabled overlooked addon result: ");
-        						console.log(result);
-                        
-                                if(typeof result.enabled != 'undefined'){
-                                    console.log('addon has been switched to: ', result.enabled);
-                                }
-
-        					}).catch((e) => {
-        						//console.log("Error enabling/disabling addon: ", this_addon_id);
-                                console.log("Error switching on overlooked addon; ", e);
-        					});
-                    
-                        }
-                        
-                        
-                        
-                        //return;
-        			}).catch((e) => {
-        				console.log("overlooked fix: get_installed_addons_data catch (error?):", e);
-        			});
-                    */
-                    
-                }
-                else{
-                    document.getElementById('extension-candleappstore-broken-addons-container').style.display = "none";
-                }
+                
                 
                 
                 
             }
 			catch (e) {
 				// statements to handle any exceptions
-				console.log("appstore: generate overview error: ", e);
+				console.error("appstore: generate overview error: ", e);
 			}
         }
 
@@ -2648,7 +2658,9 @@
             }
             window.API.getInstalledAddons()
             .then((result) => { 
-				console.log("update_after_install: get_installed_addons_data: result: ");
+				if(this.debug){
+                    console.log("candle store: update_after_install: get_installed_addons_data: result: ");
+                }
 				//console.log(result);
                 this.api_addons_data = result;
                 this.generate_overview('shop');
@@ -2661,7 +2673,9 @@
                         }, 2000);
                     }
                     else{
-                        console.log("this addon has a UI, so switching to that.");
+                        if(this.debug){
+                            console.log("candle store: this addon has a UI, so switching to that.");
+                        }
                         window.location.pathname = '/extensions/' + addon_data["addon_id"];
                     }
                 }
@@ -2677,7 +2691,7 @@
                 document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
             
 			}).catch((e) => {
-				console.log("get getInstalledAddons info catch (error?): ", e);
+				console.error("candle store: get getInstalledAddons info catch (error?): ", e);
                 //console.log(e);
                 document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
 			});
