@@ -22,7 +22,7 @@ import time
 import socket
 #import asyncio
 #import logging
-import requests
+import requests # not used here?
 #import threading
 #import selectors
 import subprocess
@@ -258,6 +258,17 @@ class CandleappstoreAdapter(Adapter):
             print("error getting Python version system: " + str(ex))
 
 
+        self.node_version = '12'
+        try:
+            python_check = shell('python3 --version')
+            python_check = python_check.replace("Python ", "")
+            python_version_parts = python_check.split('.')
+            if len(python_version_parts) == 3:
+                self.python_version = str(python_version_parts[0]) + "." + str(python_version_parts[1])
+            if self.DEBUG:
+                print("Python version: " + str(self.python_version))
+        except Exception as ex:
+            print("error getting Python version system: " + str(ex))
 
 
         if self.DEBUG:

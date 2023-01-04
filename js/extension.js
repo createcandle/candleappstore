@@ -300,7 +300,14 @@
                         try{
                             if(typeof item.packages != 'undefined'){
                             
-                                const packs = JSON.parse(item.packages);
+                                var packs = item.packages;
+                                if(typeof item.packages == 'string'){
+                                    packs = JSON.parse(item.packages);
+                                    if(this.debug){
+                                        console.warn("item.packages was a string. Probably old cached data.");
+                                    }
+                                }
+                                
                                 if(this.debug){
                                     console.log("candle store: get_cloud_addon_data: packages spotted: ", packs);
                                 }
@@ -333,11 +340,15 @@
                                     let language = 'nodejs';
                                     let python39_available = false;
                                     let python311_available = false;
+                                    let node12_available = false;
+                                    let node18_available = false;
                                     for(let p = 0; p < packs.length; p++){
                                         if(typeof packs[p]['architecture'] != 'undefined'){
                                             if(this.bits == 64){
                                                 if(packs[p]['architecture'] == 'linux-arm64'){
-                                                    console.log("linux-arm64 package spotted");
+                                                    if(this.debug){
+                                                        console.log("linux-arm64 package spotted");
+                                                    }
                                                     arm64_available = true;
                                                 }
                                             }
@@ -349,12 +360,28 @@
                                                     if(typeof packs[p]['language']['versions'] != 'undefined'){
                                                         for(let v = 0; v < packs[p]['language']['versions'].length; v++){
                                                             if(this.python_version == '3.9' && packs[p]['language']['versions'][v] == '3.9'){
-                                                                console.log("python 3.9 package spotted");
+                                                                if(this.debug){
+                                                                    console.log("python 3.9 package spotted");
+                                                                }
                                                                 python39_available = true;
                                                             }
                                                             if(this.python_version == '3.11' && packs[p]['language']['versions'][v] == '3.11'){
-                                                                console.log("python 3.11 package spotted");
+                                                                if(this.debug){
+                                                                    console.log("python 3.11 package spotted");
+                                                                }
                                                                 python311_available = true;
+                                                            }
+                                                            if(packs[p]['language']['versions'][v] == '12'){
+                                                                if(this.debug){
+                                                                    console.log("node 12 package spotted");
+                                                                }
+                                                                node12_available = true;
+                                                            }
+                                                            if(this.node_version == '18' && packs[p]['language']['versions'][v] == '18'){
+                                                                if(this.debug){
+                                                                    console.log("node 18 package spotted");
+                                                                }
+                                                                node18_available = true;
                                                             }
                                                         }
                                                     }
@@ -372,10 +399,23 @@
                                                 if(typeof packs[p]['url'] != 'undefined' && typeof packs[p]['checksum'] != 'undefined'){
                                                     
                                                     if(python39_available && packs[p]['url'].indexOf('3.7.tgz') != -1){ // TODO: should now check the url, but should properly check the package's languages data instead
-                                                        console.log("skipping python 3.7 version because a new version is known to be available");
+                                                        if(this.debug){
+                                                            console.log("skipping python 3.7 version because a new version is known to be available");
+                                                        }
                                                         continue;
                                                     }
+                                                    
+                                                    
                                                     // TODO: in the future, here could be a check for python 3.11, to skip 3.9 is the system uses 3.11
+                                                    
+                                                    // TODO: node prefered version checking. It should generally prefer version 12.
+                                                    if(node12_available && packs[p]['url'].indexOf('v12') == -1){
+                                                        if(this.debug){
+                                                            console.log("A node 12 version is available, but this is not it. Skipping.");
+                                                        }
+                                                        continue;
+                                                    }
+                                                    
                                                     item['download_url'] = packs[p]['url'];
                                                     item['checksum'] = packs[p]['checksum'];
                                                     if(this.debug){
@@ -402,8 +442,9 @@
                         
                         if(this.debug){
                             console.log("candle store: get_cloud_addon_data: returning this item: ", item);
+                            console.log("found_package?", found_package);
                         }
-                        console.log("found_package?", found_package);
+                        
                         return item;
                     }
                     //console.log()
@@ -421,7 +462,9 @@
             else{
                 console.warn("no cloud data available (yet)");
             }
-            console.log("found_package?", found_package);
+            if(this.debug){
+                console.log("found_package?", found_package);
+            }
             return null;
         }
 
