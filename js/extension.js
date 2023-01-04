@@ -17,6 +17,9 @@
 	      	this.content = '';
             
             this.bits = 32; // or 64
+            this.node_version = '12';
+            this.python_version = '3.9';
+            
             this.kiosk = false;
             this.developer = false;
             this.get_log_tail = false;
@@ -101,7 +104,7 @@
                 }
                 
                 if(typeof body.bits != 'undefined'){
-                    this.bits = body.bits;
+                    this.bits = parseInt(body.bits);
                     if(this.debug){
                         console.log("system bits: ", this.bits);
                     }
@@ -110,6 +113,12 @@
                     this.python_version = body.python_version;
                     if(this.debug){
                         console.log("python_version: ", this.python_version);
+                    }
+                }
+                if(typeof body.node_version != 'undefined'){
+                    this.node_version = body.node_version;
+                    if(this.debug){
+                        console.log("node_version: ", this.node_version);
                     }
                 }
                 

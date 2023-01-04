@@ -255,20 +255,20 @@ class CandleappstoreAdapter(Adapter):
             if self.DEBUG:
                 print("Python version: " + str(self.python_version))
         except Exception as ex:
-            print("error getting Python version system: " + str(ex))
+            print("error getting Python version: " + str(ex))
 
 
         self.node_version = '12'
         try:
-            python_check = shell('python3 --version')
-            python_check = python_check.replace("Python ", "")
-            python_version_parts = python_check.split('.')
-            if len(python_version_parts) == 3:
-                self.python_version = str(python_version_parts[0]) + "." + str(python_version_parts[1])
+            node_check = shell('node --version')
+            node_check = node_check.replace("v", "")
+            node_version_parts = node_check.split('.')
+            if len(node_version_parts) == 3:
+                self.node_version = str(node_version_parts[0])
             if self.DEBUG:
-                print("Python version: " + str(self.python_version))
+                print("Node version: " + str(self.node_version))
         except Exception as ex:
-            print("error getting Python version system: " + str(ex))
+            print("error getting Node version: " + str(ex))
 
 
         if self.DEBUG:

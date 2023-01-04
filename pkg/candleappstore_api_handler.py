@@ -125,6 +125,7 @@ class CandleappstoreAPIHandler(APIHandler):
                                           'exhibit_mode':self.adapter.exhibit_mode, 
                                           'bits':self.adapter.bits,
                                           'python_version':self.adapter.python_version,
+                                          'node_version':self.adapter.node_version,
                                           'debug':self.adapter.DEBUG
                                       }),
                     )
