@@ -311,6 +311,11 @@
                         try{
                             if(typeof item.packages != 'undefined'){
                             
+                                if(item.packages != null){
+                                    console.error('item.packages was null');
+                                    continue;
+                                }
+                                
                                 var packs = item.packages;
                                 if(typeof item.packages == 'string'){
                                     packs = JSON.parse(item.packages);
