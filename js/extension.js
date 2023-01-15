@@ -92,6 +92,13 @@
                     console.log("App Store debug: INIT response: ", body);
                 }
                 
+                if(typeof body.exhibit_mode != 'undefined'){
+                    this.exhibit_mode = body.exhibit_mode;
+                    if(this.exhibit_mode){
+                        document.body.classList.add('exhibit-mode');
+                    }
+                }
+                
                 // Received data from Candle server?
 				if( body['state'] != true ){
 					//pre.innerText = body['message'];
@@ -133,7 +140,10 @@
                             document.getElementById('experiment-settings-link').style.display = 'block';
                             document.getElementById('developer-settings-link').style.display = 'block';
                         }
-                        document.body.classList.add('developer');
+                        if(!this.exhibit_mode){
+                            document.body.classList.add('developer');
+                        }
+                        
                         this.get_log_tail = true;
                     }
                     if(document.body.classList.contains('developer')){
@@ -144,11 +154,7 @@
                     }
                 }
                 
-                if(typeof body.exhibit_mode != 'undefined'){
-                    if(body.exhibit_mode){
-                        this.exhibit_mode = true;
-                    }
-                }
+                
                 
                 // Make sure menu button is always visible. Can be hidden if the user returns from a complex addon settings page using their browser's back button.
                 //document.getElementById('menu-button').classList.remove('hidden');
@@ -988,6 +994,16 @@
             //   DEVELOPER TAB
             //
             
+            
+            document.getElementById('extension-candleappstore-developer-addon-url').addEventListener('change', (event) => {
+                if(document.getElementById('extension-candleappstore-developer-addon-id').value == ""){
+                    const url = document.getElementById('extension-candleappstore-developer-addon-url').value;
+                    var url_parts = url.split("/");
+                    document.getElementById('extension-candleappstore-developer-addon-id').value = url_parts[4];
+                }
+            });
+            
+            
             // Developer - manual addon install button
             document.getElementById("extension-candleappstore-developer-addon-install-button").addEventListener('click', (event) => {
                 console.log("manual addon install button clicked");
@@ -1335,6 +1351,13 @@
                     console.log("Candle Store debug: INIT response: ", body);
                 }
                 
+                if(typeof body.exhibit_mode != 'undefined'){
+                    this.exhibit_mode = body.exhibit_mode;
+                    if(this.exhibit_mode){
+                        document.body.classList.add('exhibit-mode');
+                    }
+                }
+                
                 // Received data from Candle server?
 				if( body['state'] != true ){
 					//pre.innerText = body['message'];
@@ -1353,18 +1376,14 @@
                 }
                 
                 // Show developer options
-                if(typeof body.developer != 'undefined'){
+                if(typeof body.developer != 'undefined' && !this.exhibit_mode){
                     if(body.developer){
-                        //document.getElementById('authorization-settings-link').style.display = 'block';
-                        //document.getElementById('experiment-settings-link').style.display = 'block';
-                        //document.getElementById('developer-settings-link').style.display = 'block';
                         document.body.classList.add('developer');
                     }
                     if(document.body.classList.contains('developer')){
                         this.developer = true;
                         console.log("developer = true");
                     }
-                    
                 }
                 
                 this.get_installed_addons_data()
@@ -2158,7 +2177,10 @@
                                     //if (event.target.tagName.toLowerCase() === 'label') {
                                     //console.log( addon_id );
                                     
-                                    
+                                    if(this.exhibit_mode){
+                                        console.warn("Candle store: cannot start/stop addons while in exhibit mode");
+                                        return;
+                                    }
                                     
                                     const this_addon_id = event.target.getAttribute('data-addon_id')
                         
@@ -2323,7 +2345,12 @@
                                     event.stopImmediatePropagation();
                                     //console.log("clicked on settings button for: ", addon_id );
                                     //console.log( event.target.getAttribute('data-addon-id') );
-
+                                    
+                                    if(this.exhibit_mode){
+                                        console.warn("Candle store: cannot change addon settings while in exhibit mode");
+                                        return;
+                                    }
+                                    
                         
                                     /*
             						window.API.postJson(

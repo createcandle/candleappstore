@@ -962,7 +962,7 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     display:none;
 }
 
-.extension-candleappstore-busy-updating-all .extension-candleappstore-item,
+.extension-candleappstore-busy-updating-all #extension-candleappstore-updates-list .extension-candleappstore-item,
 .extension-candleappstore-busy-updating{
     opacity:.3;
     /*background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.8));*/
