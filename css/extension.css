@@ -1955,6 +1955,31 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 }
 
 
+
+/*  system update available shortcut  */
+
+#extension-candleappstore-system-update-available-container{
+    display:none;
+}
+#extension-candleappstore-system-update-available-tip{
+    display:flex;
+    padding:1rem 2rem;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:8rem;
+}
+
+.system-update-available #extension-candleappstore-system-update-available-container{
+    display:block;
+}
+
+#extension-candleappstore-system-update-available-container button{
+    padding: 1.5rem 2rem;
+    font-size: 1.6rem;
+}
+
+
+
 /*  spinner  */
 
 #extension-candleappstore-busy-loading-app{
@@ -2078,7 +2103,7 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
         flex-wrap:wrap;
     }
     
-    .extension-candleappstore-settings-item:not:last-of-type{
+    .extension-candleappstore-settings-item:not(:last-of-type){
         margin-bottom:4rem;
     }
     

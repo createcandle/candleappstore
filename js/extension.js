@@ -318,7 +318,7 @@
                             if(typeof item.packages != 'undefined'){
                             
                                 if(item.packages == null){
-                                    console.error('item.packages was null');
+                                    console.error('candle store: item.packages was empty, no download candidate');
                                     continue;
                                 }
                                 
@@ -342,7 +342,23 @@
                                     console.log("candle store: get_cloud_addon_data: system_architecture: ", system_architecture);
                                 }
                                 
-                                if(packs.length == 1){
+                                if(packs.length == 0){
+                                    if(typeof item.download_url != 'undefined' && typeof item.checksum != 'undefined'){
+                                        if(this.debug){
+                                            console.warn("candle store: packages list was empty, but there is still a download_url in the item: ", item);
+                                        }
+                                        return item;
+                                    }
+                                    else{
+                                        if(this.debug){
+                                            console.warn("candle store: packages list was empty, and also no download_url in the item: ", item);
+                                        }
+                                        return null;
+                                    }
+                                    
+                                    
+                                }
+                                else if(packs.length == 1){
                                     if(this.debug){
                                         console.log("only one package available");
                                     }
@@ -447,7 +463,7 @@
                                                     break;
                                                 }
                                                 else{
-                                                    console.error("url or checksum was missing in packages item");
+                                                    console.error("candle store: url or checksum was missing in packages item: ", item);
                                                 }
                                             
                                             }
@@ -459,7 +475,7 @@
                             
                         }
                         catch(e){
-                            console.error("Error while finding optimal package: ", e);
+                            console.error("Candle store: error while finding optimal package: ", e);
                         }
                         
                         if(this.debug){
@@ -482,7 +498,7 @@
                 }
             }
             else{
-                console.warn("no cloud data available (yet)");
+                console.warn("Candle store: no cloud data available (yet)");
             }
             if(this.debug){
                 console.log("found_package?", found_package);
@@ -700,6 +716,23 @@
             const signup_beta_checkbox = document.getElementById('extension-candleappstore-signup-beta');
             const github_username_container = document.getElementById('extension-candleappstore-github-username-container');
             const github_username = document.getElementById('extension-candleappstore-github-username');
+            
+            
+            
+            
+            document.getElementById('extension-candleappstore-system-update-available-container').addEventListener('click', (event) => {
+                setTimeout(() => {
+                    document.querySelectorAll('.extension-power-settings-container').forEach( el => {
+                        el.classList.add('extension-power-settings-hidden');
+                    });
+                    document.getElementById('extension-power-settings-container-update').classList.remove('extension-power-settings-hidden');
+                    document.getElementById('extension-power-settings-pages').classList.remove('hidden');
+                }, "500");
+            });
+            
+            
+            
+            
             
             logout_button.addEventListener('click', (event) => {
                 //console.log("logout button clicked");
