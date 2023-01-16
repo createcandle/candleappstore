@@ -3066,9 +3066,8 @@
                 
                     // ADD INSTALL BUTTON
                 
-                    
                     //if( !installed && data['versions'][v]["addon_id"] != undefined && data['versions'][v]["download_url"] != undefined && data['versions'][v]["checksum"] != undefined ){
-                    if( !installed ){
+                    if( !installed){
                         const cloud_item = this.get_cloud_addon_data(addon_id);
                         console.log("show_selected_app: get_cloud_addon_data test response ", cloud_item);
                         if(cloud_item != null){
@@ -3193,6 +3192,12 @@
                         }
                         else{
                             console.error("somehow there was no cloud data for this addon");
+                            var n = document.createElement("div");
+                            n.classList.add('extension-candleappstore-selected-no-install-candidate');
+                            var t = document.createTextNode("Cannot install");
+                            n.appendChild(t);
+                            selected_options_bar.appendChild(n);
+                            
                         }
                     }
                     
