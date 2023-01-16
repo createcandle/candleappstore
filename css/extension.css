@@ -1845,6 +1845,7 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     font-size:3rem;
 }
 
+
 .extension-candleappstore-selected-install-button,
 .extension-candleappstore-selected-uninstall-button{
     margin-top:2rem;
@@ -1856,10 +1857,18 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     background-color:rgba(0,0,0,.4);
 }
 
+.extension-candleappstore-selected-no-install-candidate,
 .extension-candleappstore-selected-install-button{
     margin-left:auto;
 }
 
+
+.extension-candleappstore-selected-no-install-candidate{
+    margin-top:2rem;
+    background-color:#600;
+    border-radius:.5rem;
+    padding:1rem;
+}
 
 
 /*  DEVELOPER  */
