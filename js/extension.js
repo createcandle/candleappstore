@@ -317,8 +317,8 @@
                         try{
                             if(typeof item.packages != 'undefined'){
                             
-                                if(item.packages != null){
-                                    console.error('item.packages was null');
+                                if(item.packages == null){
+                                    console.error('candle store: item.packages was empty, no download candidate');
                                     continue;
                                 }
                                 
@@ -342,7 +342,23 @@
                                     console.log("candle store: get_cloud_addon_data: system_architecture: ", system_architecture);
                                 }
                                 
-                                if(packs.length == 1){
+                                if(packs.length == 0){
+                                    if(typeof item.download_url != 'undefined' && typeof item.checksum != 'undefined'){
+                                        if(this.debug){
+                                            console.warn("candle store: packages list was empty, but there is still a download_url in the item: ", item);
+                                        }
+                                        return item;
+                                    }
+                                    else{
+                                        if(this.debug){
+                                            console.warn("candle store: packages list was empty, and also no download_url in the item: ", item);
+                                        }
+                                        return null;
+                                    }
+                                    
+                                    
+                                }
+                                else if(packs.length == 1){
                                     if(this.debug){
                                         console.log("only one package available");
                                     }
@@ -447,7 +463,7 @@
                                                     break;
                                                 }
                                                 else{
-                                                    console.error("url or checksum was missing in packages item");
+                                                    console.error("candle store: url or checksum was missing in packages item: ", item);
                                                 }
                                             
                                             }
@@ -459,7 +475,7 @@
                             
                         }
                         catch(e){
-                            console.error("Error while finding optimal package: ", e);
+                            console.error("Candle store: error while finding optimal package: ", e);
                         }
                         
                         if(this.debug){
@@ -482,7 +498,7 @@
                 }
             }
             else{
-                console.warn("no cloud data available (yet)");
+                console.warn("Candle store: no cloud data available (yet)");
             }
             if(this.debug){
                 console.log("found_package?", found_package);
@@ -3066,9 +3082,8 @@
                 
                     // ADD INSTALL BUTTON
                 
-                    
                     //if( !installed && data['versions'][v]["addon_id"] != undefined && data['versions'][v]["download_url"] != undefined && data['versions'][v]["checksum"] != undefined ){
-                    if( !installed ){
+                    if( !installed){
                         const cloud_item = this.get_cloud_addon_data(addon_id);
                         console.log("show_selected_app: get_cloud_addon_data test response ", cloud_item);
                         if(cloud_item != null){
@@ -3193,6 +3208,12 @@
                         }
                         else{
                             console.error("somehow there was no cloud data for this addon");
+                            var n = document.createElement("div");
+                            n.classList.add('extension-candleappstore-selected-no-install-candidate');
+                            var t = document.createTextNode("Cannot install");
+                            n.appendChild(t);
+                            selected_options_bar.appendChild(n);
+                            
                         }
                     }
                     
