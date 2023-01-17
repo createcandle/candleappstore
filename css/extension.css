@@ -1960,13 +1960,20 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 #extension-candleappstore-system-update-available-container{
     display:none;
+    margin: 4rem auto;
+    background-color:rgba(0,0,0,.2);
 }
+
+#extension-candleappstore-system-update-available-container:hover{
+    box-shadow: inset 0rem 0rem 100rem rgb(0 0 0 / 30%);
+}
+
+
 #extension-candleappstore-system-update-available-tip{
     display:flex;
     padding:1rem 2rem;
     align-items:center;
     justify-content:space-between;
-    margin-top:8rem;
 }
 
 .system-update-available #extension-candleappstore-system-update-available-container{
