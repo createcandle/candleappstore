@@ -115,19 +115,19 @@
                 if(typeof body.bits != 'undefined'){
                     this.bits = parseInt(body.bits);
                     if(this.debug){
-                        console.log("system bits: ", this.bits);
+                        console.log("candle store debug: system bits: ", this.bits);
                     }
                 }
                 if(typeof body.python_version != 'undefined'){
                     this.python_version = body.python_version;
                     if(this.debug){
-                        console.log("python_version: ", this.python_version);
+                        console.log("candle store debug: python_version: ", this.python_version);
                     }
                 }
                 if(typeof body.node_version != 'undefined'){
                     this.node_version = body.node_version;
                     if(this.debug){
-                        console.log("node_version: ", this.node_version);
+                        console.log("candle store debug: node_version: ", this.node_version);
                     }
                 }
                 
