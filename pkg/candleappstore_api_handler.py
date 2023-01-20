@@ -182,8 +182,7 @@ class CandleappstoreAPIHandler(APIHandler):
                                     if self.DEBUG:
                                         print("user requested get_apps.json")
                                     # is there a cached version of get_apps.json available?
-                                    cached_get_apps_exists = os.path.exists(self.adapter.cached_get_apps_path)
-                                    if cached_get_apps_exists:
+                                    if os.path.exists(self.adapter.cached_get_apps_path):
                                         
                                         # Quickly check if there is a new version of the addons overview available
                                         meta_response = self.session.get(self.adapter.app_store_url + 'meta.json')

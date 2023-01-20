@@ -875,9 +875,10 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     margin: 4rem auto;
 }
 
+
 #extension-candleappstore-view .extension-candleappstore-tab-buttons button{
 	background-color: transparent;
-	border-right: 1px solid rgba(0,0,0,.05);
+	border-right: 1px solid rgba(0,0,0,.15);
 	color: #eee;
 	cursor:pointer;
 	font-size:1.6rem;
@@ -2261,6 +2262,9 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     	margin: 4rem auto;
     }
     */
+    #extension-candleappstore-view button.extension-candleappstore-main-tab-button{
+        padding: 1rem 3rem;
+    }
 	
 }
 

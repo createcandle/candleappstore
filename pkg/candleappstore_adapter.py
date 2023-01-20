@@ -127,7 +127,8 @@ class CandleappstoreAdapter(Adapter):
 
         # Cached files paths
         self.cached_get_apps_path = os.path.join(self.data_dir_path,'get_apps.json')
-
+        if os.path.exists(self.cached_get_apps_path):
+            os.system('rm self.cached_get_apps_path') # start without a cached version
 
         
         # determine the persistent data path

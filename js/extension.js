@@ -1436,6 +1436,14 @@
             
             
             
+            document.getElementById('extension-candleappstore-broken-addons-reboot-button').addEventListener('click', (event) => {
+                document.getElementById('extension-candleappstore-broken-addons-tip').style.display = 'none';
+                window.API.postJson('/settings/system/actions', {
+                    action: 'restartSystem'
+                }).catch(console.error);
+            });
+            
+            
 
 
 			// TABS
