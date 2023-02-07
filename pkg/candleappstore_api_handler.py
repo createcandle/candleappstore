@@ -121,10 +121,10 @@ class CandleappstoreAPIHandler(APIHandler):
                                           'installed':installed_addons, 
                                           'permissions':self.adapter.persistent_data['permissions'], 
                                           'developer':self.adapter.developer, 
-                                          'disable_uninstall':self.adapter.disable_uninstall, 
                                           'exhibit_mode':self.adapter.exhibit_mode, 
                                           'bits':self.adapter.bits,
                                           'python_version':self.adapter.python_version,
+                                          'python_minor_version':self.adapter.python_minor_version,
                                           'node_version':self.adapter.node_version,
                                           'debug':self.adapter.DEBUG
                                       }),
