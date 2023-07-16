@@ -4,7 +4,7 @@
 	      	super('candleappstore');
 			//console.log("Adding candleappstore addon to menu");
       		
-            console.log("candleappstore: window.API: ", window.API);
+            //console.log("candleappstore: window.API: ", window.API);
             
             
 			this.addMenuEntry('Candle store');
@@ -2618,7 +2618,9 @@
                     for(var p = 0; p < this.installed.length; p++){
                         
                         if(shown_as_installed_list.indexOf( this.installed[p] ) == -1){
-                            console.log("Candle App store: warning, spotted an addon that was not shown in the installed list, but should have been: ", this.installed[p]);
+                            if(this.debug){
+                                console.log("Candle App store: warning, spotted an addon that was not shown in the installed list, but should have been: ", this.installed[p]);
+                            }
                             this.not_shown_addons_list.push( this.installed[p] );
                         }
                     }
