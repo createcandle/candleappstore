@@ -23,7 +23,8 @@ echo "creating package"
 mkdir -p lib package
 
 # Pull down Python dependencies
-pip3 install -r requirements.txt -t lib --no-binary :all: --prefix ""
+#pip3 install -r requirements.txt -t lib --no-binary :all: --prefix ""
+pip3 install -r requirements.txt -t lib  --prefix "" --no-cache --use-pep517
 
 # Put package together
 cp -r lib pkg LICENSE manifest.json *.py README.md  css images js views  package/
