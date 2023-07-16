@@ -554,9 +554,12 @@
 
 #extension-candleappstore-settings input[type=range]{
     width:100%;
-    margin-bottom:2rem;
 }
-
+.extension-candleappstore-range-input-min-max{
+    margin-bottom:2rem;
+    display:flex;
+    justify-content:space-between;
+}
 
 
 
@@ -689,6 +692,10 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 
 /*  BUTTONS  */
+
+.extension-candleappstore-selected-playpause-button{
+    min-width:11rem;
+}
 
 #extension-candleappstore-update-all-button{ 
     margin: 2rem 0 2rem auto;

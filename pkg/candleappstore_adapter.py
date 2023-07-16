@@ -101,8 +101,9 @@ class CandleappstoreAdapter(Adapter):
         # Uninstall
         self.keep_data_on_uninstall = False
         
-        
-        
+        # not available via window.API, so have to scrape addon settings defaults manually
+        self.addon_defaults = {} # holds all default settings from all addons manifest files
+        self.installed_addons = [] # simple directory names list of installed addons (including broken ones)
         #print("os.uname() = " + str(os.uname()))
 
         # Some paths
@@ -149,7 +150,7 @@ class CandleappstoreAdapter(Adapter):
         first_run = False
         try:
             if os.path.exists(self.persistence_file_path):
-                with open(self.persistence_file_path) as f:
+                with open(self.persistence_file_path, "r") as f:
                     self.persistent_data = json.load(f)
                     if self.DEBUG:
                         print("Persistence data was loaded succesfully.")
@@ -276,6 +277,8 @@ class CandleappstoreAdapter(Adapter):
             print("Current working directory: " + str(os.getcwd()))
             print("End of candle app store adapter init")
 
+        self.scan_installed_addons()
+
         self.ready = True
         
         
@@ -382,6 +385,7 @@ class CandleappstoreAdapter(Adapter):
 
     def scan_installed_addons(self):
         real_dirs = []
+        new_default_settings = {}
         #if self.DEBUG:
         #    print("self.user_profile['addonsDir'] = " + str(self.user_profile['addonsDir']))
         try:
@@ -389,10 +393,41 @@ class CandleappstoreAdapter(Adapter):
             for filename in raw_dirs:
                 if os.path.isdir( os.path.join(self.user_profile['addonsDir'],filename) ):
                     real_dirs.append(filename)
+                    
+                    try:
+                        manifest_path = os.path.join(self.user_profile['addonsDir'],filename,'manifest.json')
+                        #print("manifest_path: " + str(manifest_path))
+                        if os.path.isfile(manifest_path):
+                            #print('manifest file exists: ' + str(manifest_path))
+                            
+                            with open(manifest_path) as manifest_file:
+                                parsed_json = json.load(manifest_file)
+                                #print(parsed_json)
+                                #print("\n\nLOADED JSON: " + str(parsed_json['options']['default']))
+                                if self.DEBUG:
+                                    print("loaded manifest: " + str(manifest_path))
+                                defaults = {}
+                                if 'options' in parsed_json:
+                                    if 'default' in parsed_json['options']:
+                                        new_default_settings[filename] = parsed_json['options']['default']
+                                    else:
+                                        if self.DEBUG:
+                                            print("addon did not have default settings?")
+                                
+                        else:
+                            if self.DEBUG:
+                                print("Warning, addon dir did not have a manifest? missing file: " + str(filename))
+                    except Exception as ex:
+                        if self.DEBUG:
+                            print("error getting default addon settings from: " + str(manifest_path))
+                    
         except Exception as ex:
             if self.DEBUG:
                 print("could not get list of actually installed addons directories: " + str(ex))
-            
+        
+        self.addon_defaults = new_default_settings
+        #print("self.addon_defaults: " + str(self.addon_defaults))
+        
         return real_dirs
 
 
@@ -468,11 +503,11 @@ class CandleappstoreAdapter(Adapter):
                 if self.DEBUG:
                     print("Persistence file existed. Will try to save to it.")
 
-            with open(self.persistence_file_path) as f:
+            with open(self.persistence_file_path, 'w') as f:
                 #if self.DEBUG:
                 #    print("saving persistent data: " + str(self.persistent_data))
                 #pretty = json.dumps(self.persistent_data, sort_keys=True, indent=4, separators=(',', ': '))
-                json.dump( self.persistent_data, open( self.persistence_file_path, 'w+' ), indent=4 )
+                json.dump( self.persistent_data, f, indent=4 )
                 if self.DEBUG:
                     print("Data stored")
                 return True
@@ -512,7 +547,7 @@ class CandleappstoreAdapter(Adapter):
 
 
 def shell(command):
-    print("SHELL COMMAND = " + str(command))
+    #print("SHELL COMMAND = " + str(command))
     shell_check = ""
     try:
         shell_check = subprocess.check_output(command, shell=True)
@@ -528,18 +563,18 @@ def kill(command):
     check = ""
     try:
         search_command = "ps ax | grep \"" + command + "\" | grep -v grep"
-        print("in kill, search_command = " + str(search_command))
+        #print("in kill, search_command = " + str(search_command))
         check = shell(search_command)
-        print("check: " + str(check))
+        #print("check: " + str(check))
 
         if check != "":
-            print("Process was already running. Cleaning it up.")
+            #print("Process was already running. Cleaning it up.")
 
             old_pid = check.split(" ")[0]
-            print("- old PID: " + str(old_pid))
+            #print("- old PID: " + str(old_pid))
             if old_pid != None:
                 os.system("sudo kill " + old_pid)
-                print("- old process has been asked to stop")
+                #print("- old process has been asked to stop")
                 time.sleep(1)
         
 

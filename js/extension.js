@@ -4,7 +4,7 @@
 	      	super('candleappstore');
 			//console.log("Adding candleappstore addon to menu");
       		
-            //console.log("API: ", window.API);
+            console.log("candleappstore: window.API: ", window.API);
             
             
 			this.addMenuEntry('Candle store');
@@ -38,6 +38,7 @@
             this.addons_being_installed = []; // contains names of addons in process of being installed, so that the install button can be hidden
             this.addon_dirs = []; // reflects actual directories on the disk
             this.extensions = []; // holds all the data about installed addons data that extend the UI (css and js files)
+            this.addon_defaults = {}; // holds addon settings defaults, loaded via the addon api (not available through window.API)
             this.extensions_list = [];
             this.selector = "";
             this.username = "";
@@ -104,6 +105,7 @@
                 
                 // Received data from Candle server?
 				if( body['state'] != true ){
+                    console.error('candleappstore: failed to get proper init data? state was false.');
 					//pre.innerText = body['message'];
 				}
                 else{
@@ -133,6 +135,13 @@
                         console.log("candle store debug: node_version: ", this.node_version);
                     }
                 }
+                if(typeof body.addon_defaults != 'undefined'){
+                    this.addon_defaults = body.addon_defaults;
+                    if(this.debug){
+                        console.log("candle store debug: addon_defaults: ", this.addon_defaults);
+                    }
+                }
+                
                 
                 
                 // Show developer options
@@ -1300,12 +1309,12 @@
             //
             
             document.getElementById('extension-candleappstore-filter-search-input').addEventListener('keyup', (event) => {
-                console.log('search input changed');
+                //console.log('search input changed');
                 this.generate_overview('shop');
 			});
             
             document.getElementById('extension-candleappstore-filter-search-input').addEventListener('blur', (event) => {
-                console.log('search input blurred');
+                //console.log('search input blurred');
                 this.generate_overview('shop');
 			});
             
@@ -1737,8 +1746,6 @@
         // Get installed addons data from window.API
         get_installed_addons_data = () =>
         {
-            const pre = document.getElementById('extension-candleappstore-response-data');
-            //console.log(this);
             return new Promise((myResolve, myReject) =>
             {
                 window.API.getInstalledAddons()
@@ -1751,7 +1758,6 @@
     			}).catch((e) => {
     				//console.log("get getInstalledAddons info catch (error?)");
                     //console.log(e);
-    				//pre.innerText = e.toString();
                     myReject();
     			});
             });
@@ -1760,7 +1766,7 @@
         
         remember_permission = (addon_id, permission, value) =>
         {
-            const pre = document.getElementById('extension-candleappstore-response-data');
+            //const pre = document.getElementById('extension-candleappstore-response-data');
             //console.log(this);
             return new Promise((myResolve, myReject) =>
             {
@@ -2656,7 +2662,7 @@
         
         
         
-        
+        //update_addon_defaults_after_install()
         
         // Update after install (turned into separate function to avoid nested api calls)
         
@@ -2782,6 +2788,7 @@
             
             // Hides the data that might need to be loaded in from the Candle webserver (which can take a little time) in one swoop
             document.getElementById('extension-candleappstore-selected-secondary').style.display = 'none';
+            document.getElementById('extension-candleappstore-selected-homepage_url').style.display = 'none';
             
             const selected = document.getElementById('extension-candleappstore-selected');
             
@@ -2842,6 +2849,10 @@
                 // Homepage
                  if(typeof data.homepage_url != 'undefined'){
                      document.getElementById('extension-candleappstore-selected-homepage_url').href = data.homepage_url;
+                     if(this.kiosk == false){
+                         document.getElementById('extension-candleappstore-selected-homepage_url').style.display = 'block';
+                     }
+                     
                  }
                  else{
                      document.getElementById('extension-candleappstore-selected-homepage_url').href = "#"; // will be loaded in fully later
@@ -3119,7 +3130,7 @@
                     //if( !installed && data['versions'][v]["addon_id"] != undefined && data['versions'][v]["download_url"] != undefined && data['versions'][v]["checksum"] != undefined ){
                     if( !installed){
                         const cloud_item = this.get_cloud_addon_data(addon_id);
-                        console.log("show_selected_app: get_cloud_addon_data test response ", cloud_item);
+                        //console.log("show_selected_app: get_cloud_addon_data test response ", cloud_item);
                         if(cloud_item != null){
                             if( typeof cloud_item['addon_id'] != 'undefined' && typeof cloud_item['download_url'] != 'undefined' && typeof cloud_item["checksum"] != 'undefined' ){ // overkill
                                 if(this.debug){
@@ -3205,7 +3216,12 @@
                                                     this.addons_being_installed.splice(t, 1);
                                                 }
                                             }
-
+                                            
+                							if(this.debug){
+                                                console.log("requesting fresh addon default settings");
+                                            }
+                                            this.update_addon_settings_defaults();
+                                            
 
                 						}).catch((e) => {
                 							console.log("installation catch (error?): ", e);
@@ -3648,7 +3664,12 @@
         
         show_addon_config(addon_id){ // ingests .schema data from self.api_addon_data
             try{
-                //console.log("in show_addon_config for: " + addon_id);
+                if(this.debug){
+                    console.log("in show_addon_config for: " + addon_id);
+                    console.log("addon defaults: ", this.addon_defaults[addon_id]);
+                }
+                
+                
                 
                 // Clean up from previous addon settings
                 const pre = document.getElementById('extension-candleappstore-response-data');
@@ -3696,13 +3717,11 @@
 					    console.log(installed_adons_data);
                     }
                     
-                    
                     window.API.getAddonConfig( addon_id )
                     .then((data) => { 
                         if(this.debug){
     					    console.log("get addon config result: ", data);
                         }
-    					//console.log(data);
                         //console.log(data['body']);
                 
                         //var spotted_advanced_setting = false;
@@ -3715,6 +3734,13 @@
                             //console.log('This addon does not have any saved preferences yet');
                             form.innerHTML = '<p>This addon does not have any saved preferences yet.</p>';
                             //return;
+                            if(typeof this.addon_defaults[addon_id] != 'undefined'){
+                                if(this.debug){
+                                    console.log("no saved settings for this addon yet, but defaults are available. Swapping those in.");
+                                }
+                                data = this.addon_defaults[addon_id]
+                                //for(let z = 0; z < data_keys.length; z++){}
+                            }
                         }
                         //console.log("data keys length = " + data_keys.length);
                         
@@ -3778,7 +3804,7 @@
                         //console.log("addon_settings_schema:", addon_settings_schema);
                 
                         const addon_settings_props = addon_settings_schema['properties'];
-                
+                        
                         var addon_settings_required = [];
                         if(addon_settings_schema.hasOwnProperty('required')){
                             addon_settings_required = addon_settings_schema['required'];
@@ -3791,6 +3817,8 @@
                         }
                         //console.log("all props: " + settings_keys);
                         //console.log("addon_settings_required = " + addon_settings_required);
+                
+                        
                 
                 
                         var stop_processing = false;
@@ -3806,6 +3834,26 @@
                     
 
                             if(stop_processing){return;} // weird that return false didn't work.
+
+
+
+                            // Check if there is a default value available
+                            if(typeof data[info] == 'undefined' && typeof this.addon_defaults[addon_id] != 'undefined'){
+                                
+                                if(typeof this.addon_defaults[addon_id][info] != 'undefined' && typeof this.addon_defaults[addon_id][info] != 'object'){
+                                    if(this.debug){
+                                        console.log("no stored setting for: \n", info, ". \nHowever, defaults settings are available, so swapping those in: \n", this.addon_defaults[addon_id][info]);
+                                    }
+                                    data[info] = this.addon_defaults[addon_id][info];
+                                }else{
+                                    console.warn("default settings value was an object? Ignoring: ", this.addon_defaults[addon_id][info]);
+                                }
+                                //data = this.addon_defaults[addon_id]
+                                //for(let z = 0; z < data_keys.length; z++){}
+                            }
+
+
+
 
                             // CREATE DIV
                             const css_element_id = 'extension-candleappstore-settings-setting-' + this.makeSafeForCSS(info);
@@ -3863,12 +3911,12 @@
                             //d.appendChild(p);
                     
                             if(this.debug){
-                                console.log("appstore debug: creating input: ", addon_settings_props[info]);
+                                console.log("\n\nappstore debug: creating input: ", addon_settings_props[info]);
+                                console.log("stored preference: ", data[info]);
                             }
                             
                             
                             try{
-                                //console.log("\n\nstored preference: ", data[info]);
                                 
                                 // BOOLEAN SWITCH
                                 
@@ -3962,7 +4010,9 @@
                                     var s = document.createElement("input");
                                     s.id = css_element_id;
                                     s.name = info;
-                        
+                                    
+                                    var s_min_max_container_el = null;
+                                    
                                     var input_type = 'text';
                                     if(addon_settings_props[info]['type'] != "string"){
                                         if(addon_settings_props[info]['type'] == "integer" || addon_settings_props[info]['type'] == "number"){
@@ -3970,6 +4020,7 @@
                                             if(typeof addon_settings_props[info]['minimum'] != 'undefined' && typeof addon_settings_props[info]['maximum'] != 'undefined'){
                                                 input_type = "range";
                                                 
+                                                // Create the element that shows the currently selected slider value
                                                 var sv = document.createElement("div");
                                                 sv.id = css_element_id + "-value";
                                                 sv.classList.add('extension-candleappstore-range-input-value');
@@ -3983,6 +4034,21 @@
                                                 //console.log("- range. maximum: ", addon_settings_props[info]['maximum']);
                                                 s.min = addon_settings_props[info]['minimum'];
                                                 s.max = addon_settings_props[info]['maximum'];
+                                                
+                                                // Create minimum and maximum slider values indicator div
+                                                var s_min_el = document.createElement("div");
+                                                s_min_el.innerText = addon_settings_props[info]['minimum'];
+                                                var s_max_el = document.createElement("div");
+                                                s_max_el.innerText = addon_settings_props[info]['maximum'];
+                                                
+                                                s_min_max_container_el = document.createElement("div");
+                                                s_min_max_container_el.classList.add('extension-candleappstore-range-input-min-max');
+                                                s_min_max_container_el.append(s_min_el);
+                                                s_min_max_container_el.append(s_max_el);
+                                                
+                                                sv.classList.add('extension-candleappstore-range-input-value');
+                                                
+                                                
                                                 if(addon_settings_props[info]['type'] == "integer"){
                                                     s.step = 1;
                                                 }
@@ -4035,6 +4101,10 @@
                         
                         
                                     d.appendChild(s); // append string input
+                        
+                                    if(s_min_max_container_el != null){
+                                        d.appendChild(s_min_max_container_el); // append range slider minimum and maximum values if available
+                                    }
                         
                                     d.appendChild(p); // append description to div
                                     
@@ -4520,6 +4590,34 @@
         }
         
         
+        
+        // update addon settings defaults
+        update_addon_settings_defaults = () =>
+        {
+            return new Promise((myResolve, myReject) =>
+            {
+    	        window.API.postJson(
+    	            `/extensions/${this.id}/api/ajax`,
+    			    {'action':'get_installed_dirs'}
+
+    	        ).then((body) => {
+    				if(body['state'] == true){
+                        this.addon_defaults = body.addon_defaults;
+                        myResolve( body.addon_defaults );
+    				}
+    				else{
+                        myReject({});
+    				}
+
+    	        }).catch((e) => {
+                    if(this.debug){
+                        console.error("candleappstore: error calling addon api for get_installed_dirs: ", e);
+                    }
+                    myReject({});
+    	        });	
+            
+            });
+        };
         
         
 	}

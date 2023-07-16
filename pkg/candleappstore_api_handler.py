@@ -105,7 +105,7 @@ class CandleappstoreAPIHandler(APIHandler):
                     
                     installed_addons = []
                     try:
-                        installed_addons = self.adapter.scan_installed_addons()
+                        self.adapter.installed_addons = self.adapter.scan_installed_addons()
                     except Exception as ex:
                         if self.DEBUG:
                             print("Error getting installed addons list: " + str(ex))
@@ -118,7 +118,7 @@ class CandleappstoreAPIHandler(APIHandler):
                                           #'addons': self.adapter.persistent_data['addons'], # doesn't seem used by anything
                                           'meta_updated_time': self.adapter.persistent_data['meta_updated_time'], 
                                           'app_store_url':self.adapter.app_store_url, 
-                                          'installed':installed_addons, 
+                                          'installed':self.adapter.installed_addons, 
                                           'permissions':self.adapter.persistent_data['permissions'], 
                                           'developer':self.adapter.developer, 
                                           'exhibit_mode':self.adapter.exhibit_mode, 
@@ -126,6 +126,7 @@ class CandleappstoreAPIHandler(APIHandler):
                                           'python_version':self.adapter.python_version,
                                           'python_minor_version':self.adapter.python_minor_version,
                                           'node_version':self.adapter.node_version,
+                                          'addon_defaults':self.adapter.addon_defaults,
                                           'debug':self.adapter.DEBUG
                                       }),
                     )
@@ -258,7 +259,7 @@ class CandleappstoreAPIHandler(APIHandler):
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state':True, 'installed':addon_dirs }),
+                      content=json.dumps({'state':True, 'installed':addon_dirs, 'addon_defaults':self.adapter.addon_defaults }),
                     )
                     
                     
