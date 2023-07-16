@@ -108,7 +108,7 @@
 
 .extension-candleappstore-selected-settings{
     font-style:italic;
-    margin-bottom:4rem;
+    margin-bottom:1rem;
 }
 
 .extension-candleappstore-selected-settings:not(:empty)::before{
