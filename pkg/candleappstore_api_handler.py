@@ -118,15 +118,21 @@ class CandleappstoreAPIHandler(APIHandler):
                                           #'addons': self.adapter.persistent_data['addons'], # doesn't seem used by anything
                                           'meta_updated_time': self.adapter.persistent_data['meta_updated_time'], 
                                           'app_store_url':self.adapter.app_store_url, 
-                                          'installed':self.adapter.installed_addons, 
-                                          'permissions':self.adapter.persistent_data['permissions'], 
+                                          'permissions':self.adapter.persistent_data['permissions'], # doesn't seem used anymore
                                           'developer':self.adapter.developer, 
                                           'exhibit_mode':self.adapter.exhibit_mode, 
                                           'bits':self.adapter.bits,
                                           'python_version':self.adapter.python_version,
                                           'python_minor_version':self.adapter.python_minor_version,
                                           'node_version':self.adapter.node_version,
+                                          'installed':self.adapter.installed_addons, 
                                           'addon_defaults':self.adapter.addon_defaults,
+                                          'addon_sizes':self.adapter.addon_sizes, 
+                                          'total_addons_size':self.adapter.total_addons_size,
+                                          'free_disk_space':self.adapter.user_partition_free_disk_space,
+                                          'total_memory':self.adapter.total_memory,
+                                          'free_memory':self.adapter.free_memory,
+                                          'available_memory':self.adapter.available_memory,
                                           'debug':self.adapter.DEBUG
                                       }),
                     )
@@ -252,6 +258,8 @@ class CandleappstoreAPIHandler(APIHandler):
                     addon_dirs = []
                     try:
                         addon_dirs = self.adapter.scan_installed_addons()
+                        self.adapter.scan_addons_file_size()
+                        
                     except Exception as ex:
                         if self.DEBUG:
                             print("Getting installed addon dirs error: " + str(ex))
@@ -259,7 +267,15 @@ class CandleappstoreAPIHandler(APIHandler):
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state':True, 'installed':addon_dirs, 'addon_defaults':self.adapter.addon_defaults }),
+                      content=json.dumps({'state':True, 
+                                          'installed':addon_dirs, 
+                                          'addon_defaults':self.adapter.addon_defaults, 
+                                          'addon_sizes':self.adapter.addon_sizes, 
+                                          'total_addons_size':self.adapter.total_addons_size,
+                                          'free_disk_space':self.adapter.user_partition_free_disk_space,
+                                          'free_memory':self.adapter.free_memory,
+                                          'available_memory':self.adapter.available_memory,
+                                          }),
                     )
                     
                     

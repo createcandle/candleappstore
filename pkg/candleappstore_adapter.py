@@ -7,18 +7,12 @@
 from __future__ import print_function
 
 import os
-#from os import path
 import sys
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
-#try:
-#    sys.path.append(os.path.join(os.sep,'home','pi','.webthings','addons','candleappstore','lib'))
-#except:
-#    print("couldn't add extra path")
+
 import re
 import json
 import time
-#import queue
-#import signal
 import socket
 #import asyncio
 #import logging
@@ -29,13 +23,6 @@ import subprocess
 from subprocess import call, Popen
 #from collections import namedtuple
 
-
-try:
-#    from .intentions import *
-#    print("succesfully imported intentions.py file")
-    pass
-except Exception as ex:
-    print("ERROR loading intentions.py: " + str(ex))
     
 from gateway_addon import Database, Adapter
 from .util import *
@@ -43,10 +30,7 @@ from .util import *
 #from .candleappstore_notifier import *
 
 try:
-    #from gateway_addon import APIHandler, APIResponse
     from .candleappstore_api_handler import *
-    print("CandleappstoreAPIHandler imported")
-    #pass
 except Exception as ex:
     print("Unable to load CandleappstoreAPIHandler (which is used for UI extention): " + str(ex))
 
@@ -81,38 +65,49 @@ class CandleappstoreAdapter(Adapter):
         self.name = self.__class__.__name__ # CandleappstoreAdapter
         #print("self.name = " + str(self.name))
         Adapter.__init__(self, self.addon_name, self.addon_name, verbose=verbose)
-        #print("Adapter ID = " + self.get_id())
-
-        #os.environ["LD_LIBRARY_PATH"] = os.path.join(self.user_profile['addonsDir'],self.addon_name,'snips')
-
-        # Get initial audio_output options
-        #self.audio_controls = get_audio_controls()
-        #print("audio controls: " + str(self.audio_controls))
 
         self.developer = False
         self.running = True
         self.app_store_url = 'https://www.candlesmarthome.com/appstore/'
         
+        self.boot_path = '/boot'
+        if os.path.exists('/boot/firmware'):
+            self.boot_path = '/boot/firmware'
+        
         # Exhibit mode
         self.exhibit_mode = False
-        if os.path.isfile('/boot/exhibit_mode.txt'):
+        if os.path.isfile(self.boot_path + '/exhibit_mode.txt'):
             self.exhibit_mode = True
         
         # Uninstall
         self.keep_data_on_uninstall = False
-        
-        # not available via window.API, so have to scrape addon settings defaults manually
-        self.addon_defaults = {} # holds all default settings from all addons manifest files
-        self.installed_addons = [] # simple directory names list of installed addons (including broken ones)
-        #print("os.uname() = " + str(os.uname()))
 
-        # Some paths
-        #print("self.user_profile:")
-        #print(str(self.user_profile))
+        self.addon_defaults = {} # addon defaults are not available via window.API, so have to scrape addon settings defaults manually from the manifest files
+        self.addon_sizes = {} # holds how big the addon directories are
+        self.installed_addons = [] # simple directory names list of installed addons (including broken ones)
+        self.total_addons_size = None # will hold the total disk size of all the addons
+
+        # Disk space
+        self.user_partition_free_disk_space = None
         
+        # Total memory
+        self.total_memory = None
+        try:
+            total_memory = run_command("awk '/^MemTotal:/{print $2}' /proc/meminfo | tr -d '\n'")
+            self.total_memory = int( int(''.join(filter(str.isdigit, total_memory))) / 1000)
+        except Exception as ex:
+            print("Error: could not get total installed memory: " + str(ex))
+        
+        # Available memory
+        self.free_memory = None #free memory is literally empty, while 
+        self.available_memory = None # available memory can be freed up if need be
+        self.update_free_memory_and_disk_space()
+        
+        
+        
+        # Paths
         self.addon_path = os.path.join(self.user_profile['addonsDir'], self.addon_name)
         self.data_dir_path = os.path.join(self.user_profile['dataDir'], self.addon_name)
-
 
         # Make sure the data directory exists
         try:
@@ -121,31 +116,19 @@ class CandleappstoreAdapter(Adapter):
                 print("data directory did not exist, created it now")
         except Exception as ex:
             print("Error: could not make sure data dir exists: " + str(ex))
-            
 
         # Cached files paths
         self.cached_get_apps_path = os.path.join(self.data_dir_path,'get_apps.json')
         if os.path.exists(self.cached_get_apps_path):
             os.system('rm ' + str(self.cached_get_apps_path)) # start without a cached version
-
         
         # determine the persistent data path
-        try:
-            self.persistence_file_path = os.path.join(self.data_dir_path, 'persistence.json')
-            if self.DEBUG:
-                print("self.persistence_file_path = " + str(self.persistence_file_path))
-        except:
-            try:
-                print("setting persistence file path failed, will try older method.")
-                self.persistence_file_path = os.path.join(os.path.expanduser('~'), '.webthings', 'data', 'candleappstore','persistence.json')
-            except:
-                print("Double error making persistence file path")
-                self.persistence_file_path = "/home/pi/.webthings/data/candleappstore/persistence.json"
+        self.persistence_file_path = os.path.join(self.data_dir_path, 'persistence.json')
+        if self.DEBUG:
+            print("self.persistence_file_path = " + str(self.persistence_file_path))
         
-        
-        
-        
-        # Get persistent data
+            
+       # Get persistent data
         self.persistent_data = {}
         first_run = False
         try:
@@ -185,8 +168,12 @@ class CandleappstoreAdapter(Adapter):
             #    if self.DEBUG:
             #        print("addons was not in persistent data, adding it now.")
             #    self.persistent_data['addons'] = {}
+            
+            # Permisisons not currently used anymore?
             if 'permissions' not in self.persistent_data:
                 self.persistent_data['permissions'] = {}
+                
+            # should be used to find out of the candle webserver has fresh addon updates, but is unfinished
             if 'meta_updated_time' not in self.persistent_data:
                 self.persistent_data['meta_updated_time'] = 0
                 
@@ -200,6 +187,8 @@ class CandleappstoreAdapter(Adapter):
             self.add_from_config()
         except Exception as ex:
             print("Error loading config: " + str(ex))
+            
+        self.DEBUG = True
             
         #self.ssid = self.candleappstore_name + " " + self.persistent_data['unique_id'] + "_nomap"
         #print("ssid = " + str(self.ssid))
@@ -218,17 +207,17 @@ class CandleappstoreAdapter(Adapter):
             print("Failed to start API handler (this only works on gateway version 0.10 or higher). Error: " + str(e))
 
 
-        # create or remove developer.txt from /boot
+        # create or remove developer.txt from boot partition
         if self.developer:
             if self.DEBUG:
                 print("creating developer.txt file")
-            os.system('sudo touch /boot/developer.txt')
+            os.system('sudo touch ' + str(self.boot_path) + '/developer.txt')
             os.system('sudo systemctl start rsyslog.service')
         else:
-            if os.path.isfile('/boot/developer.txt'):
+            if os.path.isfile(self.boot_path + '/developer.txt'):
                 if self.DEBUG:
                     print("removing developer.txt file")
-                os.system('sudo rm /boot/developer.txt')
+                os.system('sudo rm ' + str(self.boot_path) + '/developer.txt')
 
 
 
@@ -277,11 +266,20 @@ class CandleappstoreAdapter(Adapter):
             print("Current working directory: " + str(os.getcwd()))
             print("End of candle app store adapter init")
 
+        print("doing scans")
+        # Find out which addons are really installed, and what their default settings are
         self.scan_installed_addons()
 
+        # find out how big the addon directories are
+        if not self.DEBUG:
+            time.sleep(5)
+        self.scan_addons_file_size()
+        
+        
         self.ready = True
-        
-        
+
+
+
 #
 #  GET CONFIG
 #
@@ -311,7 +309,6 @@ class CandleappstoreAdapter(Adapter):
         #print(str(config))
 
         if 'Debugging' in config:
-            print("-Debugging was in config")
             self.DEBUG = bool(config['Debugging'])
             if self.DEBUG:
                 print("Debugging enabled")        
@@ -322,7 +319,6 @@ class CandleappstoreAdapter(Adapter):
                 print("-Keep addon data when uninstalling preference was in config: " + str(config['Keep addon data when uninstalling']))
             self.keep_data_on_uninstall = bool(config['Keep addon data when uninstalling'])
         
-
 
         if 'Show developer options' in config:
             if self.DEBUG:
@@ -383,7 +379,12 @@ class CandleappstoreAdapter(Adapter):
                 print("Error loading api token from settings: " + str(ex))
 
 
+    # returns list of installed addons by scanning addons directory. 
+    # Also grabs default addon settings from manifest files
     def scan_installed_addons(self):
+        start_time = time.time()
+        if self.DEBUG:
+            print("in scan_installed_addons")
         real_dirs = []
         new_default_settings = {}
         #if self.DEBUG:
@@ -394,6 +395,7 @@ class CandleappstoreAdapter(Adapter):
                 if os.path.isdir( os.path.join(self.user_profile['addonsDir'],filename) ):
                     real_dirs.append(filename)
                     
+                    # get default addon settings from manifest file
                     try:
                         manifest_path = os.path.join(self.user_profile['addonsDir'],filename,'manifest.json')
                         #print("manifest_path: " + str(manifest_path))
@@ -428,9 +430,76 @@ class CandleappstoreAdapter(Adapter):
         self.addon_defaults = new_default_settings
         #print("self.addon_defaults: " + str(self.addon_defaults))
         
+        # also update how much memory is available
+        self.update_free_memory_and_disk_space()
+        
+        end_time = time.time()
+        if self.DEBUG:
+            print("scan_installed_addons: time taken: " + str(end_time - start_time))
+            
         return real_dirs
 
-
+    
+    # Find out how big the addons are
+    def scan_addons_file_size(self):
+        start_time = time.time()
+        
+        if self.DEBUG:
+            print("in scan_addons_file_size")
+        
+        file_sizes = shell('du ' + str(self.user_profile['addonsDir']) + ' --max-depth=1')
+        for line in file_sizes.splitlines():
+            try:
+                line_parts1 = line.split('\t')
+                line_parts2 = line.split('addons/')
+                
+                if len(line_parts1) > 1 and len(line_parts2) > 1:
+                    self.addon_sizes[ line_parts2[1] ] = int( line_parts1[0] )
+                elif len(line_parts1) > 0 and line.endswith('/addons'):
+                    self.total_addons_size = int( line_parts1[0] )
+                    
+            except Exception as ex:
+                print("Error parsing addon file size scan line: " + str(ex))
+        
+        if self.DEBUG:
+            print("self.addon_sizes: " + str(self.addon_sizes) )
+            print("self.total_addons_size: " + str(self.total_addons_size))
+        
+        # also update how much memory is available
+        self.update_free_memory_and_disk_space()
+        
+        end_time = time.time()
+        if self.DEBUG:
+            print("scan_addons_file_size: time taken: " + str(end_time - start_time))
+            
+            
+    def update_free_memory_and_disk_space(self):
+        if self.DEBUG:
+            print("in update_free_memory_and_disk_space")
+        try:
+            # Available disk space
+            self.user_partition_free_disk_space = int(shell("df /home/pi/.webthings | awk 'NR==2{print $4}' | tr -d '\n'"))
+            
+            # Check free memory
+            free_memory = subprocess.check_output(['grep','^MemFree','/proc/meminfo'])
+            free_memory = free_memory.decode('utf-8')
+            self.free_memory = int( int(''.join(filter(str.isdigit, free_memory))) / 1000)
+            if self.DEBUG:
+                print("free_memory: " + str(free_memory))
+            
+            # Check available memory
+            available_memory = subprocess.check_output("free | grep Mem:", shell=True)
+            available_memory = available_memory.decode('utf-8')
+            available_memory_parts = available_memory.split()
+            available_memory = available_memory_parts[-1]
+            self.available_memory = int( int(''.join(filter(str.isdigit, available_memory))))
+            if self.DEBUG:
+                print("available_memory: " + str(available_memory))
+            
+        except Exception as ex:
+            print("Error getting memory / free user partition disk space: " + str(ex))
+            
+            
     def remove_thing(self, device_id):
         try:
             obj = self.get_device(device_id)        

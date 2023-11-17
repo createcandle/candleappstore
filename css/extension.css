@@ -357,11 +357,27 @@
     text-transform: capitalize;
 }
 
+
+.extension-candleappstore-addon-size{
+    display:none;
+    font-style:italic;
+}
+.extension-candleappstore-low-disk-space .extension-candleappstore-addon-size,
+.developer .extension-candleappstore-addon-size{
+    display:inline;
+}
+
+.extension-candleappstore-addon-size,
 .extension-candleappstore-basic-version{
     margin-left:1rem;
     opacity:.5;
     font-weight:normal;
     font-size:1.6rem;
+}
+
+.extension-candleappstore-addon-size:after{
+    content:"Mb";
+    font-style:italic;
 }
 
 
@@ -399,6 +415,69 @@
 	text-align:center;
 }
 
+
+/*  Low disk space and low memory warning  */
+
+#extension-candleappstore-disk-space{
+    display:none;
+    text-align:center;
+    padding:4rem 0;
+    box-sizing:border-box;
+}
+#extension-candleappstore-low-disk-space-hint{
+    display:none;
+    margin-bottom:2rem;
+}
+.extension-candleappstore-low-memory-warning,
+#extension-candleappstore-disk-space > div{
+    display:inline-block;
+    line-height:3rem;
+    font-weight:bold;
+    padding:2rem;
+    border-radius:.5rem;
+    background-color:#c57f00;
+}
+.extension-candleappstore-low-disk-space #extension-candleappstore-disk-space > div{
+    background-color:#c57f00;
+}
+
+.extension-candleappstore-low-disk-space #extension-candleappstore-disk-space,
+.developer #extension-candleappstore-disk-space{
+    display:block;
+}
+.extension-candleappstore-low-disk-space #extension-candleappstore-low-disk-space-hint{
+    display:block;
+}
+
+.extension-candleappstore-low-memory-warning{
+    display:none;
+    text-align:center;
+    width:100%;
+    margin: 2rem 0;
+    box-sizing:border-box;
+}
+.extension-candleappstore-low-memory-warning > div{
+    max-width:33rem;
+    display:inline-block;
+}
+#extension-candleappstore-overview-available-memory:not(:empty),
+#extension-candleappstore-install-available-memory:not(:empty){
+    display:block;
+    margin-top:2rem;
+}
+
+.extension-candleappstore-low-memory #extension-candleappstore-install-low-memory-warning{
+    display:block;
+}
+
+.extension-candleappstore-very-low-memory #extension-candleappstore-install-low-memory-warning,
+.extension-candleappstore-very-low-memory #extension-candleappstore-overview-low-memory-warning{
+    display:block;
+    background-color:red;
+}
+#extension-candleappstore-overview-low-memory-warning{
+    margin-bottom:6rem;
+}
 
 /*  SELECTED  */
 
@@ -463,7 +542,7 @@
 .extension-candleappstore-settings-left{
     margin-right:2rem;
     min-width:150px;
-    max-width:75%;
+    max-width:calc(75% - 1rem);
 }
 
 
@@ -2087,6 +2166,10 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     #extension-candleappstore-settings,
     #extension-candleappstore-selected{
         padding: 11rem 8rem 30vh 8rem;
+    }
+    
+    #extension-candleappstore-disk-space{
+        padding:4rem;
     }
     
 }

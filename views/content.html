@@ -16,10 +16,7 @@
 			
 			<div id="extension-candleappstore-tab-installed" class="extension-candleappstore-tab">
                 
-                
-                
 				<div id="extension-candleappstore-installed" class="extension-candleappstore-centered-page">
-                    
                     
                     <a href="/settings" id="extension-candleappstore-system-update-available-container">
                     <div id="extension-candleappstore-system-update-available-tip" class="extension-candleappstore-vlak">
@@ -28,6 +25,11 @@
                     </div>
                     </a>
                     
+                    <div id="extension-candleappstore-overview-low-memory-warning"  class="extension-candleappstore-low-memory-warning">
+                        <div>Warning, your controller is very low on memory. This could cause instability.
+                            <span id="extension-candleappstore-overview-available-memory"></span>
+                        </div>
+                    </div>
                     
                     <h2>Installed</h2>
 					
@@ -37,6 +39,8 @@
                         </div>
 					</div>
 					
+                    <div id="extension-candleappstore-disk-space"></div>
+                    
 				</div>
 
 			</div>
@@ -241,9 +245,6 @@
         <div id="extension-candleappstore-selected" class="extension-candleappstore-overlay">
             <div id="extension-candleappstore-selected-close-container" class="back-button icon-button" data-l10n-id="back-button" aria-label="Back"></div>
             
-
-            
-            
             <div id="extension-candleappstore-installation-failed" style="display:none;text-align:center">
                 <h2>Oops</h2>
                 <p>Something went wrong, sorry.</p>
@@ -420,6 +421,11 @@
                     </div>
                     
                     <div id="extension-candleappstore-selected-options" class="extension-candleappstore-options"></div>
+                    <div id="extension-candleappstore-install-low-memory-warning" class="extension-candleappstore-low-memory-warning">
+                        <div>Warning, your controller is low on memory. Installing another addon could cause instability. 
+                            <span id="extension-candleappstore-install-available-memory"></span>
+                        </div>
+                    </div>
                 </div>
                 
             </div>

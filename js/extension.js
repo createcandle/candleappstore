@@ -39,6 +39,11 @@
             this.addon_dirs = []; // reflects actual directories on the disk
             this.extensions = []; // holds all the data about installed addons data that extend the UI (css and js files)
             this.addon_defaults = {}; // holds addon settings defaults, loaded via the addon api (not available through window.API)
+            this.addon_sizes = {}; // holds sizes of addon directories on disk in bytes
+            this.total_addons_size = null; // total combined size of all addons
+            this.free_disk_space = null;
+            this.free_memory = null;
+            this.available_memory = null;
             this.extensions_list = [];
             this.selector = "";
             this.username = "";
@@ -117,32 +122,6 @@
                     
                 }
                 
-                if(typeof body.bits != 'undefined'){
-                    this.bits = parseInt(body.bits);
-                    if(this.debug){
-                        console.log("candle store debug: system bits: ", this.bits);
-                    }
-                }
-                if(typeof body.python_version != 'undefined'){
-                    this.python_version = body.python_version;
-                    if(this.debug){
-                        console.log("candle store debug: python_version: ", this.python_version);
-                    }
-                }
-                if(typeof body.node_version != 'undefined'){
-                    this.node_version = body.node_version;
-                    if(this.debug){
-                        console.log("candle store debug: node_version: ", this.node_version);
-                    }
-                }
-                if(typeof body.addon_defaults != 'undefined'){
-                    this.addon_defaults = body.addon_defaults;
-                    if(this.debug){
-                        console.log("candle store debug: addon_defaults: ", this.addon_defaults);
-                    }
-                }
-                
-                
                 
                 // Show developer options
                 if(typeof body.developer != 'undefined'){
@@ -171,9 +150,14 @@
                 }
                 
                 
+                // Parse most of the data
+                this.parse_body(body);
+                
                 
                 // Make sure menu button is always visible. Can be hidden if the user returns from a complex addon settings page using their browser's back button.
                 //document.getElementById('menu-button').classList.remove('hidden');
+                
+                
                 
     
 			})
@@ -184,6 +168,151 @@
 	    }
 
 
+
+        // A single place to parse various Api responses
+        parse_body(body){
+            
+            if(typeof body.bits != 'undefined'){
+                this.bits = parseInt(body.bits);
+                if(this.debug){
+                    console.log("candle store debug: system bits: ", this.bits);
+                }
+            }
+            if(typeof body.python_version != 'undefined'){
+                this.python_version = body.python_version;
+                if(this.debug){
+                    console.log("candle store debug: python_version: ", this.python_version);
+                }
+            }
+            if(typeof body.node_version != 'undefined'){
+                this.node_version = body.node_version;
+                if(this.debug){
+                    console.log("candle store debug: node_version: ", this.node_version);
+                }
+            }
+            if(typeof body.addon_defaults != 'undefined'){
+                this.addon_defaults = body.addon_defaults;
+                if(this.debug){
+                    console.log("candle store debug: addon_defaults: ", this.addon_defaults);
+                }
+            }
+            if(typeof body.addon_sizes != 'undefined'){
+                this.addon_sizes = body.addon_sizes;
+                if(this.debug){
+                    console.log("candle store debug: addon_sizes: ", this.addon_sizes);
+                }
+            }
+            if(typeof body.total_addons_size != 'undefined'){
+                this.total_addons_size = body.total_addons_size;
+                if(this.debug){
+                    console.log("candle store debug: total_addons_size: ", this.total_addons_size);
+                }
+            }
+            if(typeof body.free_disk_space != 'undefined'){
+                this.free_disk_space = body.free_disk_space;
+                if(this.debug){
+                    console.log("candle store debug: free_disk_space: ", this.free_disk_space);
+                }
+            }
+            if(typeof body.free_memory != 'undefined'){ // Not currently used
+                this.free_memory = body.free_memory;
+                if(this.debug){
+                    console.log("candle store debug: free_memory: ", this.free_memory);
+                }
+            }
+            if(typeof body.available_memory != 'undefined'){
+                this.available_memory = body.available_memory;
+                if(this.debug){
+                    console.log("candle store debug: available_memory: ", this.available_memory);
+                }
+            }
+            
+            // UPDATE UI BASED ON UPDATED VALUES
+            
+            if(document.getElementById('extension-candleappstore-disk-space') != null){
+                // Update low disk space class
+                console.log("this.free_disk_space: ", this.free_disk_space);
+                try{
+                
+                    if(this.free_disk_space != null && this.total_addons_size != null){
+                    
+                    
+                        const available_disk_mb = Math.round(this.free_disk_space/1000);
+                        const addons_size_mb = Math.round(this.total_addons_size/1000);
+                    
+                        document.getElementById('extension-candleappstore-disk-space').innerHTML = '<div><div id="extension-candleappstore-low-disk-space-hint">Warning, the disk is getting full</div>Total addons size: ' + addons_size_mb + 'Mb<br/>Available disk space: ' + available_disk_mb + 'Mb</div>';
+                        if(this.debug){
+                            console.log("candleappstore: available disk space in Mb: ", available_disk_mb);
+                        }
+                        if(this.free_disk_space < 1000000){ // less than a gigabyte of space remaning
+                            if(this.debug){
+                                console.log("candleappstore: low disk space");
+                            }
+                            document.getElementById('extension-candleappstore-content').classList.add('extension-candleappstore-low-disk-space');
+                        }
+                        else{
+                            if(this.debug){
+                                console.log("candleappstore: enough disk space");
+                            }
+                            document.getElementById('extension-candleappstore-content').classList.remove('extension-candleappstore-low-disk-space');
+                        }
+                    
+                    }
+                
+                }
+                catch(e){
+                    console.log("Error checking/setting low disk space indicator class: ", e);
+                }
+            
+            
+                // Update low memory indicator
+                console.log("this.available_memory: ", this.available_memory);
+                try{
+                
+                    if(this.available_memory != null){
+                    
+                        const available_memory_mb = Math.round(this.available_memory/1000);
+                    
+                        document.getElementById('extension-candleappstore-overview-available-memory').innerText = 'Available memory: ' + available_memory_mb + 'Mb';
+                        document.getElementById('extension-candleappstore-install-available-memory').innerText = 'Available memory: ' + available_memory_mb + 'Mb';
+                        if(this.debug){
+                            console.log("candleappstore: available memory in Mb: ", available_memory_mb );
+                        }
+                        if(this.available_memory < 250000){ // less than 250Mb remaining
+                            if(this.debug){
+                                console.log("candleappstore: low memory.");
+                            }
+                            document.getElementById('extension-candleappstore-content').classList.add('extension-candleappstore-low-memory');
+                        
+                            // Very low memory, less than 100mb
+                            if(this.available_memory < 100000){
+                                if(this.debug){
+                                    console.log("candleappstore: VERY low memory.");
+                                }
+                                document.getElementById('extension-candleappstore-content').classList.add('extension-candleappstore-very-low-memory');
+                            }
+                            else{
+                                document.getElementById('extension-candleappstore-content').classList.remove('extension-candleappstore-very-low-memory');
+                            }
+                        }
+                        else{
+                            if(this.debug){
+                                console.log("candleappstore: enough available memory");
+                            }
+                            document.getElementById('extension-candleappstore-content').classList.remove('extension-candleappstore-low-memory');
+                            document.getElementById('extension-candleappstore-content').classList.remove('extension-candleappstore-very-low-memory');
+                        }
+                    
+                    }
+                
+                }
+                catch(e){
+                    console.log("Error checking/setting low disk space indicator class: ", e);
+                }
+            }
+            
+            
+        }
 
 
 
@@ -924,7 +1053,6 @@
 			});
             
             
-            
             show_signup_button.addEventListener('click', (event) => {
                 //console.log("show signup button clicked");
                 login_form.style.display = 'none';
@@ -942,7 +1070,6 @@
                 }
                 //console.log("signup_beta_checkbox.checked = " + signup_beta_checkbox.checked);
 			});
-            
             
             
             signup_button.addEventListener('click', (event) => {
@@ -1764,6 +1891,8 @@
         };
         
         
+        // No longer used
+        /*
         remember_permission = (addon_id, permission, value) =>
         {
             //const pre = document.getElementById('extension-candleappstore-response-data');
@@ -1795,15 +1924,11 @@
     				}
 
     	        }).catch((e) => {
-    	  			//console.log("Error getting timer items: " + e.toString());
-    				//console.log("Error: " + e);
-    				//pre.innerText = "remembering permission failed - connection error?";
-    				//return {};
                     myReject({});
     	        });	
             });
         }
-        
+        */
         
         
         
@@ -1955,10 +2080,10 @@
                 const search_text = document.getElementById('extension-candleappstore-filter-search-input').value;
                 
                 
+                
                 //
                 //  UPDATE ADDONS
                 //
-
 
                 //console.log('this.installed (from python): ', this.installed);
 
@@ -2034,7 +2159,6 @@
                             //console.log("Error getting extension value: ", e);
                         }
                     
-                        
                 
                         const keys = Object.keys(data[i]);
                         //console.log("keys: ", keys);
@@ -2050,7 +2174,20 @@
                                 
                                 if(page == 'installed' && info == 'name'){
                                     text += '<span class="extension-candleappstore-basic-version">' + data[i]['version'] + '</span>';
+                                    
+                                    try{
+                                        if(typeof this.addon_sizes[addon_id] != 'undefined'){
+                                            let rounded_size = Math.round(0.5 + (this.addon_sizes[addon_id] / 1000) );
+                                            text += '<span class="extension-candleappstore-addon-size">' + rounded_size + '</span>';
+                                        }
+                                    }
+                                    catch(e){
+                                        console.log("Error adding addon size: ", e);
+                                    }
+                                    
                                 }
+                                
+                                
                                 
                                 t.innerHTML = text;
                                 
@@ -2349,9 +2486,6 @@
                                 				console.log("init: get_installed_addons_data catch (error?):", e);
                                 			});
                                             
-                                
-                                
-                                
 
                 						}).catch((e) => {
                 							//console.log("Error enabling/disabling addon: ", this_addon_id);
@@ -2370,25 +2504,6 @@
                                         //document.getElementById('connectivity-scrim').classList.add('hidden');
                                         alert("There is something wrong with this app. You could try re-installing it.");
                                     }
-                        
-                        
-                                    /*
-                                    window.API.getAddonConfig( data[i]["addon_id"])
-                                    .then((result) => { 
-            							//console.log("get addon config result: ");
-            							//console.log(result); 
-                                        //console.log(data[i]);
-                                        document.getElementById("extension-candleappstore-settings-title").innerText = data[i]["name"];
-                                        this.show_addon_config(data[i]["addon_id"], result);
-
-            						}).catch((e) => {
-            							//console.log("get addon config catch (error?)");
-                                       //console.log(e);
-            							//pre.innerText = e.toString();
-            						});
-                                    */
-                        
-                        
                         
                                 });
                                 
@@ -2429,27 +2544,6 @@
                                         return;
                                     }
                                     
-                        
-                                    /*
-            						window.API.postJson(
-            							`/extensions/candleappstore/api/ajax`,
-            							{'action':'get_manifest','addon_id': data[i]["addon_id"] }
-            						).then((body) => { 
-            							//console.log("clear item reaction: ");
-            							//console.log(body);
-            							if( body['state'] != true ){
-            								//pre.innerText = body['message'];
-            							}
-                                        else{
-                                            this.show_selected_app(JSON.parse(body['body']), target.getAttribute('data-installed') ); // data, and whether it is installed already
-                                        }
-
-            						}).catch((e) => {
-            							//console.log("candleappstore: error in clear device handler");
-            							//pre.innerText = e.toString();
-            						});
-                                    */
-                        
                                     this.show_addon_config( event.target.getAttribute('data-addon-id') );                
                         
                         
@@ -4603,8 +4697,12 @@
     			    {'action':'get_installed_dirs'}
 
     	        ).then((body) => {
+                    //console.log("get_installed_dirs response: ", body);
     				if(body['state'] == true){
-                        this.addon_defaults = body.addon_defaults;
+                        
+                        // Update all the values in a central method
+                        this.parse_body(body);
+                        
                         myResolve( body.addon_defaults );
     				}
     				else{
