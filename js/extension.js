@@ -554,6 +554,12 @@
                                                                 }
                                                                 python311_available = true;
                                                             }
+                                                            if(this.python_version == '3.11' && packs[p]['language']['versions'][v] == '3.9'){
+                                                                if(this.debug){
+                                                                    console.log("python 3.9 package spotted");
+                                                                }
+                                                                python39_available = true;
+                                                            }
                                                             if(packs[p]['language']['versions'][v] == '12'){
                                                                 if(this.debug){
                                                                     console.log("node 12 package spotted");

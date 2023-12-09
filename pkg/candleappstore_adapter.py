@@ -188,7 +188,7 @@ class CandleappstoreAdapter(Adapter):
         except Exception as ex:
             print("Error loading config: " + str(ex))
             
-        self.DEBUG = True
+        #self.DEBUG = True
             
         #self.ssid = self.candleappstore_name + " " + self.persistent_data['unique_id'] + "_nomap"
         #print("ssid = " + str(self.ssid))
@@ -233,16 +233,19 @@ class CandleappstoreAdapter(Adapter):
             print("error getting bits of system: " + str(ex))
 
         
-        self.python_version = '3.9'
-        self.python_minor_version = 9
+        self.python_version = '3.11'
+        self.python_minor_version = 11
         try:
             python_check = shell('python3 --version')
+            print("python_check: " + str(python_check))
             python_check = python_check.replace("Python ", "")
             python_version_parts = python_check.split('.')
             if len(python_version_parts) == 3:
                 
                 self.python_version = str(python_version_parts[0]) + "." + str(python_version_parts[1])
                 self.python_minor_version = int(python_version_parts[1])
+            else:
+                print("error, python version did not consist of three parts: " + str(python_version_parts))
             if self.DEBUG:
                 print("Python version: " + str(self.python_version))
         except Exception as ex:
