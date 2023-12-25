@@ -156,7 +156,26 @@
                 
                 // Make sure menu button is always visible. Can be hidden if the user returns from a complex addon settings page using their browser's back button.
                 //document.getElementById('menu-button').classList.remove('hidden');
-                
+                if(this.developer != true){
+					let addon_settings_link_el = document.getElementById('addon-settings-link');
+					if(addon_settings_link_el){
+						if(addon_settings_link_el.src == '/settings/addons'){
+							addon_settings_link_el.src = '/extensions/candleappstore';
+						}
+					}
+                }
+				else{
+					if(document.getElementById('extension-candleappstore-settings-menu-hint') == null){
+						let addon_settings_hint = document.createElement('div');
+						addon_settings_hint.setAttribute('id','extension-candleappstore-settings-menu-hint');
+						//addon_settings_hint.classList.add('extension-candleappstore-vlak');
+						addon_settings_hint.innerHTML = '<a href="/extensions/candleappstore">More settings</a>';
+						document.getElementById('settings-menu').appendChild(addon_settings_hint);
+					}
+				}
+				
+				
+				
                 
                 
     
@@ -231,7 +250,7 @@
             
             if(document.getElementById('extension-candleappstore-disk-space') != null){
                 // Update low disk space class
-                console.log("this.free_disk_space: ", this.free_disk_space);
+                //console.log("this.free_disk_space: ", this.free_disk_space);
                 try{
                 
                     if(this.free_disk_space != null && this.total_addons_size != null){
@@ -266,7 +285,7 @@
             
             
                 // Update low memory indicator
-                console.log("this.available_memory: ", this.available_memory);
+                //console.log("this.available_memory: ", this.available_memory);
                 try{
                 
                     if(this.available_memory != null){
@@ -1599,7 +1618,7 @@
                     }
                     if(document.body.classList.contains('developer')){
                         this.developer = true;
-                        console.log("candle store debug: developer = true");
+                        console.log("candle store debug: body has developer class");
                     }
                 }
                 
@@ -3003,7 +3022,6 @@
                
                     document.getElementById('extension-candleappstore-screenshots').innerHTML = "";
                     
-                
                     document.getElementById("extension-candleappstore-selected-main").style.display = 'block';
                     //document.getElementById('extension-candleappstore-selected-main').style.display = 'block';
                     document.getElementById("extension-candleappstore-selected-post-install").style.display = 'none';
@@ -3018,7 +3036,7 @@
                 
                     if(typeof data.error != 'undefined'){
                         //console.log("There was an arror showing the app. Maybe server gave a bad response?");
-                        console.log("There was a error. Details could not be loaded. It could be a connection error, or - less likely - an unknown app.");
+                        console.log("There was a error. Details could not be loaded. It could be a connection error, or - less likely - an unknown app. data,data.error: ", data,data.error);
                         selected.style.display = 'none';
                         return;
                     }

@@ -1899,7 +1899,7 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 /*  hide developer options  */
 
-#addon-settings-link,
+
 #update-settings-link,
 #authorization-settings-link,
 #experiment-settings-link,
@@ -1909,7 +1909,6 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     display:none;
 }
 
-.developer #addon-settings-link:not(.hidden),
 .developer #update-settings-link:not(.hidden),
 .developer #authorization-settings-link:not(.hidden),
 .developer #experiment-settings-link:not(.hidden),
@@ -1921,9 +1920,24 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 
 
-
-
-
+#extension-candleappstore-settings-menu-hint{
+	text-align:center;
+	max-width: 40rem;
+	margin: 4rem auto;
+}
+#extension-candleappstore-settings-menu-hint a{
+	color:white;
+	padding:1rem 2rem;
+	font-size:1.6rem;
+	display:block;
+	width:100%;
+	text-decoration:none;
+	background-color:rgba(0,0,0,.2);
+	border-radius:.5rem;
+}
+#extension-candleappstore-settings-menu-hint a:hover{
+	background-color:rgba(0,0,0,.4);
+}
 
 
 /*  App store redirect on addons page  */
