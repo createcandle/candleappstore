@@ -74,11 +74,12 @@
             }
             
 			
-			console.error("document.getElementById('addon-settings-link'): ", document.getElementById('addon-settings-link'));
-			
+			//console.error("document.getElementById('addon-settings-link'): ", document.getElementById('addon-settings-link'));
 			
 			/*
-			document.getElementById('addon-settings-link').addEventListener('click', (event) => {
+			document.getElementById('addon-settings-link').href = '/extensions/candleappstore';
+			
+			document.getElementById('addon-settings-link').addEventListener('mousedown', (event) => {
 				console.log("redirecting addon settings to Candle app store");
 				if(!document.body.classList.contains('developer')){
 					event.preventDefault();
@@ -91,14 +92,21 @@
 			*/
 			
             
+			
+			document.getElementById('addon-settings-link').href = '/extensions/candleappstore';
+			
             //document.getElementById('installed-addons-list').style.display = 'none';
             document.getElementById('addon-main-settings').innerHTML += '<div id="extension-candleappstore-addons-page-redirect"><a href="/extensions/candleappstore" class="text-button">Return to Candle app store</a></div>';
             
             
             //console.log("local storage JWT: ", localStorage.getItem('jwt'));
                         
-            
-            document.getElementById('add-adapters-hint-anchor').href = '/extensions/candleappstore';
+            if(document.getElementById('add-adapters-hint-anchor')){
+            	document.getElementById('add-adapters-hint-anchor').href = '/extensions/candleappstore';
+            }
+            //else{
+            //	console.warn("candleappstore: add-adapter-hin-anchor does not exist");
+            //}
             
             //
             // PRE-INIT
@@ -174,12 +182,13 @@
                 // Make sure menu button is always visible. Can be hidden if the user returns from a complex addon settings page using their browser's back button.
                 //document.getElementById('menu-button').classList.remove('hidden');
                 
+				console.log("candleappstore: developer: ", this.developer);
 				if(this.developer){
 					if(document.getElementById('extension-candleappstore-settings-menu-hint') == null){
 						let addon_settings_hint = document.createElement('div');
 						addon_settings_hint.setAttribute('id','extension-candleappstore-settings-menu-hint');
 						//addon_settings_hint.classList.add('extension-candleappstore-vlak');
-						addon_settings_hint.innerHTML = '<a href="/extensions/candleappstore">More settings</a>';
+						addon_settings_hint.innerHTML = '<a href="/settings/addons">Original addons settings</a>';
 						document.getElementById('settings-menu').appendChild(addon_settings_hint);
 					}
 					
