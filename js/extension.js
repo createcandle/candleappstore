@@ -28,7 +28,7 @@
             this.current_page = "installed";
             this.busy_polling = false;
             
-            this.app_store_url = "https://www.candlesmarthome.com/appstore/";
+            this.app_store_url = "https://www.candlesmarthome.com/extensions/appstore/";
             
             this.apps_overview = {};
             this.installed = []; // has data about folders in the addons folder. Comes from app store addon, and is then updated if addons are installed or uninstalled.
@@ -73,6 +73,23 @@
                 this.kiosk = true;
             }
             
+			
+			console.error("document.getElementById('addon-settings-link'): ", document.getElementById('addon-settings-link'));
+			
+			
+			/*
+			document.getElementById('addon-settings-link').addEventListener('click', (event) => {
+				console.log("redirecting addon settings to Candle app store");
+				if(!document.body.classList.contains('developer')){
+					event.preventDefault();
+					
+					addon_settings_redirect_el = document.createElement('a');
+					addon_settings_redirect_el.href = '/extensions/candleappstore';
+					addon_settings_redirect_el.click();
+				}
+			});
+			*/
+			
             
             //document.getElementById('installed-addons-list').style.display = 'none';
             document.getElementById('addon-main-settings').innerHTML += '<div id="extension-candleappstore-addons-page-redirect"><a href="/extensions/candleappstore" class="text-button">Return to Candle app store</a></div>';
@@ -81,7 +98,7 @@
             //console.log("local storage JWT: ", localStorage.getItem('jwt'));
                         
             
-            document.getElementById('add-adapters-hint-anchor').href = '/candleappstore';
+            document.getElementById('add-adapters-hint-anchor').href = '/extensions/candleappstore';
             
             //
             // PRE-INIT
@@ -156,21 +173,23 @@
                 
                 // Make sure menu button is always visible. Can be hidden if the user returns from a complex addon settings page using their browser's back button.
                 //document.getElementById('menu-button').classList.remove('hidden');
-                if(this.developer != true){
-					let addon_settings_link_el = document.getElementById('addon-settings-link');
-					if(addon_settings_link_el){
-						if(addon_settings_link_el.src == '/settings/addons'){
-							addon_settings_link_el.src = '/extensions/candleappstore';
-						}
-					}
-                }
-				else{
+                
+				if(this.developer){
 					if(document.getElementById('extension-candleappstore-settings-menu-hint') == null){
 						let addon_settings_hint = document.createElement('div');
 						addon_settings_hint.setAttribute('id','extension-candleappstore-settings-menu-hint');
 						//addon_settings_hint.classList.add('extension-candleappstore-vlak');
 						addon_settings_hint.innerHTML = '<a href="/extensions/candleappstore">More settings</a>';
 						document.getElementById('settings-menu').appendChild(addon_settings_hint);
+					}
+					
+                }
+				else{
+					let addon_settings_link_el = document.getElementById('addon-settings-link');
+					if(addon_settings_link_el){
+						if(addon_settings_link_el.src == '/settings/addons'){
+							addon_settings_link_el.src = '/extensions/candleappstore';
+						}
 					}
 				}
 				
