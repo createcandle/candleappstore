@@ -319,9 +319,10 @@
                     if(this.available_memory != null){
                     
                         const available_memory_mb = Math.round(this.available_memory/1000);
-                    
+                    	
                         document.getElementById('extension-candleappstore-overview-available-memory').innerText = 'Available memory: ' + available_memory_mb + 'Mb';
                         document.getElementById('extension-candleappstore-install-available-memory').innerText = 'Available memory: ' + available_memory_mb + 'Mb';
+						document.getElementById('extension-candleappstore-store-available-memory').innerText = 'Available memory: ' + available_memory_mb + 'Mb';
                         if(this.debug){
                             console.log("candleappstore: available memory in Mb: ", available_memory_mb );
                         }
@@ -3463,6 +3464,7 @@
                                             //console.log("addon_id: " + addon_id + " was uninstalled, in theory.");
                                         }
                                         document.getElementById("extension-candleappstore-selected").style.display = 'none';
+										document.getElementById('extension-candleappstore-view').style.zIndex = 'auto';
                                         //document.getElementById("extension-candleappstore-settings").style.display = 'none';
                             
                                         //console.log("this.installed = " + this.installed );
@@ -4022,7 +4024,8 @@
                             // LABEL
                             var l = document.createElement("label");
                             l.for = info;
-                            var t = document.createTextNode(info);
+							const cleaned_label = info.replaceAll('_',' ');
+                            var t = document.createTextNode(cleaned_label);
                             l.appendChild(t); // append text to label
                 
                             if(info.indexOf('atitude') != -1 || info.indexOf('ontitude') != -1 || info.toLowerCase() == 'lat' || info.toLowerCase() == 'lon'){
@@ -4047,8 +4050,10 @@
                                 if( description.startsWith('Advanced.') ){
                                     //console.log("descriptions started with Advanced.");
                                     advanced = true;
-                                    description = description.replace('Advanced. ','');
-                                    description = description.replace('Advanced.','');
+									description = description.substring(9);
+									description = description.trim();
+                                    //description = description.replace('Advanced. ','');
+                                    //description = description.replace('Advanced.','');
                                 }
                                 //console.log(description);
                         
@@ -4425,7 +4430,8 @@
                                     //console.log("This addon has a complex object in its settings. Creating redirect button. type: ", addon_settings_props[info]['type']);
                                     form.innerHTML = '<p>This addon has some complicated settings. Click the button below to close the Candle app store and change your preferences via the system settings instead.</p><a href="/settings/addons/config/' + addon_id + '"><button class="extension-candleappstore-button">Click here to change settings</button></a>';
                                     document.getElementById('extension-candleappstore-settings-options').style.display = 'none';
-                                    
+                                    document.getElementById('extension-candleappstore-view').style.zIndex = 'auto';
+									
                                     stop_processing = true;
                                     return false;
                                 }
@@ -4596,6 +4602,7 @@
             					}).catch((e) => {
             						console.log("setAddonConfig catch (error?): ", e);
                                     document.getElementById("extension-candleappstore-settings").style.display = 'none';
+									document.getElementById('extension-candleappstore-view').style.zIndex = 'auto';
                                     document.getElementById('connectivity-scrim').classList.add('hidden');
                                     alert("There was a connection error while saving the settings.");
             					});
@@ -4630,6 +4637,7 @@
             }
             catch(e){
                 console.log("Error in show_addon_config: " + e);
+				document.getElementById('extension-candleappstore-view').style.zIndex = 'auto';
             }
             
         }

@@ -466,10 +466,12 @@
     margin-top:2rem;
 }
 
+.extension-candleappstore-low-memory .extension-candleappstore-low-memory-warning,
 .extension-candleappstore-low-memory #extension-candleappstore-install-low-memory-warning{
     display:block;
 }
 
+.extension-candleappstore-very-low-memory .extension-candleappstore-low-memory-warning,
 .extension-candleappstore-very-low-memory #extension-candleappstore-install-low-memory-warning,
 .extension-candleappstore-very-low-memory #extension-candleappstore-overview-low-memory-warning{
     display:block;
@@ -1930,10 +1932,11 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 	padding:1rem 2rem;
 	font-size:1.6rem;
 	display:block;
-	width:100%;
+	width:calc(100% - 8rem);
 	text-decoration:none;
 	background-color:rgba(0,0,0,.2);
 	border-radius:.5rem;
+	margin: 2rem auto;
 }
 #extension-candleappstore-settings-menu-hint a:hover{
 	background-color:rgba(0,0,0,.4);
@@ -2138,6 +2141,13 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     #extension-candleappstore-tab-installed .extension-candleappstore-basic-options > *{
         text-align:left;
     }
+	
+	
+	.extension-candleappstore-settings-left{
+		max-width:none;
+		width:10%;
+		flex-grow:1;
+	}
 }
 
 
