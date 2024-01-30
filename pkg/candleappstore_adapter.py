@@ -104,10 +104,14 @@ class CandleappstoreAdapter(Adapter):
         self.update_free_memory_and_disk_space()
         
         
-        
+         
         # Paths
         self.addon_path = os.path.join(self.user_profile['addonsDir'], self.addon_name)
         self.data_dir_path = os.path.join(self.user_profile['dataDir'], self.addon_name)
+        self.hostname_image_target_path = os.path.join(self.user_profile['gatewayDir'],'build','static','images','candle_hostname.svg')
+
+        print("self.user_profile: " + str(self.user_profile))
+
 
         # Make sure the data directory exists
         try:
@@ -149,7 +153,9 @@ class CandleappstoreAdapter(Adapter):
         #time.sleep(3) # give the network some more time to settle
         
         #self.mac = get_own_mac("wlan0")
-        #self.hostname = get_own_hostname()
+        
+        
+            
         #print("self.hostname = " + str(self.hostname))
         #self.mac_zero = self.mac.replace(self.mac[len(self.mac)-1], '0')
 
@@ -237,15 +243,16 @@ class CandleappstoreAdapter(Adapter):
         self.python_minor_version = 11
         try:
             python_check = shell('python3 --version')
-            print("python_check: " + str(python_check))
+            if self.DEBUG:
+                print("python_check: " + str(python_check))
             python_check = python_check.replace("Python ", "")
             python_version_parts = python_check.split('.')
             if len(python_version_parts) == 3:
-                
                 self.python_version = str(python_version_parts[0]) + "." + str(python_version_parts[1])
                 self.python_minor_version = int(python_version_parts[1])
             else:
-                print("error, python version did not consist of three parts: " + str(python_version_parts))
+                if self.DEBUG:
+                    print("error, python version string did not consist of three parts: " + str(python_version_parts))
             if self.DEBUG:
                 print("Python version: " + str(self.python_version))
         except Exception as ex:
@@ -268,8 +275,7 @@ class CandleappstoreAdapter(Adapter):
         if self.DEBUG:
             print("Current working directory: " + str(os.getcwd()))
             print("End of candle app store adapter init")
-
-        print("doing scans")
+            print("doing scans")
         # Find out which addons are really installed, and what their default settings are
         self.scan_installed_addons()
 
@@ -277,6 +283,25 @@ class CandleappstoreAdapter(Adapter):
         if not self.DEBUG:
             time.sleep(5)
         self.scan_addons_file_size()
+        
+        
+        # Write hostname SVG image, which can be displayed in the controller network scanner at https://www.candlesmarthome.com/scanner
+        try:
+            self.hostname = get_own_hostname()
+            self.hostname_svg = '<svg id="candle-hostname-svg" height="73" viewBox="0 0 500 73" width="500" xmlns="http://www.w3.org/2000/svg"><text id="candle-hostname-svg-text" fill="#fff" font-family="Arial" font-size="35" letter-spacing="7" x="16" y="50">' + str(self.hostname).title() + '</text></svg>'
+            # self.hostname_icon_svg = '<svg id="candle-hostname-icon-svg" height="900" viewBox="0 0 900 900" width="900" xmlns="http://www.w3.org/2000/svg"><g id="candle-hostname-icon-logo" fill="#fff"><path d="m373.619415 107c87.458527 145.954956-25.31665 212.917175-35.178222 348.408051 0 90.199981 50.030822 163.408477 111.680572 163.408477 61.64978 0 111.680603-73.208496 111.680603-163.408477 2.20929-178.713044-93.493957-269.937409-188.182953-348.408051z"/><path d="m824 604.614014c0-60.047852-167.445496-108.726197-374-108.726197-206.554489 0-374 48.678345-374 108.726197 0 60.04779 167.445511 108.726135 374 108.726135 206.554504 0 374-48.678345 374-108.726135z" fill-rule="evenodd" opacity=".695792"/></g><text id="candle-hostname-icon-text" font-family="Arial" font-size="112" letter-spacing="2.24" x="263.819062" y="847">' + str(self.hostname).title() + '</text></svg>'
+            
+            if self.DEBUG:
+                print("self.hostname_svg: " + str(self.hostname_svg))
+            with open(self.hostname_image_target_path, 'w') as ff:
+                ff.write(self.hostname_svg)
+                if self.DEBUG:
+                    print("wrote hostname SVG image to: " + str(self.hostname_image_target_path))
+            if os.path.exists(self.hostname_image_target_path):
+                os.chmod(self.hostname_image_target_path, 0o644)
+                
+        except Exception as ex:
+            print("Error creating hostname_svg image: " + str(ex))
         
         
         self.ready = True
