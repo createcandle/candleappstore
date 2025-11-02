@@ -55,7 +55,7 @@
     }
   },
   "short_name": "candleapps",
-  "version": "0.5.17",
+  "version": "0.5.18",
   "web_accessible_resources": [
     "css/*.css",
     "images/*.svg",
