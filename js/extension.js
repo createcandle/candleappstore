@@ -719,6 +719,13 @@
                                                         }
                                                         continue;
                                                     }
+													
+                                                    if(node20_available && packs[p]['url'].indexOf('v18') != -1){
+                                                        if(this.debug){
+                                                            console.log("A node 20 version is available, but this is not it. Skipping.");
+                                                        }
+                                                        continue;
+                                                    }
                                                     
                                                     item['download_url'] = packs[p]['url'];
                                                     item['checksum'] = packs[p]['checksum'];
