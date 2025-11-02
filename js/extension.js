@@ -585,8 +585,10 @@
                                     let language = 'nodejs';
                                     let python39_available = false;
                                     let python311_available = false;
+									let python313_available = false;
                                     let node12_available = false;
                                     let node18_available = false;
+									let node20_available = false;
                                     for(let p = 0; p < packs.length; p++){
                                         if(typeof packs[p]['architecture'] != 'undefined'){
                                             if(this.bits == 64){
@@ -610,6 +612,25 @@
                                                                 }
                                                                 python39_available = true;
                                                             }
+                                                            if(this.python_version == '3.13' && packs[p]['language']['versions'][v] == '3.13'){
+                                                                if(this.debug){
+                                                                    console.log("candleappstore: debug: python 3.13 package spotted");
+                                                                }
+                                                                python313_available = true;
+                                                            }
+                                                            if(this.python_version == '3.13' && packs[p]['language']['versions'][v] == '3.11'){
+                                                                if(this.debug){
+                                                                    console.log("candleappstore: debug: python 3.11 package spotted");
+                                                                }
+                                                                python311_available = true;
+                                                            }
+                                                            if(this.python_version == '3.13' && packs[p]['language']['versions'][v] == '3.9'){
+                                                                if(this.debug){
+                                                                    console.log("candleappstore: debug: python 3.9 package spotted");
+                                                                }
+                                                                python39_available = true;
+                                                            }
+															
                                                             if(this.python_version == '3.11' && packs[p]['language']['versions'][v] == '3.11'){
                                                                 if(this.debug){
                                                                     console.log("candleappstore: debug: python 3.11 package spotted");
@@ -622,6 +643,14 @@
                                                                 }
                                                                 python39_available = true;
                                                             }
+															
+                                                            if(this.python_version == '3.9' && packs[p]['language']['versions'][v] == '3.9'){
+                                                                if(this.debug){
+                                                                    console.log("candleappstore: debug: python 3.9 package spotted");
+                                                                }
+                                                                python39_available = true;
+                                                            }
+															
                                                             if(packs[p]['language']['versions'][v] == '12'){
                                                                 if(this.debug){
                                                                     console.log("candleappstore: debug: node 12 package spotted");
@@ -633,6 +662,12 @@
                                                                     console.log("candleappstore: debug: node 18 package spotted");
                                                                 }
                                                                 node18_available = true;
+                                                            }
+                                                            if(this.node_version == '20' && packs[p]['language']['versions'][v] == '20'){
+                                                                if(this.debug){
+                                                                    console.log("candleappstore: debug: node 20 package spotted");
+                                                                }
+                                                                node20_available = true;
                                                             }
                                                         }
                                                     }
@@ -649,16 +684,29 @@
                                                 }
                                                 if(typeof packs[p]['url'] != 'undefined' && typeof packs[p]['checksum'] != 'undefined'){
                                                     
-                                                    if(this.python_version != '3.7' && (python39_available || python311_available) && packs[p]['url'].indexOf('3.7.tgz') != -1){ // TODO: should now check the url, but should properly check the package's languages data instead
+                                                    if(this.python_version != '3.7' && (python39_available || python311_available || python313_available) && packs[p]['url'].indexOf('3.7.tgz') != -1){ // TODO: should now check the url, but should properly check the package's languages data instead
                                                         if(this.debug){
                                                             console.log("skipping python 3.7 version because a newer version is known to be available");
                                                         }
                                                         continue;
                                                     }
                                                     
+                                                    if(this.python_version == '3.13' && python313_available && packs[p]['url'].indexOf('3.9.tgz') != -1){ // TODO: should now check the url, but should properly check the package's languages data instead
+                                                        if(this.debug){
+                                                            console.log("skipping python 3.9 version because a 3.13 version is known to be available");
+                                                        }
+                                                        continue;
+                                                    }
+                                                    if(this.python_version == '3.13' && python313_available && packs[p]['url'].indexOf('3.11.tgz') != -1){ // TODO: should now check the url, but should properly check the package's languages data instead
+                                                        if(this.debug){
+                                                            console.log("skipping python 3.9 version because a 3.11 version is known to be available");
+                                                        }
+                                                        continue;
+                                                    }
+													
                                                     if(this.python_version == '3.11' && python311_available && packs[p]['url'].indexOf('3.9.tgz') != -1){ // TODO: should now check the url, but should properly check the package's languages data instead
                                                         if(this.debug){
-                                                            console.log("skipping python 3.9 version because a 4.11 version is known to be available");
+                                                            console.log("skipping python 3.9 version because a 3.11 version is known to be available");
                                                         }
                                                         continue;
                                                     }
