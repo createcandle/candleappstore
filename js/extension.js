@@ -4,7 +4,7 @@
 	      	super('candleappstore');
 			//console.log("Adding candleappstore addon to menu");
       		
-            console.log("candleappstore: window.API: ", window.API);
+            //console.log("candleappstore: window.API: ", window.API);
             
             
 			this.addMenuEntry('Candle store');
