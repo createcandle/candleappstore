@@ -57,6 +57,9 @@
 
 
 
+#extension-candleappstore-selected-icon{
+	margin:2rem 0;
+}
 
 .extension-candleappstore-selected-description{
     font-style:italic;
@@ -341,6 +344,20 @@
     padding:3rem;
     font-size:2.5rem;
     width:50%;
+}
+
+/*
+.extension-candleappstore-installed-addon-icon{
+	vertical-align:center;
+}
+*/
+
+.extension-candleappstore-installed-addon-name-line{
+	display:flex;
+	align-items:center;
+}
+.extension-candleappstore-installed-addon-name-line > img{
+	margin-right:1rem;
 }
 
 
@@ -1251,12 +1268,15 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 
 #extension-candleappstore-filtered-out-tip{
     width:100%;
-    padding:6rem;
+    padding-top:6rem;
     text-align:center;
     opacity:.6;
     font-style: italic;
 }
-
+#extension-candleappstore-show-all-addons-button{
+	margin: 2rem auto 6rem auto;
+	cursor:pointer;
+}
 
 
 
@@ -1444,7 +1464,6 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     margin-bottom: 0.4rem;
     border-radius: 0.5rem;
 }
-
 
 
 .extension-candleappstore-selected-name{
@@ -1860,6 +1879,23 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 }
 
 
+
+
+/*  SETTINGS MENU ADDONS LIST  */
+
+#extension-candleappstore-settings-menu-addons-list > a{
+	color:white;
+	text-decoration:none;
+	cursor:pointer;
+	opacity:.9;
+	text-align:center;
+	margin-bottom:1rem;
+}
+
+#extension-candleappstore-settings-menu-addons-list .settings-item{
+	cursor:pointer;
+}
+
 /*  DEVELOPER  */
 
 #extension-candleappstore-tab-button-developer{
@@ -2196,6 +2232,10 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
         padding:4rem;
     }
     
+	#extension-candleappstore-tab-installed .extension-candleappstore-installed-addon-description-line{
+		padding-left:calc(24px + 1rem);
+	}
+	
 }
 
 
@@ -2233,6 +2273,15 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     #extension-candleappstore-view button.extension-candleappstore-main-tab-button{
         padding: 1rem 3rem;
     }
+	
+	#extension-candleappstore-tab-installed .extension-candleappstore-installed-addon-name-line > img.extension-candleappstore-installed-addon-icon{
+		width:32px;
+		min-height:32px;
+		margin-right:2rem;
+	}
+	#extension-candleappstore-tab-installed .extension-candleappstore-installed-addon-description-line{
+		padding-left:calc(32px + 2rem);
+	}
 	
 }
 

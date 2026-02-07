@@ -4,7 +4,7 @@
 	      	super('candleappstore');
 			//console.log("Adding candleappstore addon to menu");
       		
-            //console.log("candleappstore: window.API: ", window.API);
+            console.log("candleappstore: window.API: ", window.API);
             
             
 			this.addMenuEntry('Candle store');
@@ -118,6 +118,22 @@
             //	console.warn("candleappstore: add-adapter-hin-anchor does not exist");
             //}
             
+			
+            window.API.getInstalledAddons()
+            .then((result) => { 
+				//console.log("get_installed_addons_data:  result: ", result);
+				
+				result.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1) // sort alphabetically
+				//console.log("sorted result: ", result);
+                this.api_addons_data = result;
+				this.generate_settings_addons_list();
+			
+			})
+			.catch((err) => {
+				console.error("candleappstore: caught error calling window.API.getInstalledAddons: ", err);
+			})
+			
+			
             //
             // PRE-INIT
             //
@@ -212,11 +228,6 @@
 					}
 				}
 				
-				
-				
-                
-                
-    
 			})
             .catch((e) => {
 				console.log("candleappstore: error in init: ", e);
@@ -373,6 +384,67 @@
             
             
         }
+
+		
+		generate_settings_addons_list(){
+			//console.log("in generate_settings_addons_list.  this.api_addons_data: ", this.api_addons_data);
+			if(this.api_addons_data){
+				
+				let settings_menu_addons_list_el = document.querySelector('#extension-candleappstore-settings-menu-addons-list');
+				if(settings_menu_addons_list_el == null){
+					const settings_menu_el = document.querySelector('#settings-menu');
+					if(settings_menu_el){
+						settings_menu_addons_list_el = document.createElement('ul');
+						settings_menu_addons_list_el.innerHTML = '<a href="/extensions/candleappstore"><h1>Addons</h1></a>';
+						settings_menu_addons_list_el.setAttribute('id','extension-candleappstore-settings-menu-addons-list');
+						settings_menu_el.appendChild(settings_menu_addons_list_el);
+					}
+					
+				}
+				
+				if(settings_menu_addons_list_el){
+					//console.log("settings addons menu list (now) exists.  this.api_addons_data: ", this.api_addons_data);
+					for(let a = 0; a < this.api_addons_data.length; a++){
+						const addon = this.api_addons_data[a];
+						let addon_list_el = document.createElement('li');
+						addon_list_el.classList.add('settings-item');
+						
+						let addon_link_el = document.createElement('a');
+						addon_link_el.textContent = addon.name;
+						addon_link_el.addEventListener('click', () => {
+							//console.log("should show settings for: ", addon.id);
+							const candle_store_main_menu_button_el = document.getElementById('extension-candleappstore-menu-item');
+							if(candle_store_main_menu_button_el){
+								candle_store_main_menu_button_el.click();
+								let maximum_loops=40;
+								const try_showing_addon_settings = () => {
+									console.log("maximum_loops: ", maximum_loops);
+									const candle_app_store_selected_addon_overlay_el = document.getElementById('extension-candleappstore-selected');
+		                            if(candle_app_store_selected_addon_overlay_el){
+		                            	candle_app_store_selected_addon_overlay_el.style.display = 'none';
+										this.show_addon_config(addon.id);
+		                            }
+									else{
+										maximum_loops--;
+										if(maximum_loops > 0){
+											setTimeout(try_showing_addon_settings,20);
+										}
+									}
+								}
+								setTimeout(try_showing_addon_settings,10);
+							}
+						})
+						//addon_link_el.setAttribute('href','/extensions/candleappstore#' + this.api_addons_data[a].id);
+						addon_link_el.style.backgroundImage = 'url(/extensions/' + this.api_addons_data[a].id + '/images/menu-icon.svg)'
+						addon_list_el.appendChild(addon_link_el);
+						
+						settings_menu_addons_list_el.appendChild(addon_list_el);
+					}
+				}
+				
+			}
+		}
+
 
 
 
@@ -2339,12 +2411,20 @@
                     
                             if(info == 'name' || info == 'description'){
                                 
-                                var t = document.createElement('span');
+                                var t = document.createElement('div');
+								if(info == 'name'){
+									t.classList.add('extension-candleappstore-installed-addon-name-line');
+								}
+								else{
+									t.classList.add('extension-candleappstore-installed-addon-description-line');
+								}
+								
                                 var text = linkify(data[i][info], true); // removes links from descriptions, and turns them into actual links
                                 
                                 if(page == 'installed' && info == 'name'){
                                     text += '<span class="extension-candleappstore-basic-version">' + data[i]['version'] + '</span>';
-                                    
+                                    text = '<img src="/extensions/' + addon_id + '/images/menu-icon.svg" alt="' + data[i][info] + ' icon" class="extension-candleappstore-installed-addon-icon" width="24" height="24"  onload="(function(){this.style.opacity=1}).call(this)" onerror="(function(){this.style.opacity=0}).call(this)"> ' + text;
+									
                                     try{
                                         if(typeof this.addon_sizes[addon_id] != 'undefined'){
                                             let rounded_size = Math.round(0.5 + (this.addon_sizes[addon_id] / 1000) );
@@ -2870,6 +2950,25 @@
                         var filtered_out_tip_text_el = document.createTextNode(filtered_out_addons_count + " addons are hidden by your current filter settings");
                         filtered_out_tip_el.appendChild(filtered_out_tip_text_el);
                         document.getElementById('extension-candleappstore-list').appendChild(filtered_out_tip_el);
+						
+						const privacy_filter_select_el = document.getElementById('extension-candleappstore-filter-privacy-select');
+						const review_filter_select_el = document.getElementById('extension-candleappstore-filter-reviews-select');
+						const expert_filter_select_el = document.getElementById('extension-candleappstore-filter-expert-select');
+						
+						if( (expert_filter_select_el.value != '4' && expert_filter_select_el.value != '5') || privacy_filter_select_el.value != '0' || review_filter_select_el.value != '0'){
+							var show_all_addons_button_el = document.createElement("div");
+							show_all_addons_button_el.setAttribute('id', 'extension-candleappstore-show-all-addons-button');
+							show_all_addons_button_el.textContent = 'Show all';
+							show_all_addons_button_el.addEventListener('click', () => {
+								//document.getElementById('extension-candleappstore-filter-search-input').value = '';
+								privacy_filter_select_el.value = 0;
+								review_filter_select_el.value = 0;
+								expert_filter_select_el.value = 4;
+								this.generate_overview('shop');
+							});
+							document.getElementById('extension-candleappstore-list').appendChild(show_all_addons_button_el);
+						}
+						
                     }
                 }
                 
@@ -3062,8 +3161,11 @@
             document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
             document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'none';
             document.getElementById('extension-candleappstore-busy-loading-app').style.display = 'flex';
-
-            
+			
+			const selected_icon_el = document.getElementById('extension-candleappstore-selected-icon');
+			if(selected_icon_el){
+				document.getElementById('extension-candleappstore-selected-icon').src = '/extensions/' + addon_id + '/images/menu-icon.svg';
+			}
             // clear opinion, which doesn't always exist
             if(document.getElementById("extension-candleappstore-selected-opinion") != null){
                 document.getElementById("extension-candleappstore-selected-opinion").innerHTML = "";
