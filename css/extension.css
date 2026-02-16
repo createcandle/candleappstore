@@ -367,6 +367,10 @@
     font-size:2.6rem;
     opacity:.9;
 }
+#extension-candleappstore-installedlist .extension-candleappstore-basic-name{
+	font-size:2rem;
+}
+
 .extension-candleappstore-basic-name > span{
     display:inline-block;
 }
@@ -441,6 +445,10 @@
     padding:4rem 0;
     box-sizing:border-box;
 }
+#extension-candleappstore-disk-space:empty{
+	display:none;
+}
+
 #extension-candleappstore-low-disk-space-hint{
     display:none;
     margin-bottom:2rem;
@@ -2228,7 +2236,7 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
         padding: 11rem 8rem 30vh 8rem;
     }
     
-    #extension-candleappstore-disk-space{
+    #extension-candleappstore-disk-space:not(:empty){
         padding:4rem;
     }
     

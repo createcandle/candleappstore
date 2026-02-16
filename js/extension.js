@@ -149,7 +149,7 @@
                 }
                 
                 if(this.debug){
-                    console.log("App Store debug: INIT response: ", body);
+                    console.log("candle store debug: INIT response: ", body);
                 }
                 
                 if(typeof body.exhibit_mode != 'undefined'){
