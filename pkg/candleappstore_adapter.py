@@ -79,6 +79,11 @@ class CandleappstoreAdapter(Adapter):
         if os.path.isfile(self.boot_path + '/exhibit_mode.txt'):
             self.exhibit_mode = True
         
+        
+        self.busy_installing_addon_from_url = False
+        self.prerelease_addons = {} # Keeps track of which addons were upgraded to a pre-release version during this session.
+        # TODO: store this is persistent data, and then compare versions in the UI
+        
         # Uninstall
         self.keep_data_on_uninstall = False
 
@@ -103,14 +108,14 @@ class CandleappstoreAdapter(Adapter):
         self.available_memory = None # available memory can be freed up if need be
         self.update_free_memory_and_disk_space()
         
-        
+        #self.bits64 = (sys.maxsize > 2**32)
          
         # Paths
         self.addon_path = os.path.join(self.user_profile['addonsDir'], self.addon_name)
         self.data_dir_path = os.path.join(self.user_profile['dataDir'], self.addon_name)
         self.hostname_image_target_path = os.path.join(self.user_profile['gatewayDir'],'build','static','images','candle_hostname.svg')
 
-        print("self.user_profile: " + str(self.user_profile))
+        #print("self.user_profile: " + str(self.user_profile))
 
 
         # Make sure the data directory exists
@@ -130,6 +135,8 @@ class CandleappstoreAdapter(Adapter):
         self.persistence_file_path = os.path.join(self.data_dir_path, 'persistence.json')
         if self.DEBUG:
             print("self.persistence_file_path = " + str(self.persistence_file_path))
+        
+        
         
             
        # Get persistent data
@@ -218,7 +225,7 @@ class CandleappstoreAdapter(Adapter):
             if self.DEBUG:
                 print("creating developer.txt file")
             os.system('sudo touch ' + str(self.boot_path) + '/developer.txt')
-            os.system('sudo systemctl start rsyslog.service')
+            #os.system('sudo systemctl start rsyslog.service')
         else:
             if os.path.isfile(self.boot_path + '/developer.txt'):
                 if self.DEBUG:
@@ -239,8 +246,8 @@ class CandleappstoreAdapter(Adapter):
             print("error getting bits of system: " + str(ex))
 
         
-        self.python_version = '3.11'
-        self.python_minor_version = 11
+        self.python_version = '3.13'
+        self.python_minor_version = 13
         try:
             python_check = shell('python3 --version')
             if self.DEBUG:
@@ -499,6 +506,67 @@ class CandleappstoreAdapter(Adapter):
         end_time = time.time()
         if self.DEBUG:
             print("scan_addons_file_size: time taken: " + str(end_time - start_time))
+            
+            
+    def install_addon_from_url(self,url,addon_id,new_version=None):
+        if self.DEBUG:
+            print("in install_addon_from_url.  addon_id,url: ", addon_id, url)
+        succes = False
+        if self.busy_installing_addon_from_url == False and isinstance(url,str) and isinstance(addon_id,str) and len(addon_id) > 1 and url.startswith('https://'):
+            self.busy_installing_addon_from_url = True
+            try:
+                tar_filename = str(url).rsplit('/', 1)[-1]
+                if tar_filename.endswith('.tgz'):
+                    if os.path.isdir('/home/pi/.webthings/addons/package'):
+                        time.sleep(1)
+                        if os.path.isdir('/home/pi/.webthings/addons/package'):
+                            os.system('rm -rf /home/pi/.webthings/addons/package*') # delete all dirs that start with package. This could be an issue if an addon called 'package' exists. Could download and unpack in an outside working directory first
+                            if self.DEBUG:
+                                print("\nERROR, install_addon_from_url noticed that a directory called 'package' already existed. It has been deleted")
+                    
+                    download_command = "cd /home/pi/.webthings/addons; wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 3 " + str(url) + "; tar xf " + tar_filename
+                    if self.DEBUG:
+                        print("addon download_command: \n\n" +str(download_command) + "\n\n")
+                        
+                    download_output = run_command(download_command)
+                    if isinstance(download_output,str):
+                        if self.DEBUG:
+                            print("install_addon_from_url: download_output: \n\n", download_output, "\n\n")
+                            
+                    if os.path.isdir('/home/pi/.webthings/addons/package'):
+                        succes = True
+                        if os.path.isdir('/home/pi/.webthings/addons/' + addon_id):
+                            os.system('rm -rf /home/pi/.webthings/addons/' + addon_id)
+                            
+                        os.system('mv /home/pi/.webthings/addons/package /home/pi/.webthings/addons/' + str(addon_id))
+                        if os.path.isdir('/home/pi/.webthings/addons/package'):
+                            succes = False
+                            os.system('rm -rf /home/pi/.webthings/addons/package')
+                        
+                    os.system('rm /home/pi/.webthings/addons/*.tgz')
+                    time.sleep(1)
+                    self.busy_installing_addon_from_url = False
+                    
+                    succes = (succes and os.path.isdir('/home/pi/.webthings/addons/' + addon_id))
+                    if succes and isinstance(new_version,str):
+                        version_check = run_command('cat manifest.json | grep \'"version"\' | awk \'{print $2}\'')
+                        if isinstance(version_check,str):
+                            version_check = version_check.replace('"','')
+                            version_check = version_check.replace(',','').rstrip()
+                            if version_check != new_version:
+                                if self.DEBUG:
+                                    print("\ninstall_addon_from_url: ERROR, there seems to be a version mismatch: -->" + str(new_version) + "<-- != -->" + str(version_check) + "<--")
+                            else:
+                                if self.DEBUG:
+                                    print("install_addon_from_url: OK, installed version matches with the intended version: " + str(new_version))
+                                self.prerelease_addons[addon_id] = new_version
+                                
+                    return succes
+            except Exception as ex:
+                print("caught error in install_addon_from_url: ", ex)
+                
+        self.busy_installing_addon_from_url = False    
+        return False
             
             
     def update_free_memory_and_disk_space(self):

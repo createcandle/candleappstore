@@ -56,6 +56,41 @@
 }
 
 
+/*  FLASH MESSAGE  */
+
+#extension-candleappstore-flash-message-container{
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	min-height:0;
+	height:9.6rem;
+	max-height:9.6rem;
+	pointer-events:none;
+	background-color:#0a273c;
+	color:white;
+	font-weight:bold;
+	text-align:center;
+	overflow:hidden;
+	transition: all 0.1s ease-out;
+	padding:1rem;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	font-size:1.6rem;
+	line-height:160%;
+	z-index:1111;
+}
+#extension-candleappstore-flash-message-container:empty{
+	min-height:0;
+	height:0;
+	max-height:0;
+	padding:0;
+	transition: all 0.1s ease-in; /*cubic-bezier(0, 1, 0, 1);*/
+}
+
+
+
 
 #extension-candleappstore-selected-icon{
 	margin:2rem 0;
