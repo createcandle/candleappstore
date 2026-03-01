@@ -4,7 +4,7 @@
 	      	super('candleappstore');
 			//console.log("Adding candleappstore addon to menu");
       		
-            console.log("candleappstore: window.API: ", window.API);
+            //console.log("candleappstore: window.API: ", window.API);
             
             
 			this.addMenuEntry('Candle store');
@@ -438,7 +438,7 @@
                     
                         const available_memory_mb = Math.round(this.available_memory/1000);
                     	
-                        document.getElementById('extension-candleappstore-overview-available-memory').innerText = 'Available memory: ' + available_memory_mb + 'Mb';
+                        //document.getElementById('extension-candleappstore-overview-available-memory').innerText = 'Available memory: ' + available_memory_mb + 'Mb';
                         document.getElementById('extension-candleappstore-install-available-memory').innerText = 'Available memory: ' + available_memory_mb + 'Mb';
 						document.getElementById('extension-candleappstore-store-available-memory').innerText = 'Available memory: ' + available_memory_mb + 'Mb';
                         if(this.debug){

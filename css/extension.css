@@ -55,6 +55,10 @@
 	max-width:100%;
 }
 
+body:not(.developer) .extension-candleappstore-show-if-developer{
+	display:none!important;
+}
+
 
 /*  FLASH MESSAGE  */
 
