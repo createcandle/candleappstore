@@ -320,22 +320,32 @@
 
 .extension-candleappstore-item{
 	display: flex;
-    justify-content:space-between;
+    flex-direction:column;
 	/*background-color: #46769C;*/
     background-color:rgba(0,0,0,.2);
 	border-radius:.5rem;
 	position: relative;
 	width:100%;
 	margin-top: 2rem;
-    width: calc(33.3% - 2rem);
+    /*width: calc(33.3% - 2rem);*/
     min-width:10rem;
     padding:2rem;
     box-sizing: border-box;
-    cursor:pointer;
+}
+.extension-candleappstore-item > .extension-candleappstore-item-main{
+	display: flex;
+    justify-content:space-between;
+	/*flex-wrap:wrap;*/
+	cursor:pointer;
+    box-sizing: border-box;
 }
 
 .extension-candleappstore-basic-description{
     opacity:.8;
+}
+
+.extension-candleappstore-installed-addon-description-line{
+	line-height:170%;
 }
 
 /*.extension-candleappstore-basic-description,*/
@@ -472,6 +482,52 @@
 }
 
 
+
+/*  MEMORY USE PROGRESS BAR  */
+
+
+.extension-candleappstore-progress-bar-container{
+    border:2px solid white;
+    border-radius:2rem;
+    height:2rem;
+    width:100%;
+    box-sizing:border-box;
+    overflow:hidden;
+    position:relative;
+}
+
+.extension-candleappstore-progress-bar{
+    width:0%;
+    height:100%;
+    background-color:white;
+    text-align:center;
+}
+
+.extension-candleappstore-bar-container{
+	text-align:left;
+	border-radius:1rem;
+	height:2rem;
+	margin:1rem 0;
+	border:2px solid rgba(255,255,255,.5);
+	box-sizing:border-box;
+	overflow:hidden;
+	width:100%;
+}
+
+.extension-candleappstore-bar{
+	height:2rem;
+	width:0;
+	background-color:#888;
+	display:inline-block;
+}
+
+#extension-candleappstore-memory-purgeable-bar{
+	background-color:#444;
+}
+
+
+
+
 /*  Low disk space and low memory warning  */
 
 #extension-candleappstore-disk-space{
@@ -540,6 +596,16 @@
 #extension-candleappstore-overview-low-memory-warning{
     margin-bottom:6rem;
 }
+
+.extension-candleappstore-memory-label{
+	display:block;
+	opacity:.7;
+}
+
+.extension-candleappstore-memory-label + span{
+	margin-right:.5rem;
+}
+
 
 /*  SELECTED  */
 
@@ -730,7 +796,8 @@
     opacity:.7;
 }
 
-.extension-candleappstore-flex{
+.extension-candleappstore-flex,
+.extension-candleappstore-flex-space-between{
     display:flex;
     flex-wrap:wrap;
     justify-content:space-between;
@@ -832,10 +899,63 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 }
 
 
+/*  MEMORY USE  */
+
+#extension-candleappstore-available-memory-container{
+	margin:2rem 0 6rem 0;
+	line-height:160%;
+}
+
+.extension-candleappstore-bar{
+	height:2rem;
+	width:0;
+	background-color:#888;
+	display:inline-block;
+}
+
+#extension-candleappstore-memory-purgeable-bar{
+	background-color:#444;
+}
+
+
+
 /*  BUTTONS  */
 
 .extension-candleappstore-selected-playpause-button{
     min-width:11rem;
+}
+
+
+.extension-candleappstore-developer-options-container{
+	margin-top:4rem;
+	display:flex;
+	align-items:center;
+	justify-content:flex-end;
+}
+.extension-candleappstore-developer-options-container > button{
+	margin-left:2rem;
+	background-color:rgba(128,0,0,.6);
+}
+
+.extension-candleappstore-restart-addon-button{
+	display: block;
+    border-radius: .5rem;
+    background-image: url(/images/refresh.svg);
+    background-size: 2rem;
+    background-repeat: no-repeat;
+    background-position: center left 1.8rem !important;
+    padding-left: 5rem !important;
+}
+.extension-candleappstore-restart-addon-button:hover{
+	background-color:rgba(0,0,0,.4);
+}
+
+.extension-candleappstore-fade{
+	opacity:.6;
+	pointer-events:none;
+}
+button.extension-candleappstore-extra-fade{
+	opacity:.2;
 }
 
 #extension-candleappstore-update-all-button{ 
@@ -2179,7 +2299,6 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     }
 
     .extension-candleappstore-select-satellites-question, 
-    .extension-candleappstore-item,
     .extension-candleappstore-settings-item.extension-candleappstore-settings-enum{
         flex-wrap:wrap;
     }
@@ -2229,6 +2348,19 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
 	}
 }
 
+@media screen and (max-width: 800px) {
+	
+    .extension-candleappstore-item-main{
+    	flex-direction:column;
+    }
+	
+	.extension-candleappstore-basic-info{
+		max-width:50rem;
+		margin-bottom:2rem;
+	}
+}
+
+
 
 @media screen and (min-width: 641px) {
 	.extension-candleappstore-line2{
@@ -2274,10 +2406,11 @@ body:not(.developer) #extension-candleappstore-show-advanced-settings-button + d
     #extension-candleappstore-disk-space:not(:empty){
         padding:4rem;
     }
-    
+    /*
 	#extension-candleappstore-tab-installed .extension-candleappstore-installed-addon-description-line{
 		padding-left:calc(24px + 1rem);
 	}
+	*/
 	
 }
 

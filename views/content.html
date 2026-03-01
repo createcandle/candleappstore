@@ -28,8 +28,18 @@
                     
 					<div id="extension-candleappstore-disk-space"></div>
 					
+		            <div id="extension-candleappstore-available-memory-container" class="extension-candleappstore-vlak">
+						<p class="extension-candleappstore-header">Memory use</p>				
+						<div id="extension-candleappstore-memory-bar-container" class="extension-candleappstore-bar-container"><div id="extension-candleappstore-memory-used-bar" class="extension-candleappstore-bar"></div><div id="extension-candleappstore-memory-purgeable-bar" class="extension-candleappstore-bar"></div></div>
+						<div class="extension-candleappstore-show-if-developer extension-candleappstore-flex-space-between">
+		                	<span><span class="extension-candleappstore-memory-label">Total</span><span id="extension-candleappstore-total-memory">?</span>Mb</span>
+		                	<span><span class="extension-candleappstore-memory-label">Available</span><span id="extension-candleappstore-available-memory">?</span>Mb</span>
+		                	<span><span class="extension-candleappstore-memory-label">Empty</span><span id="extension-candleappstore-free-memory">?</span>Mb</span>
+						</div>
+		            </div>
+					
                     <div id="extension-candleappstore-overview-low-memory-warning"  class="extension-candleappstore-low-memory-warning">
-                        <div>Warning, your controller is very low on memory. This could cause instability.
+                        <div>Warning, your controller is very low on memory. You may want to disable some addons.
                             <span id="extension-candleappstore-overview-available-memory"></span>
                         </div>
                     </div>
@@ -86,6 +96,10 @@
             
 			<div id="extension-candleappstore-tab-shop" class="extension-candleappstore-tab extension-candleappstore-hidden">
 				
+				
+	            
+				
+				
                 <div id="extension-candleappstore-filter-container">
                     
                     <div id="extension-candleappstore-filter-search-container">
@@ -126,6 +140,9 @@
                 </div>
 				
 				
+				
+	            
+				
                 <div id="extension-candleappstore-store-low-memory-warning" class="extension-candleappstore-low-memory-warning">
                     <div>Warning, your controller is very low on memory. Installing additional addons could cause serious issues.
                         <span id="extension-candleappstore-store-available-memory"></span>
@@ -143,14 +160,17 @@
                 </div>
                 
                 <div id="extension-candleappstore-original-item" class="extension-candleappstore-item">
-			        <div class="extension-candleappstore-basic-info">
-                        <div class="extension-candleappstore-basic-name"></div>
-                        <div class="extension-candleappstore-basic-description"></div>
-                    </div>
-                    <div class="extension-candleappstore-basic-options-container">
-                        <div class="extension-candleappstore-basic-options">
-                        </div>
-                    </div>
+					<div class="extension-candleappstore-item-main">
+				        <div class="extension-candleappstore-basic-info">
+	                        <div class="extension-candleappstore-basic-name"></div>
+	                        <div class="extension-candleappstore-basic-description"></div>
+	                    </div>
+	                    <div class="extension-candleappstore-basic-options-container">
+	                        <div class="extension-candleappstore-basic-options">
+	                        </div>
+	                    </div>
+			        </div>
+                    <div class="extension-candleappstore-developer-options-container extension-candleappstore-show-if-developer"></div>
                 </div>
                 
 			</div>

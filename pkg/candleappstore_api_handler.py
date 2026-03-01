@@ -107,6 +107,7 @@ class CandleappstoreAPIHandler(APIHandler):
                     installed_addons = []
                     try:
                         self.adapter.installed_addons = self.adapter.scan_installed_addons()
+                        self.adapter.update_free_memory_and_disk_space()
                     except Exception as ex:
                         if self.DEBUG:
                             print("Error getting installed addons list: " + str(ex))
@@ -134,12 +135,13 @@ class CandleappstoreAPIHandler(APIHandler):
                                           'total_memory':self.adapter.total_memory,
                                           'free_memory':self.adapter.free_memory,
                                           'available_memory':self.adapter.available_memory,
-                                          'prerelease_addons':self.adapter.prerelease_addons,
+                                          'pre_release_addons':self.adapter.pre_release_addons,
                                           'debug':self.adapter.DEBUG
                                       }),
                     )
                     
-                    
+                
+                
                 elif action == 'remember_permission':
                     if self.DEBUG:
                         print('ajax handling permission change')
@@ -277,7 +279,7 @@ class CandleappstoreAPIHandler(APIHandler):
                                           'free_disk_space':self.adapter.user_partition_free_disk_space,
                                           'free_memory':self.adapter.free_memory,
                                           'available_memory':self.adapter.available_memory,
-                                          'prerelease_addons':self.adapter.prerelease_addons,
+                                          'pre_release_addons':self.adapter.pre_release_addons,
                                           }),
                     )
                     
@@ -303,16 +305,24 @@ class CandleappstoreAPIHandler(APIHandler):
                     
 
 
-                elif action == 'install_pre_release':
+                elif action == 'install_release':
                     state = False
                     message = ''
                     try:
                         
-                        if 'addon_id' in request.body and 'current_version' in request.body and 'homepage_url' in request.body:
+                        if 'addon_id' in request.body and 'current_version' in request.body and 'homepage_url' in request.body and 'release_type' in request.body:
                             
                             homepage_url = str(request.body['homepage_url'])
                             addon_id = str(request.body['addon_id'])
                             current_version = str(request.body['current_version'])
+                            release_type = str(request.body['release_type'])
+                            if release_type != 'pre' and release_type != 'normal':
+                                message = 'Error, unexpected release type'
+                            
+                            
+                            if os.path.isdir('/home/pi/.webthings/addons/' + str(addon_id) + '/.git'):
+                                print("install_addon_from_url: aborting, .git folder spotted. Addon_id was: ", addon_id)
+                                message = 'That addon has a .git folder. Update  of ' + str(addon_id) + ' aborted.'
                             
                             arch = 'linux-arm'
                             if self.adapter.bits == 64:
@@ -331,96 +341,134 @@ class CandleappstoreAPIHandler(APIHandler):
                                         github_user = homepage_url[:idx]
                             else:
                                 if self.DEBUG:
-                                    print("install_pre_release: homepage_url was likely not a github URL")
+                                    print("install_release: homepage_url was likely not a github URL")
                             
                             if addon_id == 'zigbee2mqtt-adapter':
                                 github_user = 'kabbi'
                             
                             if self.DEBUG:
-                                print("install_pre_release: Github user and addon_id are: ", github_user, addon_id)
+                                print("install_release:  release_type, github user and addon_id are: ", release_type, github_user, addon_id)
                         
-                            #get_raw_json_command = "jq -r 'map(select(.prerelease)) | first' <<< $(curl --silent https://api.github.com/repos/" + str(github_user) + "/" + str(addon_id) + "/releases)"
+                            #get_raw_json_command = "jq -r 'map(select(.pre_release)) | first' <<< $(curl --silent https://api.github.com/repos/" + str(github_user) + "/" + str(addon_id) + "/releases)"
                             #get_raw_json_command = 'bash -c "' + get_raw_json_command + '"'
                             #if self.DEBUG:
-                            #    print("install_pre_release: get_raw_json_command: \n\n" + str(get_raw_json_command) + "\n\n")
+                            #    print("install_release: get_raw_json_command: \n\n" + str(get_raw_json_command) + "\n\n")
                             
-                            pre_release_raw_json = run_command("curl --silent https://api.github.com/repos/" + str(github_user) + "/" + str(addon_id) + "/releases")
-                            if isinstance(pre_release_raw_json,str):
-                                if self.DEBUG:
-                                    print("pre_release_raw_json: \n" + str(pre_release_raw_json))
-                                try:
-                                    if 'tag_name' in pre_release_raw_json:
-                                        pre_release_json = json.loads(pre_release_raw_json)
-                                        if len(pre_release_json):
-                                            pre_release_json = pre_release_json[0]
-                                            if self.DEBUG:
-                                                print("first item: \n", json.dumps(pre_release_json,indent=4))
+                            if message == '':
+                                pre_release_raw_json = run_command("curl --silent https://api.github.com/repos/" + str(github_user) + "/" + str(addon_id) + "/releases")
+                                if isinstance(pre_release_raw_json,str):
+                                    #if self.DEBUG:
+                                    #    print("pre_release_raw_json: \n" + str(pre_release_raw_json))
+                                    try:
+                                        if 'tag_name' in pre_release_raw_json:
+                                            full_release_json = json.loads(pre_release_raw_json)
+                                            if full_release_json and len(full_release_json):
+                                                pre_release_json = None
+                                            
+                                                # TODO: are the newest releases always at the top of the list? Or should that be checked too? Heck, maybe the user could select the version they want..
+                                                for release_item in full_release_json:
+                                                    if self.DEBUG and 'tag_name' in release_item:
+                                                        print("checking release " + str(release_item['tag_name']))
+                                                    if 'prerelease' in list(release_item.keys()):
+                                                        print("\n\nrelease_item['prerelease']: ", release_item['prerelease'])
+                                                        
+                                                        if release_type == 'normal' and release_item['prerelease'] == False:
+                                                            pre_release_json = release_item
+                                                            if self.DEBUG:
+                                                                print("found normal release")
+                                                            break
+                                                        elif release_type == 'pre' and release_item['prerelease'] == True:
+                                                            pre_release_json = release_item
+                                                            if self.DEBUG:
+                                                                print("found pre release")
+                                                            break
+                                                
+                                                
+                                                if pre_release_json == None:
+                                                    message = 'No ' + str(release_type) + ' release available for ' + str(addon_id)
+                                                    if self.DEBUG:
+                                                        print("install_release: " + str(message))
+                                            
+                                                else:
+                                                    if self.DEBUG:
+                                                        print("selected item: \n", json.dumps(pre_release_json,indent=4))
                                         
-                                            if 'prerelease' in list(pre_release_json.keys()) and pre_release_json['prerelease'] == True:
-                                        
-                                                if 'tag_name' in pre_release_json and 'name' in pre_release_json and pre_release_json['tag_name'] != pre_release_json['name']:
-                                                    message = 'Name and tag mismatch: ' + str(pre_release_json['name']) + " != " + pre_release_json['tag_name'] 
-                                        
-                                                if 'tag_name' in pre_release_json:
-                                                    if pre_release_json['tag_name'] == current_version:
-                                                        message = 'Already running the latest pre-release version of ' + str(addon_id)
-                                                        self.prerelease_addons[addon_id] = current_version
-                                                if message == '' and 'assets' in pre_release_json:
-                                                    best_python_option = ''
-                                                    best_node_option = ''
-                                                    for asset_details in pre_release_json["assets"]:
+                                                    #if 'tag_name' in pre_release_json and 'name' in pre_release_json and str(pre_release_json['tag_name']) != str(pre_release_json['name']):
+                                                    #    message = 'Name and tag mismatch: ' + str(pre_release_json['name']) + " != " + str(pre_release_json['tag_name']) 
+                                                        
+                                                            
+                                                    if 'tag_name' in pre_release_json:
+                                                        if str(pre_release_json['tag_name']) == str(current_version):
+                                                            message = 'Already running the latest ' + str(release_type) + ' release version of ' + str(addon_id)
+                                                            self.adapter.pre_release_addons[addon_id] = current_version
+                                                            
+                                                    if len(str(message)):
                                                         if self.DEBUG:
-                                                            print("install_pre_release: asset_details: ", asset_details)
-                                                        if 'browser_download_url' in asset_details and 'name' in asset_details and arch in str(asset_details['name']) and not '.sha256sum' in str(asset_details['name']):
-                                                            python_version_part = '-v' + str(self.adapter.python_version) + '.tgz'
-                                                            if python_version_part in asset_details['name']:
-                                                                best_python_option = str(asset_details['browser_download_url'])
-                                                            elif '-v3.9.tgz' in asset_details['name'] and best_python_option == '':
-                                                                best_python_option = str(asset_details['browser_download_url'])
-                                                            elif not '-v3.' in asset_details['name']:
-                                                                if 'v20' in asset_details['name'] or best_node_option == '':
-                                                                    best_node_option = str(asset_details['browser_download_url'])
-                                                    if best_python_option != '' and best_python_option.startswith('https://github.com/'):
-                                                        state = self.adapter.install_addon_from_url(best_python_option,addon_id)
-                                                        if state:
-                                                            message = 'Addon updated to pre-release version ' + str(pre_release_json['tag_name'])
-                                                    elif best_node_option != '' and best_node_option.startswith('https://github.com/'):
-                                                        new_version = None
-                                                        if 'tag_name' in pre_release_json:
-                                                            new_version = str(pre_release_json['tag_name'])
-                                                        state = self.adapter.install_addon_from_url(best_node_option,addon_id, new_version)
-                                                        if state:
-                                                            message = 'Addon updated to pre-release version ' + str(new_version)
+                                                            print("\nERROR: message was not empty: " + str(message))
+                                                            
+                                                    if message == '' and 'assets' in list(pre_release_json.keys()):
+                                                        if self.DEBUG:
+                                                            print("looping over assets: ", len(pre_release_json['assets']))
+                                                        best_python_option = ''
+                                                        best_node_option = ''
+                                                        for asset_details in pre_release_json["assets"]:
+                                                            if self.DEBUG:
+                                                                print("install_release: asset_details: ", asset_details)
+                                                            if 'browser_download_url' in asset_details and 'name' in asset_details and arch in str(asset_details['name']) and not '.sha256sum' in str(asset_details['name']):
+                                                                python_version_part = '-v' + str(self.adapter.python_version) + '.tgz'
+                                                                if python_version_part in asset_details['name']:
+                                                                    best_python_option = str(asset_details['browser_download_url'])
+                                                                elif '-v3.9.tgz' in asset_details['name'] and best_python_option == '':
+                                                                    best_python_option = str(asset_details['browser_download_url'])
+                                                                elif not '-v3.' in asset_details['name']:
+                                                                    if 'v20' in asset_details['name'] or best_node_option == '':
+                                                                        best_node_option = str(asset_details['browser_download_url'])
+                                                        if best_python_option != '' and best_python_option.startswith('https://github.com/'):
+                                                            state = self.adapter.install_addon_from_url(best_python_option,addon_id)
+                                                            if state:
+                                                                message = 'Addon changed to ' + str(release_type) + ' release version ' + str(pre_release_json['tag_name'])
+                                                        elif best_node_option != '' and best_node_option.startswith('https://github.com/'):
+                                                            new_version = None
+                                                            if 'tag_name' in pre_release_json:
+                                                                new_version = str(pre_release_json['tag_name'])
+                                                            state = self.adapter.install_addon_from_url(best_node_option,addon_id, new_version)
+                                                            if state:
+                                                                message = 'Addon updated to ' + str(release_type) + ' release version ' + str(new_version)
+                                                        else:
+                                                            if self.DEBUG:
+                                                                print("did not find a viable pre-release download url for " + str(addon_id))
+                                        
+                                                    
                                                     else:
                                                         if self.DEBUG:
-                                                            print("did not find a viable pre-release download url for " + str(addon_id))
+                                                            print("no tag_name spotted in pre_release_raw_json, aborting attempt to install pre-release")
+                                                        message = 'There is no ' + str(release_type) + ' release for ' + str(addon_id)
+                                                                
                                             else:
                                                 if self.DEBUG:
                                                     print("no tag_name spotted in pre_release_raw_json, aborting attempt to install pre-release")
-                                                message = 'There is no pre-release for ' + str(addon_id)
-                                                                
+                                                message = 'Zero releases spotted for ' + str(addon_id)
+                                                
                                         else:
                                             if self.DEBUG:
                                                 print("no tag_name spotted in pre_release_raw_json, aborting attempt to install pre-release")
-                                            message = 'Zero releases spotted for ' + str(addon_id)
-                                                
-                                    else:
-                                        if self.DEBUG:
-                                            print("no tag_name spotted in pre_release_raw_json, aborting attempt to install pre-release")
-                                        message = 'No pre-release available for ' + str(addon_id)
+                                            message = 'No ' + str(release_type) + ' release available for ' + str(addon_id)
                                         
-                                except Exception as ex:
+                                    except Exception as ex:
+                                        if self.DEBUG:
+                                            print("install_release: caught error loading pre-release json: ", ex)
+                                        if message == '':
+                                            message = 'Caught an error while checking if a pre-release is available for ' + str(addon_id) + ' ' + str(ex)
+                                else:
                                     if self.DEBUG:
-                                        print("install_pre_release: caught error loading pre-release json: ", ex)
-                                    if message == '':
-                                        message = 'Caught an error while checking if a pre-release is available for ' + str(addon_id)
+                                        print("install_release: error, raw release json was not a string")
+                                    message = 'downloaded  raw release json was not a string. Perhaps the addon is not on Github? Try it yourself: https://github.com/' + str(github_user) + "/" + str(addon_id)
                             else:
                                 if self.DEBUG:
-                                    print("install_pre_release: error, raw pre-release json was not a string")
-                                message = 'downloaded pre_release_raw_json was not a string. Perhaps the addon is not on Github? Try it yourself: https://github.com/' + str(github_user) + "/" + str(addon_id)
+                                    print("install_release: early abort")
                         else:
                             if self.DEBUG:
-                                print("install_pre_release: invalid parameters provided")
+                                print("install_release: invalid parameters provided")
                             message = 'Error, invalid parameters'
                                 
                     except Exception as ex:
@@ -432,7 +480,7 @@ class CandleappstoreAPIHandler(APIHandler):
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state':state,'message':message,'prerelease_addons':self.adapter.prerelease_addons}),
+                      content=json.dumps({'state':state,'message':message,'pre_release_addons':self.adapter.pre_release_addons}),
                     )
                     
                 

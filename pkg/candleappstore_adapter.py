@@ -81,7 +81,7 @@ class CandleappstoreAdapter(Adapter):
         
         
         self.busy_installing_addon_from_url = False
-        self.prerelease_addons = {} # Keeps track of which addons were upgraded to a pre-release version during this session.
+        self.pre_release_addons = {} # Keeps track of which addons were upgraded to a pre-release version during this session.
         # TODO: store this is persistent data, and then compare versions in the UI
         
         # Uninstall
@@ -515,6 +515,11 @@ class CandleappstoreAdapter(Adapter):
         if self.busy_installing_addon_from_url == False and isinstance(url,str) and isinstance(addon_id,str) and len(addon_id) > 1 and url.startswith('https://'):
             self.busy_installing_addon_from_url = True
             try:
+                
+                if os.path.isdir('/home/pi/.webthings/addons/' + str(addon_id) + '/.git'):
+                    print("install_addon_from_url: aborting, .git folder spotted. Addon_id was: ", addon_id)
+                    return False
+                
                 tar_filename = str(url).rsplit('/', 1)[-1]
                 if tar_filename.endswith('.tgz'):
                     if os.path.isdir('/home/pi/.webthings/addons/package'):
@@ -559,7 +564,7 @@ class CandleappstoreAdapter(Adapter):
                             else:
                                 if self.DEBUG:
                                     print("install_addon_from_url: OK, installed version matches with the intended version: " + str(new_version))
-                                self.prerelease_addons[addon_id] = new_version
+                                self.pre_release_addons[addon_id] = new_version
                                 
                     return succes
             except Exception as ex:
