@@ -308,6 +308,7 @@ class CandleappstoreAPIHandler(APIHandler):
                 elif action == 'install_release':
                     state = False
                     message = ''
+                    new_version = None
                     try:
                         
                         if 'addon_id' in request.body and 'current_version' in request.body and 'homepage_url' in request.body and 'release_type' in request.body:
@@ -424,25 +425,26 @@ class CandleappstoreAPIHandler(APIHandler):
                                                                     if 'v20' in asset_details['name'] or best_node_option == '':
                                                                         best_node_option = str(asset_details['browser_download_url'])
                                                         if best_python_option != '' and best_python_option.startswith('https://github.com/'):
+                                                            if 'tag_name' in pre_release_json:
+                                                                new_version = str(pre_release_json['tag_name'])
                                                             state = self.adapter.install_addon_from_url(best_python_option,addon_id)
                                                             if state:
-                                                                message = 'Addon changed to ' + str(release_type) + ' release version ' + str(pre_release_json['tag_name'])
+                                                                message = str(addon_id) + ' changed to ' + str(release_type) + ' release version ' + str(pre_release_json['tag_name'])
                                                         elif best_node_option != '' and best_node_option.startswith('https://github.com/'):
-                                                            new_version = None
                                                             if 'tag_name' in pre_release_json:
                                                                 new_version = str(pre_release_json['tag_name'])
                                                             state = self.adapter.install_addon_from_url(best_node_option,addon_id, new_version)
                                                             if state:
-                                                                message = 'Addon updated to ' + str(release_type) + ' release version ' + str(new_version)
+                                                                message = str(addon_id) + ' updated to ' + str(release_type) + ' release version ' + str(new_version)
                                                         else:
                                                             if self.DEBUG:
                                                                 print("did not find a viable pre-release download url for " + str(addon_id))
-                                        
+                                                            message = 'No relevant ' + str(release_type) + ' release found for ' + str(addon_id)
                                                     
                                                     else:
                                                         if self.DEBUG:
                                                             print("no tag_name spotted in pre_release_raw_json, aborting attempt to install pre-release")
-                                                        message = 'There is no ' + str(release_type) + ' release for ' + str(addon_id)
+                                                        message = 'No ' + str(release_type) + ' release found for ' + str(addon_id)
                                                                 
                                             else:
                                                 if self.DEBUG:
@@ -480,7 +482,7 @@ class CandleappstoreAPIHandler(APIHandler):
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state':state,'message':message,'pre_release_addons':self.adapter.pre_release_addons}),
+                      content=json.dumps({'state':state, 'message':message, 'new_version':new_version, 'pre_release_addons':self.adapter.pre_release_addons}),
                     )
                     
                 
