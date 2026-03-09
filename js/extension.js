@@ -279,8 +279,14 @@
 				
 				const total_memory_el = this.view.querySelector('#extension-candleappstore-total-memory');
                 if(total_memory_el){
-					total_memory_el.textContent = body['total_memory'];
-					this.view.querySelector('#extension-candleappstore-available-memory').textContent = avail_mem;
+					if(body['total_memory'] > 3000){
+						total_memory_el.textContent = Math.round(body['total_memory']/1000) + " Gb ";
+					}else{
+						total_memory_el.textContent = body['total_memory'] + "Mb ";
+					}
+					
+					this.view.querySelector('#extension-candleappstore-used-memory').textContent = Math.round(total_mem - avail_mem);
+					this.view.querySelector('#extension-candleappstore-available-memory').textContent = Math.round(avail_mem - free_mem);
 					this.view.querySelector('#extension-candleappstore-free-memory').textContent = body['free_memory'];
                 }
 				
