@@ -77,16 +77,6 @@
 						this.jump_to_addon = new URL(location.href).searchParams.get('addon');
 						//console.log("should show this addon: ", this.jump_to_addon);
 					}
-					else if(window.location.hash.length > 1){
-						this.jump_to_addon_settings = window.location.hash.replace('#','');
-						//console.log("should show this addon's settings: ", this.jump_to_addon);
-						try{
-							history.pushState("", document.title, window.location.pathname + window.location.search);
-						}catch(err){
-							console.error("candle store: caught error removing hash from URL bar: ", err);
-						}
-						
-					}
 					
 	  		  	}
 	        })
@@ -1097,7 +1087,7 @@
             if(document.body.classList.contains('developer')){
                 this.developer = true;
                 if(this.debug){
-                    console.log("Candle store: show: detected 'developer' class in body");
+                    console.log("Candle store debug: show: detected 'developer' class in body");
                 }
             }
             else{
@@ -1107,6 +1097,22 @@
                 this.developer = false;
             }
             
+			
+			
+			if(window.location.hash.length > 1){
+				this.jump_to_addon_settings = window.location.hash.replace('#','');
+				if(this.debug){
+					console.log("Candle store debug: should show this addon's settings: ", this.jump_to_addon);
+				}
+				try{
+					//history.replaceState({}, document.title, window.location.href.split('#')[0]);
+					history.replaceState("", document.title, window.location.pathname); //  + window.location.search
+				}catch(err){
+					console.error("candle store: caught error removing hash from URL bar: ", err);
+				}
+	
+			}
+			
             
             // TABS
             
@@ -1967,13 +1973,16 @@
 					}
 					if(this.installed.indexOf(this.jump_to_addon_settings) != -1){
 						this.show_addon_config(this.jump_to_addon_settings);
+						this.jump_to_addon_settings = '';
+						
 					}
 					else{
 						if(this.debug){
-							console.error("addon to jump to settings page for is not installed: ", this.jump_to_addon_settings)
+							console.error("addon to jump to settings page for is not installed: ", this.jump_to_addon_settings);
 						}
+						this.jump_to_addon_settings = '';
 					}
-					this.jump_to_addon_settings = ''
+					
 				}
 				
 			})
