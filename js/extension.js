@@ -51,6 +51,7 @@
             this.received_cloud_data = false;
             this.updating_all = false;
 			this.jump_to_addon = ''
+			this.jump_to_addon_settings = ''
 			this.content_el = null;
             
             this.selected_overlay_closed = false; // if a user clicks on an addon, but immediately navigates back, the overlay would normally still be loaded once the data is received
@@ -76,6 +77,17 @@
 						this.jump_to_addon = new URL(location.href).searchParams.get('addon');
 						//console.log("should show this addon: ", this.jump_to_addon);
 					}
+					else if(window.location.hash.length > 1){
+						this.jump_to_addon_settings = window.location.hash.replace('#','');
+						//console.log("should show this addon's settings: ", this.jump_to_addon);
+						try{
+							history.pushState("", document.title, window.location.pathname + window.location.search);
+						}catch(err){
+							console.error("candle store: caught error removing hash from URL bar: ", err);
+						}
+						
+					}
+					
 	  		  	}
 	        })
 	        .catch((err) => console.error('candle store: failed to fetch content:', err));
@@ -280,9 +292,9 @@
 				const total_memory_el = this.view.querySelector('#extension-candleappstore-total-memory');
                 if(total_memory_el){
 					if(body['total_memory'] > 3000){
-						total_memory_el.textContent = Math.round(body['total_memory']/1000) + " Gb ";
+						total_memory_el.textContent = Math.round(body['total_memory']/1000) + " GB ";
 					}else{
-						total_memory_el.textContent = body['total_memory'] + "Mb ";
+						total_memory_el.textContent = body['total_memory'] + "MB ";
 					}
 					
 					this.view.querySelector('#extension-candleappstore-used-memory').textContent = Math.round(total_mem - avail_mem);
@@ -1880,7 +1892,7 @@
 
             
             
-            console.log("candle store: calling init");
+            //console.log("candle store: calling init");
             
             //
             // INIT
@@ -1890,7 +1902,7 @@
 				{'action':'init'}
 			)
             .then((body) => {
-				console.warn("candle store: got show init response: ", body);
+				//console.warn("candle store: got show init response: ", body);
                 this.parse_body(body);
                 
                 return window.API.getInstalledAddons()
@@ -1915,39 +1927,58 @@
 
 			})
             .then((result) => { 
-                console.log("response from get_installed_addons_data: ", result);
+                if(this.debug){
+					console.log("candle store: debug: response from get_installed_addons_data: ", result);
+				}
 				if(result){
 					this.api_addons_data = result;
 				}
                 this.generate_overview('installed');
 				if(this.jump_to_addon != ''){
 					if(this.installed.indexOf(this.jump_to_addon) != -1){
-						console.warn("That addon is already installed: ", this.jump_to_addon);
+						if(this.debug){
+							console.warn("candle store: debug: that addon is already installed: ", this.jump_to_addon);
+						}
 						this.show_selected_app(this.jump_to_addon);
 					}
 					else{
 						if(this.debug){
-							console.log("candleappstore: debug: downloading get_apps.json before jumping to addon: ", this.jump_to_addon);
+							console.log("candle store: debug: downloading get_apps.json before jumping to addon: ", this.jump_to_addon);
 						}
 	                    this.get_data("get_apps.json").then(response => {
 							if(this.debug){
-								console.log("downloading get_apps.json before jumping to addon: cloud app data received: ", response);
+								console.log("candle store: debug: downloading get_apps.json before jumping to addon: cloud app data received: ", response);
 							}
 	                        this.cloud_app_data = response;
 	                        this.received_cloud_data = true;
 							this.show_selected_app(this.jump_to_addon);
 	                    })
-	                    .catch((e) => {
+	                    .catch((err) => {
 							if(this.debug){
-								console.log("candleappstore: error getting data for jump_to_addon from url: ", e);
+								console.error("candle store: caught error getting data for jump_to_addon from url: ", err);
 							}
 	        			});
 					}
+					this.jump_to_addon = '';
+				}
+				else if(this.jump_to_addon_settings != ''){
+					if(this.debug){
+						console.warn("candle store: debug: should jump to settings of addon: ", this.jump_to_addon_settings);
+					}
+					if(this.installed.indexOf(this.jump_to_addon_settings) != -1){
+						this.show_addon_config(this.jump_to_addon_settings);
+					}
+					else{
+						if(this.debug){
+							console.error("addon to jump to settings page for is not installed: ", this.jump_to_addon_settings)
+						}
+					}
+					this.jump_to_addon_settings = ''
 				}
 				
 			})
-            .catch((e) => {
-				console.log("candleappstore: error in init: ", e);
+            .catch((err) => {
+				console.error("candleappstore: caught error in init: ", err);
 			});
             
             
