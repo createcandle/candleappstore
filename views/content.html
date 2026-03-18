@@ -182,7 +182,13 @@
                     <p>Here you can find some features that aid in developing addons.</p>
                     <p></p>
 					
-                    <div class="extension-candleappstore-vlak">
+					<div id="extension-candleappstore-tab-developer-subtab-buttons" class="extension-candleappstore-flex">
+						<button class="text-button" data-tab="install">Install addon</button>
+						<button class="text-button" data-tab="log">Internal logs</button>
+						<button class="text-button" data-tab="things">Things</button>
+					</div>
+					
+                    <div class="extension-candleappstore-vlak extension-candleappstore-tab-developer-subtab" id="extension-candleappstore-tab-developer-subtab-install">
                         <h4>Manual addon installation</h4>
                         <p>Provide the addon ID, a link to the tar.gz file, and the shasum.</p>
                         <input type="text" id="extension-candleappstore-developer-addon-id" name="extension-candleappstore-developer-addon-url" autocomplete="off" placeholder="Addon ID"> 
@@ -202,11 +208,25 @@
                     </div>
                     
                     
-                    <div class="extension-candleappstore-vlak">
+                    <div class="extension-candleappstore-vlak extension-candleappstore-tab-developer-subtab" id="extension-candleappstore-tab-developer-subtab-log">
                         <h4>Internal log tail</h4>
                         <input type="text" id="extension-candleappstore-developer-log-tail-filter" placeholder="filter">
                         <div id="extension-candleappstore-developer-log-tail"></div>
                     </div>
+					
+					
+					
+                    <div class="extension-candleappstore-vlak extension-candleappstore-tab-developer-subtab" id="extension-candleappstore-tab-developer-subtab-things">
+                        <h4>Things attributes</h4>
+						<div style="display:flex">
+							<input type="search" id="extension-candleappstore-developer-things-filter-input" placeholder="filter">
+							<button id="extension-candleappstore-developer-things-filter-input-button" class="text-button">Search</button>
+						</div>
+						<p id="extension-candleappstore-developer-things-filter-result-meta"></p>
+						<pre id="extension-candleappstore-developer-things-attributes"></pre>
+                    </div>
+					
+					
                     
                 </div>
             </div>
