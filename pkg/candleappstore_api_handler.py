@@ -136,6 +136,8 @@ class CandleappstoreAPIHandler(APIHandler):
                                           'free_memory':self.adapter.free_memory,
                                           'available_memory':self.adapter.available_memory,
                                           'pre_release_addons':self.adapter.pre_release_addons,
+                                          'candle_version':self.adapter.candle_version,
+                                          'last_versions_allowed_for_candle_v2':self.adapter.last_versions_allowed_for_candle_v2,
                                           'debug':self.adapter.DEBUG
                                       }),
                     )

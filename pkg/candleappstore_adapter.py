@@ -55,7 +55,7 @@ class CandleappstoreAdapter(Adapter):
         
         verbose -- whether or not to enable verbose logging
         """
-        print("Starting Candleappstore addon")
+        #print("Starting Candleappstore addon")
         #print(str( os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib') ))
         self.pairing = False
         self.ready = False
@@ -70,10 +70,19 @@ class CandleappstoreAdapter(Adapter):
         self.running = True
         self.app_store_url = 'https://www.candlesmarthome.com/appstore/'
         
+        
         self.boot_path = '/boot'
         if os.path.exists('/boot/firmware'):
             self.boot_path = '/boot/firmware'
         
+        self.candle_version = '2.0.0'
+        self.candle_mayor_version = 2
+        if os.path.isfile(self.boot_path + '/candle_version.txt'):
+            fresh_candle_version = str(run_command('cat ' + str(self.boot_path) + '/candle_version.txt')).strip().rstrip()
+            if '.' in fresh_candle_version:
+                self.candle_version = fresh_candle_version
+                self.candle_mayor_version
+            
         # Exhibit mode
         self.exhibit_mode = False
         if os.path.isfile(self.boot_path + '/exhibit_mode.txt'):
@@ -127,7 +136,7 @@ class CandleappstoreAdapter(Adapter):
             print("Error: could not make sure data dir exists: " + str(ex))
 
         # Cached files paths
-        self.cached_get_apps_path = os.path.join(self.data_dir_path,'get_apps.json')
+        self.cached_get_apps_path = os.path.join(self.data_dir_path,'get_apps_' + str(self.candle_mayor_version) + '.json')
         if os.path.exists(self.cached_get_apps_path):
             os.system('rm ' + str(self.cached_get_apps_path)) # start without a cached version
         
@@ -136,6 +145,175 @@ class CandleappstoreAdapter(Adapter):
         if self.DEBUG:
             print("self.persistence_file_path = " + str(self.persistence_file_path))
         
+        
+        
+        self.last_versions_allowed_for_candle_v2 = {
+            "webinterface":2010,
+            "Candle-manager-addon":1003002,
+            "activitypub-adapter":23,
+            "airport":1001006,
+            "awox-mesh-light-adapter":8,
+            "azure-iot-bridge":1002003,
+            "blinkt-adapter":2001,
+            "bmp280-adapter":1003,
+            "calendar":1001005,
+            "chromecast-adapter":4005,
+            "cololight-adapter":1000,
+            "counter-adapter":3005,
+            "cron-adapter":2007,
+            "date-time-adapter":1002003,
+            "dingz-adapter":3002,
+            "display-toggle":1001009,
+            "dmx-adapter":2000,
+            "earthquake-monitor-adapter":3002,
+            "email-sender-adapter":4001,
+            "enocean-adapter":1008,
+            "esphome-adapter":2002,
+            "etekcity-adapter":5004,
+            "eufy-adapter":3004,
+            "flic-button-adapter":3003,
+            "followers":8015,
+            "foobot-adapter":4,
+            "fritz-adapter":2003004,
+            "frontier-silicon-adapter":8005,
+            "generic-sensors-adapter":17,
+            "github-adapter":2000,
+            "google-home-adapter":1001002,
+            "gotify-notifier":1003,
+            "gpio-adapter":7005,
+            "highlights":5006,
+            "homekit-adapter":11000,
+            "homematic-adapter":8001,
+            "homie-adapter":2003,
+            "http-adapter":7000,
+            "influxdb-bridge":5001,
+            "input-event-adapter":2005,
+            "insteon-adapter":1000002,
+            "internet-radio":2002014,
+            "kafka-bridge":5004,
+            "kodi-adapter":2002,
+            "konnected-adapter":1001,
+            "lametric-adapter":2001,
+            "lg-tv-adapter":3006,
+            "lifx-adapter":5000,
+            "logitech-harmony-adapter":2010,
+            "luftdaten-adapter":1001001,
+            "macrozilla":1013,
+            "magichome-adapter":3,
+            "matrix-adapter":4003,
+            "max-adapter":1009,
+            "maxsmart2-adapter":1000,
+            "medisana-ks250-adapter":1006,
+            "meross-adapter":4002,
+            "mi-flora-adapter":1000001,
+            "miLight-adapter":6,
+            "microblocks-adapter":5005,
+            "modbus-adapter":4000,
+            "modbus-bridge":2001,
+            "mqtt-bridge":2,
+            "myq-adapter":1002,
+            "mysensors-adapter":1004002,
+            "mystrom-switch-adapter":1000007,
+            "nanoleaf-adapter":1003,
+            "netatmo-energy-adapter":3000003,
+            "netatmo-weather-adapter":5002,
+            "netgear-adapter":4,
+            "network-presence-detection-adapter":2001008,
+            "node-red-extension":2004,
+            "onvif-adapter":3003,
+            "opengarage-adapter":2001,
+            "opensensemap-adapter":1004,
+            "openuv-adapter":5001,
+            "p1-adapter":3002,
+            "philips-hue-adapter":1000005,
+            "photo-frame":2000005,
+            "piface-adapter":1002,
+            "power-settings":3007008,
+            "powerwall-adapter":1003,
+            "privacy-manager":3009,
+            "prometheus-bridge":9000,
+            "prowl-adapter":2004,
+            "psi-sg":1004004,
+            "pulse-adapter":4002,
+            "purpleair-adapter":1002001,
+            "pushbullet-adapter":2002,
+            "pushover-notifier":1002,
+            "pushsafer-notifier":1002,
+            "rf433-adapter":1004,
+            "ring-adapter":9,
+            "roku-adapter":2002,
+            "run-program-adapter":3002,
+            "ruuvitag-adapter":8000,
+            "scene-control-adapter":1002,
+            "scheduler-adapter":1001,
+            "seashell":1000001,
+            "sengled-adapter":3002,
+            "sense-hat-adapter":9,
+            "sensor-tag-adapter":1005,
+            "serial-adapter":5003,
+            "shelly-adapter":1009000,
+            "simple-mqtt-adapter":1000007,
+            "sipgate-adapter":2003,
+            "slack-adapter":2003,
+            "sonos-adapter":11000,
+            "speed-test-adapter":3003,
+            "spotify-adapter":6001,
+            "serial-adapter":5003,
+            "tankerkoenig-adapter":2004,
+            "tapo-adapter":1,
+            "tasmota-adapter":2000003,
+            "telegram-sender-adapter":8,
+            "tellstick-adapter":1000000,
+            "systeminfo-adapter":1012002,
+            "thing-url-adapter":5002,
+            "tide-calendar-adapter":4003,
+            "timer-adapter":1006002,
+            "tplink-adapter":6003,
+            "tradfri-adapter":4000,
+            "ttn-adapter":2002,
+            "tts-adapter":1004,
+            "tuya-adapter":2007,
+            "twilio-adapter":2002,
+            "twitter-adapter":2004,
+            "virtual-things-adapter":11000,
+            "voco":4002024,
+            "voice-addon":2002000,
+            "wake-on-lan-adapter":2002,
+            "weather-adapter":6001,
+            "webhook-events":4000,
+            "wemo-adapter":3003,
+            "wled-adapter":3001,
+            "x10-cm11-adapter":5001,
+            "xiaomi-temperature-humidity-sensor-adapter":2001,
+            "yamaha-adapter":2000,
+            "yeelight-adapter":4003,
+            "yo-notifier":1004,
+            "zigbee-adapter":22000,
+            "zigbee2mqtt-adapter":1002010,
+            "zmote-adapter":2001,
+            "zwave-adapter":10009,
+            "energyuse":4005,
+            "candleappstore":5020,
+            "denon-adapter":1000001,
+            "irusb-adapter":1000001,
+            "candle-theme":2006012,
+            "square-theme":1000006,
+            "bluetoothpairing":5017,
+            "webtio-hydroqc-addon":1003,
+            "lumencache-adapter":1000000,
+            "candlecam":1080,
+            "scenes":1002,
+            "tutorial":1000009,
+            "candle-weather":14,
+            "candle-zwave-adapter":11001,
+            "matter-adapter":2025,
+            "homebridge":1008,
+            "browser":1000,
+            "floorplanner":2,
+            "buttoninput":2002,
+            "soundsleeper":6,
+            "toothbrush":1001,
+            "dashboard":2008}
         
         
             
@@ -154,7 +332,7 @@ class CandleappstoreAdapter(Adapter):
                 
         except Exception as ex:
             first_run = True
-            print("Error loading persistent data: " + str(ex))
+            print("caught error loading persistent data: " + str(ex))
         
 
         #time.sleep(3) # give the network some more time to settle

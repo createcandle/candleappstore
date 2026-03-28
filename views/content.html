@@ -74,7 +74,13 @@
                         <button id="extension-candleappstore-update-all-button" class="extension-candleappstore-button">Update all</button>
                     </div>
                     
-                    
+					
+					<div id="extension-candleappstore-out-of-reach-addons-container" class="extension-candleappstore-hidden">
+                    	<h2>Addons with even newer versions</h2>
+						<p>Some updates cannot be installed because your version of Candle is too old. Upgrade your Controller to gain access to them.</p>
+						<div id="extension-candleappstore-out-of-reach-addons-list" class="extension-candleappstore-vlak"></div>
+					</div>
+						
                     <div id="extension-candleappstore-broken-addons-container" style="display:none">
                         <h2>Possibly broken addons</h2>
                         <p>Some of your addons may not be working properly. If rebooting the controller does not solve the problem then you can manually delete the addon here:</p>
@@ -469,6 +475,11 @@
                         <p>Have you tried using it?</p>
                         <button id="extension-candleappstore-show-review-button" class="extension-candleappstore-button">Add review</button>
                     </div>
+					
+                    <div id="extension-candleappstore-out-of-reach-hint" class="extension-candleappstore-hidden extension-candleappstore-vlak">
+                        <p>Update your Candle Controller to gain access to the latest version of this addon</p>
+                    </div>
+					
                     
                     <div id="extension-candleappstore-selected-options" class="extension-candleappstore-options"></div>
                     <div id="extension-candleappstore-install-low-memory-warning" class="extension-candleappstore-low-memory-warning">

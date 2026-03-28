@@ -70,6 +70,7 @@ body:not(.developer) .extension-candleappstore-show-if-developer{
 
 /*  FLASH MESSAGE  */
 
+/*  NOTE: as a backup, this css is mirrored in the css of power-settings. Any changes made here should be made there too. */
 #extension-candleappstore-flash-message-container{
 	position:fixed;
 	top:0;
@@ -2034,6 +2035,11 @@ button.extension-candleappstore-extra-fade,
 
 #extension-candleappstore-histogram-average-rating:empty{
     display:none;
+}
+
+#extension-candleappstore-out-of-reach-hint{
+	text-align:center;
+	padding:2rem;
 }
 
 
