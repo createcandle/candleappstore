@@ -16,8 +16,8 @@ import time
 import socket
 #import asyncio
 #import logging
-import requests # not used here?
-#import threading
+import requests
+import threading
 #import selectors
 import subprocess
 from subprocess import call, Popen
@@ -82,13 +82,14 @@ class CandleappstoreAdapter(Adapter):
             if '.' in fresh_candle_version:
                 self.candle_version = fresh_candle_version
                 self.candle_mayor_version
-            
+        
         # Exhibit mode
         self.exhibit_mode = False
         if os.path.isfile(self.boot_path + '/exhibit_mode.txt'):
             self.exhibit_mode = True
         
-        
+        self.busy_installing_addon = None
+        self.installing_addons_queue = {}
         self.busy_installing_addon_from_url = False
         self.pre_release_addons = {} # Keeps track of which addons were upgraded to a pre-release version during this session.
         # TODO: store this is persistent data, and then compare versions in the UI
@@ -126,6 +127,50 @@ class CandleappstoreAdapter(Adapter):
 
         #print("self.user_profile: " + str(self.user_profile))
 
+        # Make sure the work directory exists
+        self.work_dir = os.path.join(self.user_profile['baseDir'], 'work','candleappstore')
+        self.work_dir_package_path = os.path.join(self.work_dir,'package')
+        self.work_dir_package_manifest_path = os.path.join(self.work_dir_package_path,'manifest.json')
+        if not os.path.isdir(self.work_dir):
+            os.system('mkdir -p ' + str(self.work_dir))
+        
+        if os.path.isdir(self.work_dir):
+            os.system('rm -rf ' + os.path.join(str(self.work_dir),'*'))
+
+        self.web_cache_dir_path = os.path.join(self.addon_path, 'web_cache')
+        self.web_cache_data_dir_path = os.path.join(self.data_dir_path, 'web_cache')
+        if not os.path.isdir(str(self.web_cache_data_dir_path)):
+            os.system('mkdir -p ' + str(self.web_cache_data_dir_path))
+        
+        self.DEBUG = True
+        
+        # Create soft link so that the data/web_cache dir becomes web-accessible
+        if os.path.isdir(str(self.web_cache_data_dir_path)):
+            if os.path.isdir(str(self.web_cache_dir_path)):
+                symlink_check = str(run_command('stat ' + str(self.web_cache_dir_path)))
+                if 'symbolic link' in symlink_check:
+                    if self.DEBUG:
+                        print("web_cache dir is already a symbolic link")
+                else:
+                    if self.DEBUG:
+                        print("web_cache dir is not a symbolic link yet")
+                    
+                    candleappstore_screenshot_source = os.path.join(self.web_cache_dir_path,'screenshots','candleappstore','screenshot.jpg')
+                    candleappstore_screenshot_target = os.path.join(self.web_cache_data_dir_path,'screenshots','candleappstore','screenshot.jpg')
+                    if os.path.isfile(candleappstore_screenshot_source) and not os.path.isfile(candleappstore_screenshot_target):
+                        if self.DEBUG:
+                            print("moving candleappstore screenshot.jpg")
+                        os.system('mkdir -p ' + os.path.join(str(self.web_cache_data_dir_path),'screenshots','candleappstore'))
+                        os.system('mv ' + str(candleappstore_screenshot_source) + ' ' + str(candleappstore_screenshot_target))
+                    
+                    if os.path.isfile( os.path.join(self.web_cache_data_dir_path,'screenshots','candleappstore','screenshot.jpg')):
+                        os.system('rm -rf ' + str(self.web_cache_dir_path))
+                    
+                        soft_link = 'ln -s ' + str(self.web_cache_data_dir_path) + " " + str(self.web_cache_dir_path)
+                        if self.DEBUG:
+                            print("linking: " + soft_link)
+                        os.system(soft_link)
+            
 
         # Make sure the data directory exists
         try:
@@ -490,6 +535,16 @@ class CandleappstoreAdapter(Adapter):
         
         
         self.ready = True
+        
+        if self.DEBUG:
+            print("Starting the clock thread")
+        try:
+            t = threading.Thread(target=self.clock)
+            t.daemon = True
+            t.start()
+        except:
+            if self.DEBUG:
+                print("Error starting the clock thread")
 
 
 
@@ -592,6 +647,284 @@ class CandleappstoreAdapter(Adapter):
                 print("Error loading api token from settings: " + str(ex))
 
 
+
+
+    def clock(self):
+        if self.DEBUG:
+            print("in clock")
+        
+        while self.running:
+            time.sleep(1)
+            
+            addons_to_install_list = list(self.installing_addons_queue.keys())
+            if len(addons_to_install_list) and self.busy_installing_addon == None:
+                
+                should_install_this_addon = None
+                timestamp_to_beat = time.time()
+                
+                if 'candleappstore' in addons_to_install_list and 'failed_timestamp' in self.installing_addons_queue['candleappstore'] and self.installing_addons_queue['candleappstore']['failed_timestamp'] == None:
+                    should_install_this_addon = 'candleappstore'
+                elif 'power-settings' in addons_to_install_list and 'failed_timestamp' in self.installing_addons_queue['power-settings'] and self.installing_addons_queue['power-settings']['failed_timestamp'] == None:
+                    should_install_this_addon = 'power-settings'
+                elif 'candle-theme' in addons_to_install_list and 'failed_timestamp' in self.installing_addons_queue['candle-theme'] and self.installing_addons_queue['candle-theme']['failed_timestamp'] == None:
+                    should_install_this_addon = 'candle-theme'
+                else:
+                    #should_install_this_addon = addons_to_install_list[0]
+                    for candidate in addons_to_install_list:
+                        if self.DEBUG:
+                            print("candidate addon to install next: ", candidate, self.installing_addons_queue[candidate])
+                        
+                        if not 'failed_timestamp' in self.installing_addons_queue[candidate]:
+                            if self.DEBUG:
+                                print("\nERROR, missing failed_timestamp from installing_addons_queue somehow. Candidate: ". candidate)
+                            del self.installing_addons_queue[candidate]
+                        
+                        if self.installing_addons_queue[candidate]['failed_timestamp'] != None:
+                            if int(self.installing_addons_queue[candidate]['failed_timestamp']) < time.time() - 120:
+                                del self.installing_addons_queue[candidate]
+                            if self.DEBUG:
+                                print("skipping installation of addon whose installation has already failed: ", candidate)
+                            continue
+                        
+                        if 'request_timestamp' in self.installing_addons_queue[candidate] and int(self.installing_addons_queue[candidate]['request_timestamp']) < timestamp_to_beat:
+                            if self.DEBUG:
+                                print("this addon installation was requested even earlier: ", candidate)
+                            
+                            if int(self.installing_addons_queue[candidate]['request_timestamp']) < time.time() - (3600 * 2) and 'download_start_timestamp' in self.installing_addons_queue[candidate] and self.installing_addons_queue[candidate]['download_start_timestamp'] == None:
+                                if self.DEBUG:
+                                    print("this addon installation was requested over two hours ago, and somehow still hasn't started downloading? Removing it: ", candidate)
+                                del self.installing_addons_queue[candidate]
+                            
+                            timestamp_to_beat = int(self.installing_addons_queue[candidate]['request_timestamp'])
+                            should_install_this_addon = candidate
+                    
+                if should_install_this_addon != None:
+                    self.install_addon(should_install_this_addon)
+            
+            
+
+
+    def install_addon(self,addon_id,addon_url=None,addon_checksum=None):
+        if self.DEBUG:
+            print("\n\nin install_addon. ", addon_id, addon_url, addon_checksum)
+            
+        if isinstance(addon_id,str) and len(addon_id) > 1:
+
+            already_installed = False
+            
+            target_dir = os.path.join(self.user_profile['addonsDir'], addon_id)
+            if os.path.isdir(target_dir):
+                if self.DEBUG:
+                    print("install_addon: addon seems to already be installed: ", addon_id)
+                already_installed = True
+            
+            already_dir_in_work_dir = False
+            addon_work_dir = os.path.join(self.work_dir, addon_id)
+            if os.path.isdir(addon_work_dir):
+                if self.DEBUG:
+                    print("Error, found a dir in work_dir with the addon's name. Did a previous installation fail?")
+                already_dir_in_work_dir = True
+            
+            tar_name = None
+            addon_tar_path = None
+            already_tar_in_work_dir = False
+            if isinstance(addon_url,str) and addon_url.startswith('http') and (addon_url.endswith('.tgz') or addon_url.endswith('.tar.gz') ):
+                tar_name = os.path.basename(addon_url)
+                addon_tar_path = os.path.join(self.work_dir, tar_name)
+                if self.DEBUG:
+                    print("install_addon: addon_tar_path: ", addon_tar_path)
+                if os.path.isfile(addon_tar_path):
+                    already_tar_in_work_dir = True
+                    
+                if not addon_id in self.installing_addons_queue:
+                    self.installing_addons_queue[addon_id] = {
+                            'addon_url':addon_url,
+                            'addon_checksum':addon_checksum,
+                            'request_timestamp':time.time(),
+                            'download_start_timestamp':None,
+                            'download_done_timestamp':None,
+                            'start_timestamp':None,
+                            'done_timestamp':None,
+                            'failed_timestamp':None,
+                            'download_size':None,
+                            'downloaded_size':0,
+                            'addon_tar_path':addon_tar_path,
+                            'target_dir':target_dir,
+                            'tar_name':tar_name,
+                            'message':'Waiting to start',
+                            'download_attempts':0
+                        }
+                
+            if addon_id in self.installing_addons_queue:
+                self.installing_addons_queue[addon_id]['already_installed'] = already_installed
+                self.installing_addons_queue[addon_id]['already_tar_in_work_dir'] = already_tar_in_work_dir
+                self.installing_addons_queue[addon_id]['already_dir_in_work_dir'] = already_dir_in_work_dir
+            else:
+                if self.DEBUG:
+                    print("\nERROR, addon_id is not in installation queue somehow: ", addon_id)
+                return False
+                
+                
+            # If an addon_checksum is provided, then we stop here
+            if isinstance(addon_checksum,str): # and not 'addon_checksum' in self.installing_addons_queue[addon_id]:
+                self.installing_addons_queue[addon_id]['addon_checksum'] = addon_checksum
+                if self.DEBUG:
+                    print("added new addon to installation queue: ", addon_id)
+                return True
+            
+            if 'failed_timestamp' in self.installing_addons_queue[addon_id] and self.installing_addons_queue[addon_id]['failed_timestamp'] != None:
+                if self.DEBUG:
+                    print("Error, almost started an already failed installation again: ", self.installing_addons_queue[addon_id])
+                return
+            
+            
+            
+            if str(addon_id) in self.installing_addons_queue and 'addon_url' in self.installing_addons_queue[addon_id] and 'addon_tar_path' in self.installing_addons_queue[addon_id] and isinstance(self.installing_addons_queue[addon_id]['addon_tar_path'],str):
+            
+                if self.busy_installing_addon == None:
+                    self.busy_installing_addon = str(addon_id)
+                    
+                    self.installing_addons_queue[addon_id]['start_timestamp'] = time.time()
+                    self.installing_addons_queue[addon_id]['message'] = 'Starting'
+                    
+                    try:
+                        response = requests.get(str(self.installing_addons_queue[addon_id]['addon_url']), stream=True)
+                        response.raise_for_status()
+
+                        total_size = int(response.headers.get('content-length', 0))
+                        if total_size:
+                            self.installing_addons_queue[str(addon_id)]['download_size'] = int(total_size)
+                            self.installing_addons_queue[str(addon_id)]['downloaded_size'] = 0
+                        
+                        downloaded_size = 0
+
+                        if os.path.isfile(str(self.installing_addons_queue[addon_id]['addon_tar_path'])):
+                            self.installing_addons_queue[addon_id]['message'] = 'Removing left-over file from previous download attempt'
+                            os.system('rm ' + str(self.installing_addons_queue[addon_id]['addon_tar_path']))
+                            time.sleep(1)
+                        
+                        if not os.path.isfile(str(self.installing_addons_queue[addon_id]['addon_tar_path'])):
+                            chunk_size=8192
+                            with open(str(self.installing_addons_queue[addon_id]['addon_tar_path']), 'wb') as f:
+                                self.installing_addons_queue[addon_id]['download_start_timestamp'] = time.time()
+                                self.installing_addons_queue[addon_id]['message'] = 'Downloading'
+                                if self.DEBUG:
+                                    print("\n\n\n--- DOWNLOADING ---\n" + str(self.installing_addons_queue[addon_id]['addon_url']) + "\nTo: " + str(self.installing_addons_queue[addon_id]['addon_tar_path']) + "\n\n\n")
+                                
+                                for chunk in response.iter_content(chunk_size=chunk_size):
+                                    if chunk:
+                                        f.write(chunk)
+                                        downloaded_size += len(chunk)
+                                        self.installing_addons_queue[addon_id]['downloaded_size'] = int(downloaded_size)
+                                        if total_size == 0:
+                                            done = 0
+                                        else:
+                                            done = int(50 * downloaded_size / total_size)
+                    
+                                        #if self.DEBUG:
+                                        #    print(f"\r[{'█' * done}{' ' * (50 - done)}] {downloaded_size}/{total_size} bytes", end='')
+        
+                            
+                            if not os.path.isfile(str(self.installing_addons_queue[addon_id]['addon_tar_path'])):
+                                if self.DEBUG:
+                                    print("file was not downloaded to expected addon_tar_path: ", str(self.installing_addons_queue[addon_id]['addon_tar_path']))
+                                self.installing_addons_queue[addon_id]['message'] = 'Error, failed to download'
+                                self.installing_addons_queue[addon_id]['failed_timestamp'] = time.time()
+                                time.sleep(3)
+                                self.busy_installing_addon = None
+                                return False
+                            else:
+                                if isinstance(self.installing_addons_queue[addon_id]['downloaded_size'],int) and int(self.installing_addons_queue[addon_id]['downloaded_size']) > 0:
+                                    self.installing_addons_queue[addon_id]['download_done_timestamp'] = time.time()
+                                
+                                
+                                # Validate checksum is available
+                                if isinstance(self.installing_addons_queue[addon_id]['addon_checksum'],str) and len(str(self.installing_addons_queue[addon_id]['addon_checksum'])) > 5:
+                                    md5_of_downloaded_file = str(run_command('md5sum ' + str(self.installing_addons_queue[addon_id]['addon_tar_path'])))
+                                    
+                                    if self.DEBUG:
+                                        print("provided checksum:      -->" + str(self.installing_addons_queue[addon_id]['addon_checksum']) + "<--")
+                                        print("md5_of_downloaded_file: -->" + str(md5_of_downloaded_file) + "<--")
+                                    
+                                    if md5_of_downloaded_file == self.installing_addons_queue[addon_id]['addon_checksum']:
+                                        if self.DEBUG:
+                                            print("OK, MD5 checksum of downloaded file matched")
+                                    else:
+                                        if self.DEBUG:
+                                            print("\nERROR, MD5 checksum of downloaded file did NOT match")
+                                        self.installing_addons_queue[addon_id]['message'] = 'File did not download correctly'
+                                        
+                                        if self.installing_addons_queue[addon_id]['download_attempts'] == 0:
+                                            self.installing_addons_queue[addon_id]['downloaded_size'] = 0
+                                            self.installing_addons_queue[addon_id]['download_start_timestamp'] = None
+                                            self.installing_addons_queue[addon_id]['download_done_timestamp'] = None
+                                            self.installing_addons_queue[addon_id]['start_timestamp'] = None
+                                            
+                                        else:
+                                            
+                                            self.installing_addons_queue[addon_id]['failed_timestamp'] = time.time()
+                                            self.installing_addons_queue[addon_id]['message'] = 'Second attempt to download file also failed'
+                                        self.installing_addons_queue[addon_id]['download_attempts'] += 1
+                                        os.system('rm ' + str(self.installing_addons_queue[addon_id]['addon_tar_path']))
+                                        time.sleep(3)
+                                        self.busy_installing_addon = None
+                                        return
+                                
+                                
+                                if os.path.isdir(str(self.work_dir_package_path)):
+                                    os.system('rm -rf ' + str(self.work_dir_package_path))
+                                    self.installing_addons_queue[addon_id]['message'] = 'Removing left-over folder from a previous download attempt'
+                                    time.sleep(1)
+                                    
+                                if not os.path.isdir(str(self.work_dir_package_path)):
+                                    self.installing_addons_queue[addon_id]['message'] = 'Unzipping downloaded file'
+                                    unpack_check = run_command('tar xf ' + str(self.installing_addons_queue[addon_id]['addon_tar_path']))
+                                    if unpack_check == None:
+                                        self.installing_addons_queue[addon_id]['message'] = 'Extracting the downloaded file failed'
+                                        self.installing_addons_queue[addon_id]['failed_timestamp'] = time.time()
+                                    elif os.path.isdir(self.work_dir_package_path) and os.path.isfile(self.work_dir_package_manifest_path):
+                                        if os.path.isdir(str(self.installing_addons_queue[addon_id]['target_dir'])):
+                                            if self.DEBUG:
+                                                print("deleting addon's old directory first. No way back now.")
+                                            os.system('rm -rf ' + str(self.installing_addons_queue[addon_id]['target_dir']))
+                                            self.installing_addons_queue[addon_id]['message'] = 'Replacing old addon with the new one'
+                                            time.sleep(1)
+                                        else:
+                                            self.installing_addons_queue[addon_id]['message'] = 'Moving downloaded addon into addons folder'
+                                        if not os.path.isdir(str(self.installing_addons_queue[addon_id]['target_dir'])):
+                                            os.system('mv ' + str(self.work_dir_package_path) + ' ' + str(self.installing_addons_queue[addon_id]['target_dir']))
+                                        
+                                        if os.path.isdir(str(self.installing_addons_queue[addon_id]['target_dir'])) and not os.path.isdir(self.work_dir_package_path):
+                                            self.installing_addons_queue[addon_id]['message'] = 'Installation complete'
+                                            self.installing_addons_queue[addon_id]['done_timestamp'] = time.time()
+                                            time.sleep(1)
+                                            self.busy_installing_addon = None
+                                        
+                    except requests.exceptions.RequestException as ex:
+                        if self.DEBUG:
+                            print("caught error downloading/installing an addon: ", ex)
+                        self.installing_addons_queue[addon_id]['message'] = 'An error occured while downloading'
+                        self.installing_addons_queue[addon_id]['failed_timestamp'] = time.time()
+                        self.busy_installing_addon = None
+                        
+                    
+                    except Exception as ex:
+                        if self.DEBUG:
+                            print("caught error installing an addon: ", ex)
+                        self.installing_addons_queue[addon_id]['message'] = 'An error occured while installing'
+                        self.installing_addons_queue[addon_id]['failed_timestamp'] = time.time()
+                        self.busy_installing_addon = None
+
+
+        else:
+            if self.DEBUG:
+                print("\nERROR: install_addon: provided addon_id was not a valid string: ", addon_id)
+            return False
+
+
+
+
+
     # returns list of installed addons by scanning addons directory. 
     # Also grabs default addon settings from manifest files
     def scan_installed_addons(self):
@@ -619,8 +952,8 @@ class CandleappstoreAdapter(Adapter):
                                 parsed_json = json.load(manifest_file)
                                 #print(parsed_json)
                                 #print("\n\nLOADED JSON: " + str(parsed_json['options']['default']))
-                                if self.DEBUG:
-                                    print("loaded manifest: " + str(manifest_path))
+                                #if self.DEBUG:
+                                #    print("loaded manifest: " + str(manifest_path))
                                 defaults = {}
                                 if 'options' in parsed_json:
                                     if 'default' in parsed_json['options']:
@@ -751,6 +1084,54 @@ class CandleappstoreAdapter(Adapter):
         self.busy_installing_addon_from_url = False    
         return False
             
+    
+    
+    
+    def web_cache(self,urls):
+        if self.DEBUG:
+            print("in web_cache. urls: ", urls)
+        results = []
+        if isinstance(urls,list):
+            for url_to_cache in urls:
+                try:
+                    if self.DEBUG:
+                        print("web_cache: url_to_cache: ", url_to_cache)
+                    if 'to' in url_to_cache.keys():
+                        target_file_path = self.web_cache_dir_path + '/' + url_to_cache['to']
+                        if self.DEBUG:
+                            print("web_cache:  target_file_path: ", target_file_path)
+                        if not os.path.isfile(target_file_path) and str(url_to_cache['from']).startswith('http'): # and (str(url_to_cache['from']).endswith('.jpg') or str(url_to_cache['from']).endswith('.png')):
+                            filename = os.path.basename(target_file_path)
+                            download_dir = target_file_path.rstrip(filename)
+                            if not os.path.isdir(download_dir):
+                                if self.DEBUG:
+                                    print("creating directory to cache file to first: ", download_dir)
+                                os.system('mkdir -p ' + str(download_dir))
+                            if self.DEBUG:
+                                print("web_cache: downloading url_to_cache to: ", target_file_path)
+                            wget_command = 'wget ' + str(url_to_cache['from']) + ' -O ' + str(target_file_path)
+                            if self.DEBUG:
+                                print("wget_command: ", wget_command)
+                            wget_check = str(run_command(wget_command))
+                            if self.DEBUG:
+                                print("wget_check: ", wget_check)
+                        if os.path.isfile(target_file_path):
+                            if self.DEBUG:
+                                print("web_cache: OK, cached file (now) exists: ", target_file_path)
+                            results.append(url_to_cache)
+                except Exception as ex:
+                    print("\nERROR: web_cache: ", ex)
+
+        if self.DEBUG:
+            print("web_cache: returning results: ", results)
+        return results
+        
+        
+        
+        
+    
+    
+    
             
     def update_free_memory_and_disk_space(self):
         if self.DEBUG:

@@ -138,10 +138,28 @@ class CandleappstoreAPIHandler(APIHandler):
                                           'pre_release_addons':self.adapter.pre_release_addons,
                                           'candle_version':self.adapter.candle_version,
                                           'last_versions_allowed_for_candle_v2':self.adapter.last_versions_allowed_for_candle_v2,
+                                          'installing_addons_queue':self.adapter.installing_addons_queue,
+                                          'busy_installing_addon':self.adapter.busy_installing_addon,
                                           'debug':self.adapter.DEBUG
                                       }),
                     )
+                
+                elif action == 'main_poll':
                     
+                    return APIResponse(
+                      status=200,
+                      content_type='application/json',
+                      content=json.dumps({'state' : True, 
+                                          'installing_addons_queue':self.adapter.installing_addons_queue,
+                                          'busy_installing_addon':self.adapter.busy_installing_addon,
+                                          'busy_installing_addon_from_url':self.adapter.busy_installing_addon_from_url,
+                                          'total_addons_size':self.adapter.total_addons_size,
+                                          'free_disk_space':self.adapter.user_partition_free_disk_space,
+                                          'debug':self.adapter.DEBUG
+                                      }),
+                    )
+                
+                
                 
                 
                 elif action == 'remember_permission':
@@ -175,6 +193,53 @@ class CandleappstoreAPIHandler(APIHandler):
                       content=json.dumps({'state' : state, 'message' : message, 'permissions': self.adapter.persistent_data['permissions'] }),
                     )
                     
+                    
+                
+                # Download something from the candle webserver
+                elif action == 'install_addon':
+                    state = False
+                    try:
+                        if 'addon_id' in request.body and isinstance(request.body['addon_id'], str) and \
+                          'addon_url' in request.body and isinstance(request.body['addon_url'], str) and \
+                          'addon_checksum' in request.body and isinstance(request.body['addon_checksum'], str):
+                        
+                            if self.DEBUG:
+                                print("install_addon: calling adapter.install_addon for addon_id: ", request.body['addon_id'])
+                                                        
+                            state = self.adapter.install_addon(request.body['addon_id'],request.body['addon_url'],request.body['addon_checksum'])
+                        
+                    except Exception as ex:
+                        print("caught error in api install_addon request: ", ex)
+                        state = False
+                    
+                    return APIResponse(
+                      status=200,
+                      content_type='application/json',
+                      content=json.dumps({'state':state}),
+                    )
+                        
+                
+                # Cache images locally so that the webserver doesn't get as much data when the user is looking at the shop page
+                elif action == 'web_cache':
+                    state = False
+                    cached_files = []
+                    try:
+                        if 'urls' in request.body and isinstance(request.body['urls'], list):
+                            if self.DEBUG:
+                                print("install_addon: calling adapter.web_cache for urls: ", request.body['urls'])
+                            cached_files = self.adapter.web_cache(request.body['urls'])
+                            state = True
+                    except Exception as ex:
+                        print("caught error in api web_cache request: ", ex)
+                        state = False
+                    
+                    return APIResponse(
+                      status=200,
+                      content_type='application/json',
+                      content=json.dumps({'state':state,'web_cache':cached_files}),
+                    )
+                    
+                
                 
                 # Download something from the candle webserver
                 elif action == 'get_json':
@@ -249,16 +314,15 @@ class CandleappstoreAPIHandler(APIHandler):
                             print("error doing request: " + str(ex));
                             
                     #print("self.persistent_data = " + str(self.persistent_data))
-                    
-                    
-                    
-                    
+
                     return APIResponse(
                       status=200,
                       content_type='application/json',
                       content=json.dumps({'state' : True, 'message' : 'tried to get json', 'body':json_data }),
                     )
                     
+
+
 
                 elif action == 'get_installed_dirs':
                     addon_dirs = []
@@ -286,7 +350,9 @@ class CandleappstoreAPIHandler(APIHandler):
                     )
                     
                     
-                elif action == 'poll':
+                    
+                    
+                elif action == 'log_poll':
                     tail_lines = []
                     try:
                         if os.path.isfile('/home/pi/.webthings/log/run-app.log'):
