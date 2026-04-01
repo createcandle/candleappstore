@@ -218,6 +218,25 @@ class CandleappstoreAPIHandler(APIHandler):
                       content=json.dumps({'state':state}),
                     )
                         
+                elif action == 'remove_from_instalation_queue':
+                    state = False
+                    try:
+                        if 'addon_id' in request.body and isinstance(request.body['addon_id'], str):  
+                            if request.body['addon_id'] in self.installing_addons_queue:
+                                del self.installing_addons_queue[ request.body['addon_id'] ]
+                            state = self.adapter.install_addon(request.body['addon_id'],request.body['addon_url'],request.body['addon_checksum'])
+                            
+                    except Exception as ex:
+                        print("caught error in api install_addon request: ", ex)
+                        state = False
+                    
+                    return APIResponse(
+                      status=200,
+                      content_type='application/json',
+                      content=json.dumps({'state':state}),
+                    )
+                        
+                        
                 
                 # Cache images locally so that the webserver doesn't get as much data when the user is looking at the shop page
                 elif action == 'web_cache':
