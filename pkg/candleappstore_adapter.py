@@ -88,6 +88,7 @@ class CandleappstoreAdapter(Adapter):
         if os.path.isfile(self.boot_path + '/exhibit_mode.txt'):
             self.exhibit_mode = True
         
+        self.last_get_apps_update_timestamp = 0
         self.busy_installing_addon = None
         self.installing_addons_queue = {}
         self.busy_installing_addon_from_url = False
@@ -181,7 +182,7 @@ class CandleappstoreAdapter(Adapter):
             print("Error: could not make sure data dir exists: " + str(ex))
 
         # Cached files paths
-        self.cached_get_apps_path = os.path.join(self.data_dir_path,'get_apps_' + str(self.candle_mayor_version) + '.json')
+        self.cached_get_apps_path = os.path.join(self.data_dir_path,'get_apps_v' + str(self.candle_mayor_version) + '.json')
         if os.path.exists(self.cached_get_apps_path):
             os.system('rm ' + str(self.cached_get_apps_path)) # start without a cached version
         

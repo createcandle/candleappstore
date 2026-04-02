@@ -2551,12 +2551,12 @@
 					}
 					else{
 						if(this.debug){
-							console.log("candle store debug: downloading get_apps.json before jumping to addon: ", this.jump_to_addon);
+							console.log("candle store debug: downloading get_apps_v" + this.mayor_candle_version + ".json before jumping to addon: ", this.jump_to_addon);
 						}
 						const json_file_for_this_candle_version = "get_apps_v" + this.mayor_candle_version + ".json";
 	                    this.get_data( json_file_for_this_candle_version).then(response => {
 							if(this.debug){
-								console.log("candle store debug: downloading get_apps.json before jumping to addon: cloud app data received: ", response);
+								console.log("candle store debug: downloading get_apps_v" + this.mayor_candle_version + ".json before jumping to addon: cloud app data received: ", response);
 							}
 	                        this.cloud_app_data = response;
 	                        this.received_cloud_data = true;
@@ -2634,9 +2634,11 @@
                 }
                 else{
                     
-                    //console.log("asking for data from the cloud");
+                    if(this.debug){
+						console.log("candle store debug: asking for data from the cloud: get_apps_v" + this.mayor_candle_version + ".json");
+					}
                     // Get data for apps overview
-                    this.get_data("get_apps.json").then(response => {
+                    this.get_data("get_apps_v" + this.mayor_candle_version + ".json").then(response => {
                         if(this.debug){
                             console.log("candle store debug: GET ALL APPS from CLOUD response: ", response);
                         }
@@ -2682,7 +2684,7 @@
                 else{
                     //console.log("asking for data from the cloud");
                     // Get data for apps overview
-                    this.get_data("get_apps.json").then(response => {
+                    this.get_data("get_apps_v" + this.mayor_candle_version + ".json").then(response => {
                         //console.log(" GET ALL APPS from CLOUD response:");
                         //console.log(response);
                 
