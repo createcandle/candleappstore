@@ -4,7 +4,7 @@
 	      	super('candleappstore');
 			//console.log("Adding candleappstore addon to menu");
       		
-			
+			/*
             console.log("candle store: window.API: ", window.API);
             window.API.getAddonsInfo()
 			.then((info) => {
@@ -13,7 +13,7 @@
 			.catch((err) => {
 				console.error("caught error try api: ", err);
 			})
-			/*
+			
             window.API.getAddonConfig('candleappstore')
 			.then((info) => {
 				console.warn("getAddonConfig: ", info);
@@ -364,7 +364,7 @@
 			}
 			else{
 				if(this.debug){
-					console.log("candle store debug: not attempting a poll.  this.page_visible, this.busy_polling, window.location.pathname: ", this.page_visible, this.busy_polling, window.location.pathname);
+					//console.log("candle store debug: not attempting a poll.  this.page_visible, this.busy_polling, window.location.pathname: ", this.page_visible, this.busy_polling, window.location.pathname);
 				}
 			}
 			
