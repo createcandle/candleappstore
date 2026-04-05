@@ -104,7 +104,7 @@ class CandleappstoreAPIHandler(APIHandler):
                     #    print('ajax handling init')
                     #    print("self.adapter.persistent_data = " + str(self.adapter.persistent_data))
                     
-                    installed_addons = []
+                    #installed_addons = []
                     try:
                         self.adapter.installed_addons = self.adapter.scan_installed_addons()
                         self.adapter.update_free_memory_and_disk_space()
@@ -218,7 +218,7 @@ class CandleappstoreAPIHandler(APIHandler):
                       content=json.dumps({'state':state}),
                     )
                         
-                elif action == 'remove_from_instalation_queue':
+                elif action == 'remove_from_installation_queue':
                     state = False
                     try:
                         if 'addon_id' in request.body and isinstance(request.body['addon_id'], str):  
@@ -349,9 +349,9 @@ class CandleappstoreAPIHandler(APIHandler):
 
 
                 elif action == 'get_installed_dirs':
-                    addon_dirs = []
+                    #addon_dirs = []
                     try:
-                        addon_dirs = self.adapter.scan_installed_addons()
+                        self.adapter.installed_addons = self.adapter.scan_installed_addons()
                         self.adapter.scan_addons_file_size()
                         
                     except Exception as ex:
@@ -362,7 +362,7 @@ class CandleappstoreAPIHandler(APIHandler):
                       status=200,
                       content_type='application/json',
                       content=json.dumps({'state':True, 
-                                          'installed':addon_dirs, 
+                                          'installed':self.adapter.installed_addons, 
                                           'addon_defaults':self.adapter.addon_defaults, 
                                           'addon_sizes':self.adapter.addon_sizes, 
                                           'total_addons_size':self.adapter.total_addons_size,

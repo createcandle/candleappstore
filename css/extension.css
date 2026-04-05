@@ -1184,9 +1184,10 @@ button.extension-candleappstore-extra-fade,
 
 #extension-candleappstore-currently-installing{
 	position:absolute;
-	top:0;
-	right:0;
+	top:2rem;
+	right:2rem;
 	font-style:italic;
+	pointer-events:none;
 }
 
 .extension-candleappstore-installing-item{
@@ -1241,6 +1242,7 @@ button.extension-candleappstore-extra-fade,
 
 .extension-candleappstore-installing-item.extension-candleappstore-installing-item-is-enabled .extension-candleappstore-installing-item-enable-button,
 .extension-candleappstore-installing-item.extension-candleappstore-installing-item-is-enabled .extension-candleappstore-installing-item-message,
+.extension-candleappstore-installing-item:not(.extension-candleappstore-installing-item-is-enabled) .extension-candleappstore-installing-item-options-container > div,
 .extension-candleappstore-installing-item:not(.extension-candleappstore-installing-item-is-enabled) .extension-candleappstore-installing-item-add-things-container{
 	display:none;
 }
@@ -1252,10 +1254,15 @@ button.extension-candleappstore-extra-fade,
 
 .extension-candleappstore-installing-item-options-container > div{
 	text-align:left;
+	width:33%;
     min-width:calc(33% - 2rem);
     max-width:calc(50% - 2rem);
     flex-grow:1;
     flex-shrink:1;
+}
+
+.extension-candleappstore-installing-item-options-container > div:not(:last-of-type){
+    margin-right:2rem;
 }
 
 .extension-candleappstore-installing-item-options-container > div p{
@@ -1274,9 +1281,9 @@ button.extension-candleappstore-extra-fade,
 }
 
 .extension-candleappstore-installing-item-options-container button.extension-candleappstore-installing-item-enable-button{
-    padding: 1.5rem 2rem 1.5rem 5rem;
+    padding: 1.5rem 2rem 1.5rem 5.5rem;
     background-position: 2rem;
-	background-image: url(/images/enable.svg);
+    background-image: url(/images/enable.svg);
     background-size: 2rem;
     background-repeat: no-repeat;
 	margin-left:auto;

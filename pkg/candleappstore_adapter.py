@@ -728,9 +728,12 @@ class CandleappstoreAdapter(Adapter):
                     if self.DEBUG:
                         print("install_addon: addon seems to already be installed: ", addon_id)
                     already_installed = True
-            
+                else:
+                    if self.DEBUG:
+                        print("install_addon: OK, addon does not seem to be already installed: ", addon_id)
+                
                 already_dir_in_work_dir = False
-                addon_work_dir = os.path.join(self.work_dir, addon_id)
+                addon_work_dir = str(os.path.join(self.work_dir, addon_id))
                 if os.path.isdir(addon_work_dir):
                     if self.DEBUG:
                         print("Error, found a dir in work_dir with the addon's name. Did a previous installation fail?")
@@ -765,6 +768,10 @@ class CandleappstoreAdapter(Adapter):
                                 'message':'Waiting to start',
                                 'download_attempts':0
                             }
+                elif not addon_id in list(self.installing_addons_queue.keys()):
+                    if self.DEBUG:
+                        print("\nERROR: install_addon: cannot add to queue: addon_url is invalid: ", addon_url)
+                
                 
                 if addon_id in self.installing_addons_queue:
                     self.installing_addons_queue[addon_id]['already_installed'] = already_installed
@@ -780,13 +787,17 @@ class CandleappstoreAdapter(Adapter):
                 if isinstance(addon_checksum,str): # and not 'addon_checksum' in self.installing_addons_queue[addon_id]:
                     self.installing_addons_queue[addon_id]['addon_checksum'] = addon_checksum
                     if self.DEBUG:
-                        print("added new addon to installation queue: ", addon_id)
+                        print("added checksum for new addon to installation queue: ", addon_id)
+                
+                if isinstance(addon_url,str): # and not 'addon_checksum' in self.installing_addons_queue[addon_id]:
+                    if self.DEBUG:
+                        print("Stopping install_addon early because a download URL was provided. Added to queue only.")
                     return True
             
                 if 'failed_timestamp' in self.installing_addons_queue[addon_id] and self.installing_addons_queue[addon_id]['failed_timestamp'] != None:
                     if self.DEBUG:
                         print("Error, almost started an already failed installation again: ", self.installing_addons_queue[addon_id])
-                    return
+                    return True
             
             
             
@@ -910,6 +921,11 @@ class CandleappstoreAdapter(Adapter):
                                         if os.path.isdir(self.work_dir_package_path):
                                             if os.path.isfile(self.work_dir_package_manifest_path):
                                                 
+                                                if not 'manifest' in self.installing_addons_queue[addon_id]:
+                                                    if self.DEBUG:
+                                                        print("adding raw manifest.json contents to installing_addons_queue");
+                                                    self.installing_addons_queue[addon_id]['manifest'] = str(run_command('cat ' + str(self.work_dir_package_manifest_path)))
+                                                
                                                 if os.path.isfile(str(self.installing_addons_queue[addon_id]['addon_tar_path'])):
                                                     os.system('rm ' + str(self.installing_addons_queue[addon_id]['addon_tar_path']))
                                             
@@ -997,6 +1013,14 @@ class CandleappstoreAdapter(Adapter):
             if self.DEBUG:
                 print("\nERROR: install_addon: provided addon_id was not a valid string: ", addon_id)
         
+        try:
+            self.installed_addons = self.scan_installed_addons()
+            self.scan_addons_file_size()
+
+        except Exception as ex:
+            if self.DEBUG:
+                print("install_addon: caught error updating installed_addons list: " + str(ex))
+                
         self.busy_installing_addon = None
         return False
 
@@ -1016,13 +1040,13 @@ class CandleappstoreAdapter(Adapter):
         #    print("self.user_profile['addonsDir'] = " + str(self.user_profile['addonsDir']))
         try:
             raw_dirs = os.listdir( self.user_profile['addonsDir'] )
-            for filename in raw_dirs:
-                if os.path.isdir( os.path.join(self.user_profile['addonsDir'],filename) ):
-                    real_dirs.append(filename)
+            for dirname in raw_dirs:
+                if os.path.isdir( os.path.join(self.user_profile['addonsDir'],dirname) ):
+                    real_dirs.append(dirname)
                     
                     # get default addon settings from manifest file
                     try:
-                        manifest_path = os.path.join(self.user_profile['addonsDir'],filename,'manifest.json')
+                        manifest_path = str(os.path.join(self.user_profile['addonsDir'],dirname,'manifest.json'))
                         #print("manifest_path: " + str(manifest_path))
                         if os.path.isfile(manifest_path):
                             #print('manifest file exists: ' + str(manifest_path))
@@ -1036,14 +1060,14 @@ class CandleappstoreAdapter(Adapter):
                                 defaults = {}
                                 if 'options' in parsed_json:
                                     if 'default' in parsed_json['options']:
-                                        new_default_settings[filename] = parsed_json['options']['default']
+                                        new_default_settings[dirname] = parsed_json['options']['default']
                                     else:
                                         if self.DEBUG:
-                                            print("addon did not have default settings?")
+                                            print("addon did not have default settings?: ", dirname)
                                 
                         else:
                             if self.DEBUG:
-                                print("Warning, addon dir did not have a manifest? missing file: " + str(filename))
+                                print("Warning, addon dir did not have a manifest?  dirname,missing file: ", dirname, str(manifest_path))
                     except Exception as ex:
                         if self.DEBUG:
                             print("error getting default addon settings from: " + str(manifest_path))
@@ -1223,26 +1247,30 @@ class CandleappstoreAdapter(Adapter):
         likely_has_things = False
         target_dir = os.path.join(self.user_profile['addonsDir'], str(addon_id))
         if os.path.isdir(target_dir):
-            things_check = run_command("grep -r 'notifyPropertyChanged(' " + str(target_dir ))
+            things_check = run_command("grep -r 'Device.__init__(' " + str(target_dir ))
             if isinstance(things_check,str):
                 if self.DEBUG:
-                    print("check_if_addon_has_things: notifyPropertyChanged check: \n\n", things_check,"\n\n")
+                    print("check_if_addon_has_things: Device.__init__( check: \n\n", things_check,"\n\n")
                 occurence_count = 0
                 for line in str(things_check).splitlines():
-                    if '//' in line and line.find("//") < line.find('notifyPropertyChanged('):
+                    if '//' in line and line.find("//") < line.find('Device.__init__('):
+                        if self.DEBUG:
+                            print("check_if_addon_has_things: Device.__init__( seems to be commented out with //")
                         pass
-                    elif '#' in line and line.find("#") < line.find('notifyPropertyChanged('):
+                    elif '#' in line and line.find("#") < line.find('Device.__init__('):
+                        if self.DEBUG:
+                            print("check_if_addon_has_things: Device.__init__( seems to be commented out with #")
                         pass
                     else:
                         occurence_count += 1
+                        likely_has_things = True
                 
                 if self.DEBUG:
                     print("check_if_addon_has_things: notifyPropertyChanged occurence_count: ", occurence_count)
-                if occurence_count > 1:
-                    likely_has_things = True
-                else:
-                    things_check = run_command("grep -r 'Device.__init__(' " + str(target_dir ))
-                    if(isinstance(things_check,str)) and 'Device.__init__(' in things_check:
+                if likely_has_things == False:
+                    things_check = run_command("grep -r 'notifyPropertyChanged(' " + str(target_dir ))
+                    if(isinstance(things_check,str)) and 'notifyPropertyChanged(' in things_check:
+                        occurence_count += 1
                         likely_has_things = True
                     
                     if self.DEBUG:
@@ -1252,7 +1280,7 @@ class CandleappstoreAdapter(Adapter):
                         likely_has_things = True
             else:
                 if self.DEBUG:
-                    print("ERROR:  check_if_addon_has_things: run_comman returned null")
+                    print("ERROR:  check_if_addon_has_things: run_command returned null")
         else:
             if self.DEBUG:
                 print("ERROR:  check_if_addon_has_things: could not find addon's dir for addon_id: ", addon_id)
