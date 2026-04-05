@@ -4599,8 +4599,18 @@
                                                     };
                                                     screenshot1.src = this.app_store_url + shots[s];
                                                     target_element.appendChild(screenshot1);
+													
+													screenshot1.addEventListener('click', () => {
+														// disables the side-by-side display
+														target_element.classList.remove('extension-candleappstore-two-screenshots');
+													});
+													
+													
                                                     
                                                 }
+												if(shots.length == 2){
+													target_element.classList.add('extension-candleappstore-two-screenshots');
+												}
                                 
                                                 //document.getElementById('extension-candleappstore-screenshots').appendChild(img);
                                 

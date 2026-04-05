@@ -1587,15 +1587,18 @@ button.extension-candleappstore-extra-fade,
 /*  SHOP FILTER  */
 
 #extension-candleappstore-filter-container,
-#extension-candleappstore-filter-container > div{
+#extension-candleappstore-filter-container > div,
+#extension-candleappstore-filter-select-container{
     display:flex;
 }
+
+
 
 #extension-candleappstore-filter-container{
     flex-wrap:wrap;
     margin:4rem 0 2rem 0;
     justify-content:flex-end;
-    gap:4rem;
+    gap:2rem;
 }
 
 #extension-candleappstore-filter-container > div{
@@ -2586,6 +2589,17 @@ body.safe-mode:not(.developer) #extension-candleappstore-tab-button-shop{
 		width:100%;
 	}
 
+	#extension-candleappstore-filter-select-container{
+		justify-content:space-between;
+	}
+  #extension-candleappstore-filter-select-container > div:not(:last-of-type){
+    margin-right:1rem;
+  }
+  #extension-candleappstore-filter-select-container span{
+    display:inline-block;
+    margin:1rem 0;
+  }
+
 }
 
 @media screen and (max-width: 800px) {
@@ -2626,7 +2640,7 @@ body.safe-mode:not(.developer) #extension-candleappstore-tab-button-shop{
 
     .extension-candleappstore-basic-options{
         margin-left:2rem;
-		justify-content:right;
+		    justify-content:right;
     }
 
     #extension-candleappstore-view .extension-candleappstore-tab-buttons button{
@@ -2641,7 +2655,7 @@ body.safe-mode:not(.developer) #extension-candleappstore-tab-button-shop{
     #extension-candleappstore-auth,
     #extension-candleappstore-settings,
     #extension-candleappstore-selected{
-        padding: 11rem 8rem 30vh 8rem;
+        padding: 11rem 2rem 30vh 2rem;
     }
 
     #extension-candleappstore-disk-space:not(:empty){
@@ -2653,6 +2667,20 @@ body.safe-mode:not(.developer) #extension-candleappstore-tab-button-shop{
 	}
 	*/
 
+	#extension-candleappstore-filter-select-container > div{
+		margin-left:4rem;
+	}
+
+}
+
+@media screen and (min-width: 801px) {
+  #extension-candleappstore-screenshots.extension-candleappstore-two-screenshots{
+    display:flex;
+    gap:2rem;
+  }
+  #extension-candleappstore-screenshots.extension-candleappstore-two-screenshots img{
+    max-width:50%;
+  }
 }
 
 
