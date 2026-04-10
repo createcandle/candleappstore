@@ -2227,14 +2227,15 @@ button.extension-candleappstore-extra-fade,
     padding:1rem;
 }
 
-.extension-candleappstore-selected-install-previous-version-button{
-  font-size: 1.8rem;
-  height: auto;
-  margin-top: 2rem;
-  opacity: .6;
+#extension-candleappstore-view .extension-candleappstore-selected-install-previous-version-button{
+  font-size:1.8rem;
+  height:auto;
+  margin-top:2rem;
+  margin-left:0;
+  opacity:.6;
 }
 .extension-candleappstore-selected-install-previous-version-button:hover{
-  opaity:1;
+  opacity:1;
 }
 
 

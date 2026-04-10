@@ -5028,7 +5028,6 @@
 						
 						if( typeof cloud_item['addon_id'] == 'string' && typeof cloud_item['previous_download_url'] == 'string' && cloud_item['previous_download_url'].startsWith('http') && typeof cloud_item['previous_download_version'] == 'string' && typeof cloud_item["previous_checksum"] == 'string'){ // overkill
                             var b = document.createElement("button");
-                            b.classList.add('extension-candleappstore-selected-install-button');
 							b.classList.add('extension-candleappstore-selected-install-previous-version-button');
                             b.classList.add('extension-candleappstore-button');
                             b.textContent = "Install previous version " + cloud_item["previous_download_version"]
@@ -6143,8 +6142,10 @@
                         
                     
                             }
-                            catch(e){
-                                console.log("Error populating selected: " + e);
+                            catch(err){
+								if(this.debug){
+									console.error("candle store debug: caught error populating selected: ", err);
+								}
                             }
                             
 
