@@ -1092,9 +1092,14 @@
             
             if(this.cloud_app_data.length > 0 && this.api_addons_data.length > 0){
                 if(this.debug){
-                    console.log("candle store debug: - both API and Cloud data arrays had non-zero length");
+                    console.log("candle store debug: check_for_updates: OK, both API and Cloud data arrays had non-zero length");
                 }
                 
+				const a_week_ago = (Date.now() / 1000) - (3600 * 24 * 7);
+				if(this.debug){
+					console.log("candle store debug: check_for_updates: a_week_ago: ", a_week_ago);
+				}
+				
                 this.addons_to_update = []; // Holds only addon_id strings
                 this.addons_to_update_full = []; // holds complete dictionaries
                 
@@ -1141,9 +1146,20 @@
 								}
 								
                                 if(cloud_version_int > local_version_int){
-                                    //console.log("an update is available for: " + this.api_addons_data[i].id);
-                                    this.addons_to_update.push(this.api_addons_data[i].id);
-                                    this.addons_to_update_full.push({'addon_id':this.api_addons_data[i].id,'url':this.api_addons_data[i].url})
+                                    if(this.debug){
+										console.log("candle store debug: an update is available for: " + this.api_addons_data[i].id, this.api_addons_data[i], this.cloud_app_data[u]);
+									}
+									if(typeof this.cloud_app_data[u]['updated_time'] == 'number'){
+										if(this.developer || this.cloud_app_data[u]['updated_time'] < a_week_ago){
+		                                    this.addons_to_update.push(this.api_addons_data[i].id);
+		                                    this.addons_to_update_full.push({'addon_id':this.api_addons_data[i].id,'url':this.api_addons_data[i].url});
+										}
+									}
+									else{
+	                                    this.addons_to_update.push(this.api_addons_data[i].id);
+	                                    this.addons_to_update_full.push({'addon_id':this.api_addons_data[i].id,'url':this.api_addons_data[i].url});
+									}
+                                    
                                 }
                                 
                                 
