@@ -137,9 +137,10 @@ class CandleappstoreAPIHandler(APIHandler):
                                           'available_memory':self.adapter.available_memory,
                                           'pre_release_addons':self.adapter.pre_release_addons,
                                           'candle_version':self.adapter.candle_version,
-                                          'last_versions_allowed_for_candle_v2':self.adapter.last_versions_allowed_for_candle_v2,
+                                          'last_versions_allowed_for_candle_v2':self.adapter.last_versions_allowed_for_candle_v2, # never used, found a better way. But might be re-used some something else in the future, like opting into beta versions.
                                           'installing_addons_queue':self.adapter.installing_addons_queue,
                                           'busy_installing_addon':self.adapter.busy_installing_addon,
+                                          'previously_installed_versions':self.adapter.persistent_data['previously_installed_versions'],
                                           'debug':self.adapter.DEBUG
                                       }),
                     )
@@ -215,7 +216,7 @@ class CandleappstoreAPIHandler(APIHandler):
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state':state}),
+                      content=json.dumps({'state':state,'previously_installed_versions':self.adapter.persistent_data['previously_installed_versions']}),
                     )
                         
                 elif action == 'remove_from_installation_queue':
@@ -233,7 +234,7 @@ class CandleappstoreAPIHandler(APIHandler):
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state':state}),
+                      content=json.dumps({'state':state,'previously_installed_versions':self.adapter.persistent_data['previously_installed_versions']}),
                     )
                         
                         

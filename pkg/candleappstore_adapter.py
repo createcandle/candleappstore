@@ -400,7 +400,7 @@ class CandleappstoreAdapter(Adapter):
                 if self.DEBUG:
                     print("unique_id was not in persistent data, adding it now.")
                 self.persistent_data['unique_id'] = generate_random_string(20)
-                self.save_persistent_data()
+                
             #if 'addons' not in self.persistent_data: # TODO: is this used for anything?
             #    if self.DEBUG:
             #        print("addons was not in persistent data, adding it now.")
@@ -410,13 +410,19 @@ class CandleappstoreAdapter(Adapter):
             if 'permissions' not in self.persistent_data:
                 self.persistent_data['permissions'] = {}
                 
+            
+                
             # should be used to find out of the candle webserver has fresh addon updates, but is unfinished
             if 'meta_updated_time' not in self.persistent_data:
                 self.persistent_data['meta_updated_time'] = 0
                 
+            if 'previously_installed_versions' not in self.persistent_data:
+                self.persistent_data['previously_installed_versions'] = {}
+                self.save_persistent_data()
+                
         except Exception as ex:
             if self.DEBUG:
-                print("Error fixing missing values in persistent data: " + str(ex))
+                print("caught error fixing missing values in persistent data: " + str(ex))
         
         
         # LOAD CONFIG
@@ -963,6 +969,36 @@ class CandleappstoreAdapter(Adapter):
                                                     self.installing_addons_queue[addon_id]['has_things'] = self.check_if_addon_has_things(addon_id)
                                                     time.sleep(1)
                                                     self.installing_addons_queue[addon_id]['message'] = 'Installation complete'
+                                                    
+                                                    if 'previously_installed_versions' not in self.persistent_data:
+                                                        self.persistent_data['previously_installed_versions'] = {}
+                                                    if addon_id not in self.persistent_data['previously_installed_versions']:
+                                                        self.persistent_data['previously_installed_versions'][addon_id] = []
+                                                    
+                                                    was_previously_installed = False
+                                                    for previously_installed_version in self.persistent_data['previously_installed_versions'][addon_id]:
+                                                        if isinstance(previously_installed_version,dict):
+                                                            if 'addon_url' in previously_installed_version and str(previously_installed_version['addon_url']) == str(self.installing_addons_queue[addon_id]['addon_url']):
+                                                                was_previously_installed = True
+                                                                if self.DEBUG:
+                                                                    print("it seems this addon has been installed before, it's download URL was spotted in persistent data's previously_installed_versions")
+                                                                break
+                                                    if was_previously_installed == False:
+                                                        previously_installed_item = {
+                                                                'addon_url':str(self.installing_addons_queue[addon_id]['addon_url']),
+                                                                'first_install_timestamp':int(time.time())
+                                                                }
+                                                        if isinstance(self.installing_addons_queue[addon_id]['download_size'],int) and self.installing_addons_queue[addon_id]['download_size'] > 0:
+                                                            previously_installed_item['download_size'] = int(self.installing_addons_queue[addon_id]['download_size'])
+                                                        if isinstance(self.installing_addons_queue[addon_id]['addon_checksum'],str) and len(str(self.installing_addons_queue[addon_id]['addon_checksum'])) > 5:
+                                                            previously_installed_item['addon_checksum'] = self.installing_addons_queue[addon_id]['addon_checksum']
+                                                        if self.DEBUG:
+                                                            print("adding previously_installed_item to previously_installed_versions history: ", previously_installed_item)
+                                                        self.persistent_data['previously_installed_versions'][addon_id].append(previously_installed_item)
+                                                    else:
+                                                        if self.DEBUG:
+                                                            print("this version has been installed before. Not adding it to previously_installed_versions history: ", addon_id)
+                                                    
                                                     self.busy_installing_addon = None
                                                 else:
                                                     if self.DEBUG:

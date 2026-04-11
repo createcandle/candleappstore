@@ -1751,9 +1751,13 @@ button.extension-candleappstore-extra-fade,
 .extension-candleappstore-selected-license{
     font-weight:normal;
 }
-.extension-candleappstore-selected-license::before{
+.extension-candleappstore-selected-license:not(:empty)::before{
     content:'License: ';
     font-weight:bold;
+}
+
+.extension-candleappstore-selected-license:empty::after{
+	content:'unknown';
 }
 
 

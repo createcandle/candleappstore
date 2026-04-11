@@ -159,7 +159,7 @@
 	        .then((text) => {
 	         	this.content = text;
 				//location.protocol + '//' + location.host + location.pathname
-	  		 	if( location.pathname.endsWith("extensions/candleappstore") ){
+	  		 	if( location.pathname == "/extensions/candleappstore" ){
 					//console.log(document.location.href);
 	  		  		this.show();
 					
@@ -380,7 +380,7 @@
                 this.debug = body.debug;
             }
             
-            if(this.debug){
+            if(this.debug && location.pathname == '/extensions/candleappstore'){
                 console.log("candle Store debug: parse_body:  body: ", body);
             }
             
@@ -397,7 +397,7 @@
 			
 			if(typeof body['installed'] != 'undefined'){
 				this.installed = body['installed'];
-	            if(this.debug){
+	            if(this.debug && location.pathname == '/extensions/candleappstore'){
 	                console.log("candle store debug: parse_body: this.installed is now: ", this.installed);
 	            }
 			}
@@ -461,11 +461,11 @@
 				
 				
 				let used_mem = ( (total_mem - avail_mem) / total_mem) * 100;
-				if(this.debug){
+				if(this.debug && location.pathname == '/extensions/candleappstore'){
 					console.log("candle store debug: used_mem: ", used_mem);
 				}
 				let purgeable_mem = ( (avail_mem - free_mem) / total_mem) * 100;
-				if(this.debug){
+				if(this.debug && location.pathname == '/extensions/candleappstore'){
 					console.log("candle store debug: purgeable_mem: ", purgeable_mem);
 				}
 				const memory_used_bar_el = this.view.querySelector('#extension-candleappstore-memory-used-bar');
@@ -482,68 +482,70 @@
                 }
                 if(document.body.classList.contains('developer')){
                     this.developer = true;
-                    console.log("candle store debug: body has developer class");
+					if(this.debug && location.pathname == '/extensions/candleappstore'){
+                    	console.log("candle store debug: body has developer class");
+					}
                 }
             }
 			
             if(typeof body.bits != 'undefined'){
                 this.bits = parseInt(body.bits);
-                if(this.debug){
+                if(this.debug && location.pathname == '/extensions/candleappstore'){
                     console.log("candle store debug: system bits: ", this.bits);
                 }
             }
             if(typeof body.python_version != 'undefined'){
                 this.python_version = body.python_version;
-                if(this.debug){
+                if(this.debug && location.pathname == '/extensions/candleappstore'){
                     console.log("candle store debug: python_version: ", this.python_version);
                 }
             }
             if(typeof body.node_version != 'undefined'){
                 this.node_version = body.node_version;
-                if(this.debug){
+                if(this.debug && location.pathname == '/extensions/candleappstore'){
                     console.log("candle store debug: node_version: ", this.node_version);
                 }
             }
             if(typeof body.addon_defaults != 'undefined'){
                 this.addon_defaults = body.addon_defaults;
-                if(this.debug){
+                if(this.debug && location.pathname == '/extensions/candleappstore'){
                     console.log("candle store debug: addon_defaults: ", this.addon_defaults);
                 }
             }
             if(typeof body.addon_sizes != 'undefined'){
                 this.addon_sizes = body.addon_sizes;
-                if(this.debug){
+                if(this.debug && location.pathname == '/extensions/candleappstore'){
                     console.log("candle store debug: addon_sizes: ", this.addon_sizes);
                 }
             }
             if(typeof body.total_addons_size != 'undefined'){
                 this.total_addons_size = body.total_addons_size;
-                if(this.debug){
+                if(this.debug && location.pathname == '/extensions/candleappstore'){
                     console.log("candle store debug: total_addons_size: ", this.total_addons_size);
                 }
             }
             if(typeof body.free_disk_space != 'undefined'){
                 this.free_disk_space = body.free_disk_space;
-                if(this.debug){
+                if(this.debug && location.pathname == '/extensions/candleappstore'){
                     console.log("candle store debug: free_disk_space: ", this.free_disk_space);
                 }
             }
             if(typeof body.free_memory == 'number'){ // Not currently used
                 this.free_memory = body.free_memory;
-                if(this.debug){
+                if(this.debug && location.pathname == '/extensions/candleappstore'){
                     console.log("candle store debug: free_memory: ", this.free_memory);
                 }
             }
             if(typeof body.available_memory == 'number'){
                 this.available_memory = body.available_memory;
-                if(this.debug){
+                if(this.debug && location.pathname == '/extensions/candleappstore'){
                     console.log("candle store debug: available_memory: ", this.available_memory);
                 }
             }
 			
 			if(typeof body['pre_release_addons'] != 'undefined'){
 				this.pre_release_addons = body['pre_release_addons'];
-                if(this.debug){
+                if(this.debug && location.pathname == '/extensions/candleappstore'){
                     console.log("candle store debug: this.pre_release_addons: ", this.pre_release_addons);
                 }
 			}
@@ -578,17 +580,17 @@
 	                        const addons_size_mb = Math.round(this.total_addons_size/1000);
                     
 	                        disk_space_el.innerHTML = '<div><div id="extension-candleappstore-low-disk-space-hint">Warning, the disk is getting full</div>Total addons size: ' + addons_size_mb + 'Mb<br/>Available disk space: ' + available_disk_mb + 'Mb</div>';
-	                        if(this.debug){
+	                        if(this.debug && location.pathname == '/extensions/candleappstore'){
 	                            console.log("candle store debug: available disk space in Mb: ", available_disk_mb);
 	                        }
 	                        if(this.free_disk_space < 1000000){ // less than a gigabyte of space remaning
-	                            if(this.debug){
+	                            if(this.debug && location.pathname == '/extensions/candleappstore'){
 	                                console.log("candle store debug: low disk space");
 	                            }
 	                            this.content_el.classList.add('extension-candleappstore-low-disk-space');
 	                        }
 	                        else{
-	                            if(this.debug){
+	                            if(this.debug && location.pathname == '/extensions/candleappstore'){
 	                                console.log("candle store debug: enough disk space");
 	                            }
 	                            this.content_el.classList.remove('extension-candleappstore-low-disk-space');
@@ -619,7 +621,7 @@
 								this.view.querySelector('#extension-candleappstore-store-available-memory').innerText = 'Available memory: ' + available_memory_mb + 'Mb';
 							}
 						
-	                        if(this.debug){
+	                        if(this.debug && location.pathname == '/extensions/candleappstore'){
 	                            console.log("candle store debug: available memory in Mb: ", available_memory_mb );
 	                        }
 	                        if(this.available_memory < 250000){ // less than 250Mb remaining
@@ -640,7 +642,7 @@
 	                            }
 	                        }
 	                        else{
-	                            if(this.debug){
+	                            if(this.debug && location.pathname == '/extensions/candleappstore'){
 	                                console.log("candle store debug: enough available memory");
 	                            }
 	                            this.content_el.classList.remove('extension-candleappstore-low-memory');
@@ -669,7 +671,7 @@
 
 
 		generate_installing_overview(){
-			if(this.debug){
+			if(this.debug && location.pathname == '/extensions/candleappstore'){
 				console.log("candle store debug: in generate_installing_overview.  this.busy_installing_addon: ", this.busy_installing_addon);
 			}
 			
@@ -677,7 +679,7 @@
 			const installing_overview_el = this.view.querySelector('#extension-candleappstore-installing-overview-container');
 			
 			if(installing_keys_list.length){
-				if(this.debug){
+				if(this.debug && location.pathname == '/extensions/candleappstore'){
 					console.log("candle store debug: generate_installing_overview:  this.installing_addons_queue: \n", this.installing_addons_queue);
 				}
 				
@@ -1345,7 +1347,9 @@
                                 
 	                                    // check if any arm64 packages are available
 	                                    let arm64_available = false; // only set to true if the system is itself also 64 bits. If true, it means we hold out for a 64 bit version of a package.
-	                                    let language = 'nodejs';
+	                                    let system_architecture_available = false;
+										let language = 'node';
+										let optimal_version = null;
 	                                    let python39_available = false;
 	                                    let python311_available = false;
 										let python313_available = false;
@@ -1354,18 +1358,24 @@
 										let node20_available = false;
 										let node24_available = false;
 	                                    for(let p = 0; p < packs.length; p++){
-	                                        if(typeof packs[p]['architecture'] != 'undefined'){
-	                                            if(this.bits == 64){
-	                                                if(packs[p]['architecture'] == 'linux-arm64'){
-	                                                    if(this.debug){
-	                                                        console.log("candle store debug: linux-arm64 package spotted");
-	                                                    }
-	                                                    arm64_available = true;
-	                                                }
+	                                        if(typeof packs[p]['architecture'] == 'string'){
+	                                            if(this.bits == 64 && packs[p]['architecture'] == 'linux-arm64'){
+                                                    if(this.debug){
+                                                        console.log("candle store debug: OK, linux-arm64 package spotted");
+                                                    }
+													system_architecture_available = true;
+                                                    arm64_available = true;
+	                                                
 	                                            }
+												else if(this.bits == 32 && packs[p]['architecture'] == 'linux-arm'){
+                                                    if(this.debug){
+                                                        console.log("candle store debug: OK, linux-arm (32 bit) package spotted");
+                                                    }
+													system_architecture_available = true;
+												}
 	                                            if(packs[p]['architecture'] == system_architecture){
 	                                                if(typeof packs[p]['language'] != 'undefined'){
-	                                                    if(typeof packs[p]['language']['name'] != 'undefined'){
+	                                                    if(typeof packs[p]['language']['name'] == 'string'){
 	                                                        language = packs[p]['language']['name'];
 	                                                    }
 	                                                    if(typeof packs[p]['language']['versions'] != 'undefined'){
@@ -1374,21 +1384,23 @@
 	                                                                if(this.debug){
 	                                                                    console.log("candle store debug: python 3.9 package spotted");
 	                                                                }
+																	optimal_version = this.python_version;
 	                                                                python39_available = true;
 	                                                            }
 	                                                            if(this.python_version == '3.13' && packs[p]['language']['versions'][v] == '3.13'){
 	                                                                if(this.debug){
 	                                                                    console.log("candle store debug: python 3.13 package spotted");
 	                                                                }
+																	optimal_version = this.python_version;
 	                                                                python313_available = true;
 	                                                            }
-	                                                            if(this.python_version == '3.13' && packs[p]['language']['versions'][v] == '3.11'){
+	                                                            if((this.python_version == '3.13' || this.python_version == '3.11') && packs[p]['language']['versions'][v] == '3.11'){
 	                                                                if(this.debug){
 	                                                                    console.log("candle store debug: python 3.11 package spotted");
 	                                                                }
 	                                                                python311_available = true;
 	                                                            }
-	                                                            if(this.python_version == '3.13' && packs[p]['language']['versions'][v] == '3.9'){
+	                                                            if((this.python_version == '3.13' || this.python_version == '3.9') && packs[p]['language']['versions'][v] == '3.9'){
 	                                                                if(this.debug){
 	                                                                    console.log("candle store debug: python 3.9 package spotted");
 	                                                                }
@@ -1412,6 +1424,7 @@
 	                                                                if(this.debug){
 	                                                                    console.log("candle store debug: python 3.9 package spotted");
 	                                                                }
+																	optimal_version = this.python_version;
 	                                                                python39_available = true;
 	                                                            }
 														
@@ -1431,12 +1444,14 @@
 	                                                                if(this.debug){
 	                                                                    console.log("candle store debug: node 20 package spotted");
 	                                                                }
+																	optimal_version = this.node_version;
 	                                                                node20_available = true;
 	                                                            }
 	                                                            if(this.node_version == '24' && packs[p]['language']['versions'][v] == '24'){
 	                                                                if(this.debug){
 	                                                                    console.log("candle store debug: node 24 package spotted");
 	                                                                }
+																	optimal_version = this.node_version;
 	                                                                node24_available = true;
 	                                                            }
 	                                                        }
@@ -1445,6 +1460,69 @@
 	                                            }
 	                                        }
 	                                    }
+										
+										if(optimal_version == null){
+											if( language.startsWith('node') && this.node_version == '24' && node12_available == true){
+												if(this.debug){
+													console.log("candle store debug: forcing optimal version to node12")
+												}
+												optimal_version = '12';
+											}
+										}
+										
+                                        if(this.debug){
+											console.log("candle store debug: ___________________   ________________");
+                                            console.log("candle store debug:      addon language: ", language);
+											console.log("candle store debug:     optimal_version: ", optimal_version);
+											console.log("candle store debug:   ARM version match: ", system_architecture_available);
+											console.log("");
+											console.log("candle store debug:        node_version: ", typeof this.node_version, this.node_version);
+											console.log("candle store debug:    node12_available: ", node12_available);
+											console.log("candle store debug:    node24_available: ", node24_available);
+											console.log("");
+											console.log("candle store debug:      python_version: ", typeof this.python_version, this.python_version);
+											console.log("candle store debug:  python39_available: ", python39_available);
+											console.log("candle store debug: python311_available: ", python311_available);
+											console.log("candle store debug: python313_available: ", python313_available);
+                                        }
+										
+										let download_url_from_simpler_method = null;
+										if(system_architecture_available && optimal_version){
+											for(let p = 0; p < packs.length; p++){
+												if(
+													(
+														(arm64_available == false && packs[p]['url'].indexOf(system_architecture + '64') == -1) || // no 'linux-arm64' in the url. Also catches a total lack of mentioning the architecture in the URL
+														(arm64_available==true && 
+															(
+																packs[p]['url'].indexOf(system_architecture) != -1 || // precise mention of 'linux-arm64, or
+																packs[p]['url'].indexOf('linux-') == -1 // no mention of the architecture at all
+															)
+														) 
+													) &&
+													packs[p]['url'].indexOf(optimal_version + '.tgz') != -1 // Note to self: some addons have a 'v' in the URL before the version number, but not all of them, so that letter should not be used in the search string
+													
+												
+												){
+													if(this.debug){
+														console.warn("candle store debug: TEST: did the simpler code pick the correct download URL?: ", packs[p]['url']);
+													}
+													if(download_url_from_simpler_method == null){
+														download_url_from_simpler_method = packs[p]['url'];
+													}
+													else{
+														if(this.debug){
+															console.warn("candle store debug: WARNING, TEST: the simpler code matched a second download URL: ", packs[p]['url']);
+														}
+													}
+													
+												}
+												
+											}
+										}
+										if(this.debug){
+											console.warn("\n___\ncandle store debug: TEST: download_url_from_simpler_method: ", download_url_from_simpler_method,"\n^^^\n");
+										}
+										
                                 
 	                                    for(let p = 0; p < packs.length; p++){
 	                                        if(typeof packs[p]['architecture'] != 'undefined'){
@@ -1517,7 +1595,7 @@
 			                                                        console.log("candle store debug: download URL set to optimal version for prefix: ", prefix, item[prefix + 'download_url']);
 			                                                    }
 																if(typeof packs[p]['checksum'] == 'string' && packs[p]['checksum'].length > 5){
-																	 item[prefix + 'checksum'] = packs[p]['checksum'];
+																	item[prefix + 'checksum'] = packs[p]['checksum'];
 	 						                                        if(this.debug){
 	 						                                            console.log("candle store debug: checksum also set for prefix:", prefix, item[prefix + 'checksum']);
 	 						                                        }
@@ -1547,12 +1625,22 @@
 	                                            }
 	                                        }
 	                                    }
+										
+										if(this.debug){
+											console.warn("candle store debug: final download_url for prefix: ", prefix, item[prefix + 'download_url']);
+										}
+										
 	                                }
 								}
+								else{
+                                    if(this.debug){
+										console.error("candle store debug: add_download_url_to_item: did not find a packages dict with prefix: ", prefix);
+									}
+								}
                             }
-	                        catch(err){
+	                        catch (err){
 	                            if(this.debug){
-									console.error("candle store debug: caught error in add_download_url_to_item: ", err);
+									console.error("candle store debug: get_cloud_addon_data: caught error in add_download_url_to_item: ", err);
 								}
 	                        }
 							return item
@@ -1583,11 +1671,12 @@
             }
             else{
                 if(this.debug){
-					console.warn("candle store debug: no cloud data available (yet)");
+					console.warn("candle store debug: get_cloud_addon_data: no cloud data available (yet)");
 				}
             }
             if(this.debug){
-                console.log("candle store debug: found_package?", found_package);
+                console.log("candle store debug: get_cloud_addon_data: found_package? ", found_package);
+				console.warn("candle store debug: get_cloud_addon_data: returning null");
             }
             return null;
         }
@@ -1597,14 +1686,20 @@
 
 		hide() {
 			try{
-				clearInterval(this.log_poll_interval);
-                this.log_poll_interval == null
-				//console.log("interval cleared");
+                if(document.getElementById('extension-candleappstore-menu-item').classList.contains('selected') == false){
+		            if(this.debug){
+		                console.log("candle store debug: clearing view innerHTML");
+					}
+                    this.view.innerHTML = "";
+					if(this.log_poll_interval){
+						clearInterval(this.log_poll_interval);
+		                this.log_poll_interval == null
+					}
+                }
 			}
-			catch(e){
-				//console.log("no interval to clear? " + e);
-			}
-            
+            catch(err){
+                console.error("candle store: caught error in hide: ", err);
+            }
 		}
 		
 
@@ -4368,6 +4463,8 @@
             // clear tags, but create one invisible one to keep the hight the same
             document.getElementById('extension-candleappstore-selected-tags').innerHTML = '<span class="extension-candleappstore-tag extension-candleappstore-invisible">...</span>';
             
+			
+			
             // Addon name
             if(typeof data.name != 'undefined'){
                 document.getElementById('extension-candleappstore-selected-name').innerText = data.name;
@@ -4918,124 +5015,8 @@
 							
 						}
 	                    // ADD UNINSTALL BUTTON
-                
-	                    else if( installed && data['versions'][v]["addon_id"] != undefined ){
-                    
-	                        if(data['versions'][v]["addon_id"] != 'candleappstore'){
-                            
-	                            var b = document.createElement("button");
-	                            b.classList.add('extension-candleappstore-selected-uninstall-button');
-	                            b.classList.add('extension-candleappstore-button');
-	                            //b.disabled = true;
-	                            var t = document.createTextNode("Uninstall");
-	                            b.appendChild(t);
-	        					b.addEventListener('click', (event) => {
-	                                //console.log("uninstall button clicked");
-	                               //console.log(event);
-	                                event.stopImmediatePropagation();
-	                                //console.log( data['versions'][v]["addon_id"] );
-                                
-	                                if(this.exhibit_mode){
-	                                    console.log("Cannot uninstall while in exhibit mode");
-	                                    this.flash_message('Settings uninstall addons while in exhibit mode');
-									
-	                                    return;
-                                    
-	                                }
-                                
-	                                const addon_id = data['versions'][v]["addon_id"];
-                        
-                                
-	                                if(addon_id == 'candle-theme' && this.developer == false){
-	                                    console.log("The Candle theme can only be uninstalled in developer mode");
-	                                    return;
-	                                }
-                                
-                        
-	                                var really = confirm("Are you sure you want to uninstall this addon?");
-	                                if (really) {
-	                                    document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'block';
-	                                    document.getElementById('extension-candleappstore-selected-main').style.display = 'none';
-                                    
-	                                    window.API.uninstallAddon( data['versions'][v]["addon_id"] )
-	                                    .then((result) => { 
-	            							if(this.debug){
-	                                            console.log("candle store debug: uninstallation result: ", result);
-	                                            //console.log("addon_id: " + addon_id + " was uninstalled, in theory.");
-	                                        }
-	                                        document.getElementById("extension-candleappstore-selected").style.display = 'none';
-											document.getElementById('extension-candleappstore-view').style.zIndex = 'auto';
-	                                        //document.getElementById("extension-candleappstore-settings").style.display = 'none';
-                            
-							
-											if(typeof this.installing_addons_queue[addon_id] != 'undefined'){
-												this.remove_from_installing_queue(addon_id);
-											}
-							
-	                                        //console.log("this.installed = " + this.installed );
-	                                        for (var i=this.installed.length-1; i>=0; i--) {
-	                                            if (this.installed[i] === addon_id) {
-	                                           //console.log("popping addon from this.installed list: ", addon_id);
-	                                                this.installed.splice(i, 1);
-	                                            }
-	                                        }
-	                                        window.API.getInstalledAddons()
-	                                        .then((result) => { 
-	                            				if(this.debug){
-	                                                console.log("candle store debug: get_installed_addons_data: result: ");
-	                                            }
-	                            				//console.log(result);
-	                                            this.api_addons_data = result;
-	                                            this.generate_overview('installed'); // user might have come from either page
-	                                            this.generate_overview('shop');
-	                                            document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'none';
-	                                            // post-uninstall here?
-                                
-	                            			}).catch((err) => {
-	                            				if(this.debug){
-													console.error("candle store debug: get getInstalledAddons info catch (error?): ", err);
-												}
-	                                            //console.log(e);
-	                                            document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'none';
-	                            			});
-                                        
-                                        
-	                                        // remove data dir
-	                                        if(this.debug){
-	                                            console.log("candle store debug: will try to remove data dir for addon: ", addon_id);
-	                                        }
-	                            			window.API.postJson(
-	                            				`/extensions/candleappstore/api/ajax`,
-	                            				{'action':'uninstall','addon_id':addon_id}
-	                            			)
-	                                        .then((body) => {
-	                                            if(this.debug){
-	                                                console.log("candle store debug: Uninstall: removed addon data dir? ", body);
-	                                            }
-	                                            if(typeof body.addon_dirs != 'undefined'){
-	                                                this.installed = body.addon_dirs;
-	                                            }
-                                            
-	                            			})
-	                                        .catch((err) => {
-												if(this.debug){
-													console.log("candle store debug: caught error in remove addon data dir: ", err);
-												}
-	                            			});
-                            
-	            						}).catch((err) => {
-	            							if(this.debug){
-												console.log("candle store debug: caught error in uninstallation: ", err);
-											}
-	            						});
-	                                }
-                        
-	                            });
-	                            //console.log("adding uninstall button");
-	                            selected_options_bar.appendChild(b);
-	                        }
-                    
-	                    }
+                		// moved lower..
+	                    
 						
 						
 						//
@@ -5226,15 +5207,147 @@
                     }
                     else{
                         if(this.debug){
-							console.error("candle store debug: somehow there was no cloud data for this addon: ", addon_id);
+							console.log("candle store debug: no cloud data for this addon yet: ", addon_id);
+							console.log("candle store debug:  - this.received_cloud_data: ", this.received_cloud_data);
 						}
-                        var n = document.createElement("div");
-                        n.classList.add('extension-candleappstore-selected-no-install-candidate');
-                        n.textContent = "Cannot install";
-                        selected_options_bar.appendChild(n);
-                        
+						if(!installed){
+							if(this.debug){
+								console.warn("showing 'Cannot install'")
+							}
+	                    	var n = document.createElement("div");
+	                    	n.classList.add('extension-candleappstore-selected-no-install-candidate');
+	                    	n.textContent = "Cannot install";
+	                    	selected_options_bar.appendChild(n);
+						}
                     }
-                    
+					if(this.debug){
+						console.log("candle store debug:  -  addon_id, installed?: ", addon_id, installed);
+						
+					}
+                    if(this.debug){
+                        console.log("candle store debug: data: ", data);
+                    }
+					
+					if(installed && typeof data['versions'][v]["addon_id"] == 'string' && data['versions'][v]["addon_id"] != 'candleappstore'){
+                    	
+                        var b = document.createElement("button");
+                        b.classList.add('extension-candleappstore-selected-uninstall-button');
+                        b.classList.add('extension-candleappstore-button');
+                        //b.disabled = true;
+                        var t = document.createTextNode("Uninstall");
+                        b.appendChild(t);
+    					b.addEventListener('click', (event) => {
+                            //console.log("uninstall button clicked");
+                           //console.log(event);
+                            event.stopImmediatePropagation();
+                            //console.log( data['versions'][v]["addon_id"] );
+    
+                            if(this.exhibit_mode){
+                                console.log("Cannot uninstall while in exhibit mode");
+                                this.flash_message('Settings uninstall addons while in exhibit mode');
+		
+                                return;
+        
+                            }
+    
+                            const addon_id = data['versions'][v]["addon_id"];
+
+    
+                            if(addon_id == 'candle-theme' && this.developer == false){
+                                console.log("The Candle theme can only be uninstalled in developer mode");
+                                return;
+                            }
+    
+
+                            var really = confirm("Are you sure you want to uninstall this addon?");
+                            if (really) {
+                                document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'block';
+                                document.getElementById('extension-candleappstore-selected-main').style.display = 'none';
+        
+                                window.API.uninstallAddon( data['versions'][v]["addon_id"] )
+                                .then((result) => { 
+        							if(this.debug){
+                                        console.log("candle store debug: uninstallation result: ", result);
+                                        //console.log("addon_id: " + addon_id + " was uninstalled, in theory.");
+                                    }
+                                    document.getElementById("extension-candleappstore-selected").style.display = 'none';
+									document.getElementById('extension-candleappstore-view').style.zIndex = 'auto';
+                                    //document.getElementById("extension-candleappstore-settings").style.display = 'none';
+
+
+									if(typeof this.installing_addons_queue[addon_id] != 'undefined'){
+										this.remove_from_installing_queue(addon_id);
+									}
+
+                                    //console.log("this.installed = " + this.installed );
+                                    for (var i=this.installed.length-1; i>=0; i--) {
+                                        if (this.installed[i] === addon_id) {
+                                       //console.log("popping addon from this.installed list: ", addon_id);
+                                            this.installed.splice(i, 1);
+                                        }
+                                    }
+                                    window.API.getInstalledAddons()
+                                    .then((result) => { 
+                        				if(this.debug){
+                                            console.log("candle store debug: get_installed_addons_data: result: ");
+                                        }
+                        				//console.log(result);
+                                        this.api_addons_data = result;
+                                        this.generate_overview('installed'); // user might have come from either page
+                                        this.generate_overview('shop');
+                                        document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'none';
+                                        // post-uninstall here?
+    
+                        			}).catch((err) => {
+                        				if(this.debug){
+											console.error("candle store debug: get getInstalledAddons info catch (error?): ", err);
+										}
+                                        //console.log(e);
+                                        document.getElementById("extension-candleappstore-busy-uninstalling").style.display = 'none';
+                        			});
+            
+            
+                                    // remove data dir
+                                    if(this.debug){
+                                        console.log("candle store debug: will try to remove data dir for addon: ", addon_id);
+                                    }
+                        			window.API.postJson(
+                        				`/extensions/candleappstore/api/ajax`,
+                        				{'action':'uninstall','addon_id':addon_id}
+                        			)
+                                    .then((body) => {
+                                        if(this.debug){
+                                            console.log("candle store debug: Uninstall: removed addon data dir? ", body);
+                                        }
+                                        if(typeof body.addon_dirs != 'undefined'){
+                                            this.installed = body.addon_dirs;
+                                        }
+                
+                        			})
+                                    .catch((err) => {
+										if(this.debug){
+											console.log("candle store debug: caught error in remove addon data dir: ", err);
+										}
+                        			});
+
+        						}).catch((err) => {
+        							if(this.debug){
+										console.log("candle store debug: caught error in uninstallation: ", err);
+									}
+        						});
+                            }
+
+                        });
+                        if(this.debug){
+							console.log("adding uninstall button");
+						}
+                        selected_options_bar.prepend(b);
+                    }
+                    else{
+                        if(this.debug){
+							console.log("not adding uninstall button");
+						}
+                    }
                     
                 
                 
