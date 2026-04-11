@@ -2605,13 +2605,23 @@ body.safe-mode:not(.developer) #extension-candleappstore-tab-button-shop{
 	#extension-candleappstore-filter-select-container{
 		justify-content:space-between;
 	}
-  #extension-candleappstore-filter-select-container > div:not(:last-of-type){
-    margin-right:1rem;
-  }
-  #extension-candleappstore-filter-select-container span{
-    display:inline-block;
-    margin:1rem 0;
-  }
+	#extension-candleappstore-filter-select-container > div:not(:last-of-type){
+		margin-right:1rem;
+	}
+	#extension-candleappstore-filter-select-container span{
+		display:inline-block;
+		margin:1rem 0;
+	}
+  
+	#extension-candleappstore-selected-options{
+		flex-direction:column;
+	}
+	#extension-candleappstore-selected-options > *{
+		margin:.5rem 0;
+		width:100%;
+		text-align:center;
+		border-radius:1rem;
+	}
 
 }
 
