@@ -23,7 +23,7 @@
     background-repeat: no-repeat;
     background-position: 0;
     background-image: url('../images/menu-icon.svg');
-	width:9rem;
+	width:10rem;
 	margin:0 auto;
     user-select: none;
 }
@@ -2621,6 +2621,14 @@ body.safe-mode:not(.developer) #extension-candleappstore-tab-button-shop{
 		width:100%;
 		text-align:center;
 		border-radius:1rem;
+	}
+	
+	#extension-candleappstore-view #extension-candleappstore-settings .extension-candleappstore-settings-item.extension-candleappstore-settings-enum{
+		flex-direction:column;
+	}
+	#extension-candleappstore-view #extension-candleappstore-settings .extension-candleappstore-settings-item.extension-candleappstore-settings-enum > .extension-candleappstore-settings-left,
+	#extension-candleappstore-view #extension-candleappstore-settings .extension-candleappstore-settings-item.extension-candleappstore-settings-enum select{
+		width:100%;
 	}
 
 }

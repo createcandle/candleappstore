@@ -3238,6 +3238,14 @@
 						
 						const my_data = data[i];
 						
+						if(page == 'shop' && typeof my_data['available'] == 'boolean' && my_data['available'] == false){
+							if(this.debug){	
+								console.warn("not showing an addon on the shop page because it's no longer available: ", my_data);
+							}
+							continue
+						}
+						
+						
                         let addon_id = "error";
 
                         // Get the data about this addon from the gateway API as well
@@ -3255,7 +3263,9 @@
                             }
                         }
                         catch(err){
-                            console.error("candle store: error getting api data for addon: ", err);
+                            if(this.debug){
+								console.error("candle store: caught error getting api data for addon: ", err);
+							}
                         }
                     
                         
@@ -5949,7 +5959,7 @@
                                     left.appendChild(l); // append label to div
                                     left.appendChild(p); // Append description
                                     d.appendChild(left);
-                                    d.classList.add("extension-candleappstore-flex");
+                                    d.classList.add("extension-candleappstore-flex-space-between");
                                     d.classList.add('extension-candleappstore-settings-enum');
                                     
                                     var s = document.createElement("select");
