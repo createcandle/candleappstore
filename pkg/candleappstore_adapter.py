@@ -106,6 +106,12 @@ class CandleappstoreAdapter(Adapter):
         # Disk space
         self.user_partition_free_disk_space = None
         
+        self.device_sd_card_size = None
+        if os.path.exists('/dev/mmcblk0'):
+            #self.device_sd_card_size = int(run_command("sudo blockdev --getsize64 /dev/mmcblk0"))
+            self.device_sd_card_size = int(run_command("lsblk -b --output SIZE -n -d /dev/mmcblk0"))
+        
+        
         # Total memory
         self.total_memory = None
         try:

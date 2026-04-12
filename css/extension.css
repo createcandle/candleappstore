@@ -544,9 +544,17 @@ body:not(.developer) .extension-candleappstore-show-if-developer{
 	display:inline-block;
 }
 
+#extension-candleappstore-disk-space-container{
+	margin-bottom:-2rem;
+}
+
+#extension-candleappstore-disk-space-other-bar{
+	background-color:#666;
+}
 #extension-candleappstore-memory-purgeable-bar{
 	background-color:#444;
 }
+
 
 
 

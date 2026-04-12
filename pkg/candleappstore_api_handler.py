@@ -124,6 +124,7 @@ class CandleappstoreAPIHandler(APIHandler):
                                           'developer':self.adapter.developer, 
                                           'exhibit_mode':self.adapter.exhibit_mode, 
                                           'bits':self.adapter.bits,
+                                          'device_sd_card_size':self.adapter.device_sd_card_size,
                                           'python_version':self.adapter.python_version,
                                           'python_minor_version':self.adapter.python_minor_version,
                                           'node_version':self.adapter.node_version,
