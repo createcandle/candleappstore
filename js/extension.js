@@ -1939,9 +1939,10 @@
 				//console.log(result);
                 this.extensions = result;
                 this.extensions_list = Object.keys(result);
+				
 			}).catch((err) => {
 				if(this.debug){
-					console.error("candle store debug: caught error in window.API.getExtensions: ", err);
+					console.error("candle store debug: caught error calling window.API.getExtensions: ", err);
 				}
                 //console.log(e);
 			});
@@ -1963,17 +1964,19 @@
 			selected_close_button.addEventListener('click', (event) => {
                 //console.log("Selected app close button clicked");
                 this.selected_overlay_closed = true;
-                selected.style.display = 'none';
+                this.view.querySelector('#extension-candleappstore-selected').style.display = 'none';
                 this.view.querySelector('#extension-candleappstore-installation-failed').style.display = 'none';
                 this.view.style.zIndex = 'auto';
 			});
             
 			settings_close_button.addEventListener('click', (event) => {
                 //console.log("Settings close button clicked");
-                settings.style.display = 'none';
+                this.view.querySelector('#extension-candleappstore-settings').style.display = 'none';
                 this.view.style.zIndex = 'auto';
 			});
             
+			const auth = this.view.querySelector('#extension-candleappstore-auth');
+			
 			auth_close_button.addEventListener('click', (event) => {
                 //console.log("Auth close button clicked");
                 auth.style.display = 'none';
@@ -1982,7 +1985,7 @@
 			});
             
             
-            const auth = this.view.querySelector('#extension-candleappstore-auth');
+            
             
             const login_form = this.view.querySelector('#extension-candleappstore-auth-login-form');
             const signup_form = this.view.querySelector('#extension-candleappstore-auth-signup-form');
@@ -4679,12 +4682,18 @@
                     //console.log("this.installed: ", this.installed);
                     var installed = false;
                     
+					const review_tip_el = this.view.querySelector('extension-candleappstore-review-tip');
                     if(this.installed.indexOf(addon_id) != -1){
                         installed = true;
-                        this.view.querySelector('extension-candleappstore-review-tip').style.display = 'block';
+                        if(review_tip_el){
+							review_tip_el.style.display = 'block';
+						}
                     }
 					else{
-						this.view.querySelector('extension-candleappstore-review-tip').style.display = 'none';
+						if(review_tip_el){
+							review_tip_el.style.display = 'none';
+						}
+						
 					}
                     
                     //console.log("installed: " + installed);
