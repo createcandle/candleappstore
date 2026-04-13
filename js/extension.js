@@ -507,8 +507,17 @@
 				}
             }
 			
+			
+			if(typeof body['previously_installed_versions'] != 'undefined'){
+				this.previously_installed_versions = body['previously_installed_versions'];
+				if(this.debug && location.pathname == '/extensions/candleappstore'){
+					console.log("candle store debug:  this.previously_installed_versions: ", this.previously_installed_versions);
+				}
+			}
+			
+			
+			
             // UPDATE UI BASED ON UPDATED VALUES
-            
 			
 			this.content_el = this.view.querySelector('#extension-candleappstore-content');
 			if(this.content_el){
@@ -813,7 +822,7 @@
 							addon_item_el = document.createElement('div');
 							addon_item_el.setAttribute('id','extension-candleappstore-installing-overview-' + addon_id);
 							addon_item_el.classList.add('extension-candleappstore-installing-item');
-							addon_item_el.classList.add('extension-candleappstore-vlak');
+							addon_item_el.classList.add('extension-candleappstore-area');
 							
 							
 							const addon_item_close_button_el = document.createElement('div');
@@ -969,7 +978,7 @@
 											//console.log("adding change settings button");
 											let change_settings_button_container_el = document.createElement('div');
 											change_settings_button_container_el.classList.add('extension-candleappstore-installing-item-change-settings-container');
-											change_settings_button_container_el.classList.add('extension-candleappstore-vlak');
+											change_settings_button_container_el.classList.add('extension-candleappstore-area');
 											change_settings_button_container_el.innerHTML = '<div><h3>Change settings</h3><p>Fine-tune settings to your liking.</p><img src="/extensions/candleappstore/images/change_settings.svg" alt="Change settings"></div>';
 											
 							            	change_settings_button_el = document.createElement('button');
@@ -992,7 +1001,7 @@
 												//console.log("adding add things button");
 												let add_things_button_container_el = document.createElement('div');
 												add_things_button_container_el.classList.add('extension-candleappstore-installing-item-add-things-container');
-												add_things_button_container_el.classList.add('extension-candleappstore-vlak');
+												add_things_button_container_el.classList.add('extension-candleappstore-area');
 												add_things_button_container_el.innerHTML = '<div><h3>New things</h3><p>Your new addon seems capable of creating new Things.</p><img src="/extensions/candleappstore/images/add_things.svg" alt="Add Things"></div>';
 												
 								            	add_things_button_el = document.createElement('button');
@@ -1018,7 +1027,7 @@
 												//console.log("adding visit UI button");
 												let visit_ui_button_container_el = document.createElement('div');
 												visit_ui_button_container_el.classList.add('extension-candleappstore-installing-item-visit-ui-container');
-												visit_ui_button_container_el.classList.add('extension-candleappstore-vlak');
+												visit_ui_button_container_el.classList.add('extension-candleappstore-area');
 												visit_ui_button_container_el.innerHTML = '<div><h3>View</h3><p>Your new addon seems to come with a user interface.</p><img src="/extensions/candleappstore/images/visit_ui.svg" alt="View interface"></div>';
 												
 								            	visit_ui_button_el = document.createElement('button');
@@ -1129,7 +1138,8 @@
 							}
 						})
 						//addon_link_el.setAttribute('href','/extensions/candleappstore#' + this.api_addons_data[a].id);
-						addon_link_el.style.backgroundImage = 'url(/extensions/' + this.api_addons_data[a].id + '/images/menu-icon.svg)'
+						//addon_link_el.style.backgroundImage = 'url(/extensions/' + this.api_addons_data[a].id + '/images/menu-icon.svg)';
+						addon_link_el.style.backgroundImage = 'url("/extensions/candleappstore/web_cache/icons/' + this.api_addons_data[a].id + '/menu-icon.svg")';
 						addon_list_el.appendChild(addon_link_el);
 						
 						settings_menu_addons_list_el.appendChild(addon_list_el);
@@ -3403,7 +3413,7 @@
                                 
                                 if(page == 'installed' && info == 'name'){
                                     text += '<span class="extension-candleappstore-basic-version">' + data[i]['version'] + '</span>';
-                                    text = '<img src="/extensions/' + addon_id + '/images/menu-icon.svg" alt="' + data[i][info] + ' icon" class="extension-candleappstore-installed-addon-icon" width="24" height="24"  onload="(function(){this.style.display=\'inline-block\'}).call(this)" onerror="(function(){this.style.display=\'none\'}).call(this)"> ' + text;
+                                    text = '<img src="/extensions/candleappstore/web_cache/icons/' + addon_id + '/menu-icon.svg" alt="' + data[i][info] + ' icon" class="extension-candleappstore-installed-addon-icon" width="24" height="24"  onload="(function(){this.style.display=\'inline-block\'}).call(this)" onerror="(function(){this.style.display=\'none\'}).call(this)"> ' + text;
 									
                                     try{
                                         if(typeof this.addon_sizes[addon_id] != 'undefined'){
@@ -3808,7 +3818,7 @@
 		                                			})
 													.catch((err) => {
 									                    if(this.debug){
-									                        console.error("candle store deebug: error calling addon api for install_normal_release: ", err);
+									                        console.error("candle store debug: error calling addon api for install_normal_release: ", err);
 									                    }
 														normal_release_check_button_el.classList.remove('extension-candleappstore-busy-updating');
 														normal_release_check_button_el.classList.remove('extension-candleappstore-pointer-events-none');
@@ -4503,7 +4513,11 @@
             }
             
 			if(typeof addon_id != 'string'){
-				console.error("candle store: show_selected_app: addon_id was not a string: ", addon_id);
+				console.error("candle store: show_selected_app: provided addon_id was not a string: ", addon_id);
+				return
+			}
+			if(addon_id == ''){
+				console.error("candle store: show_selected_app: provided addon_id was empty string");
 				return
 			}
 			
@@ -4537,8 +4551,46 @@
             this.view.querySelector('#extension-candleappstore-selected-secondary').style.display = 'none';
             this.view.querySelector('#extension-candleappstore-selected-homepage_url').style.display = 'none';
             
-            
-            
+            const previously_installed_versions_list_el = this.view.querySelector('#extension-candleappstore-previously-installed-versions-list');
+            if(previously_installed_versions_list_el){
+            	previously_installed_versions_list_el.innerHTML = '';
+				
+				// Create list of previously installed versions, if known
+				if(typeof this.previously_installed_versions[addon_id] != 'undefined' && Array.isArray(this.previously_installed_versions[addon_id])){
+					for(let pa = 0; pa < this.previously_installed_versions[addon_id].length; p++){
+						const previously_installed_version_item = document.createElement('div');
+						previously_installed_version_item.classList.add('extension-candleappstore-previously-installed-item');
+						previously_installed_version_item.classList.add('extension-candleappstore-area');
+						
+						if(typeof this.previously_installed_versions[addon_id][pa]['first_install_timestamp'] == 'number' && typeof this.previously_installed_versions[addon_id][pa]['addon_url'] == 'string' && this.previously_installed_versions[addon_id][pa]['addon_url'].startsWith('http') && this.previously_installed_versions[addon_id][pa]['addon_url'].indexOf('/') != -1){
+						
+							const previously_installed_version_date = document.createElement('span');
+							previously_installed_version_date.classList.add('extension-candleappstore-previously-installed-item-date');
+							previously_installed_version_date.textContent = new Date( this.previously_installed_versions[addon_id][pa]['first_install_timestamp'] * 1000 ).toLocaleDateString();
+							previously_installed_version_item.appendChild(previously_installed_version_date);
+						
+							const previously_installed_version_url = document.createElement('span');
+							previously_installed_version_url.classList.add('extension-candleappstore-previously-installed-item-url');
+							previously_installed_version_date.textContent = this.previously_installed_versions[addon_id][pa]['url'].split("/").pop();
+							previously_installed_version_item.appendChild(previously_installed_version_url);
+						
+							previously_installed_version_item.addEventListener('click', () => {
+								if(confirm("Install older version?")){
+									let checksum = null;
+									if(typeof this.previously_installed_versions[addon_id][pa]["checksum"] == 'string'){
+										checksum = this.previously_installed_versions[addon_id][pa]["checksum"];
+									}
+									this.request_install(addon_id, this.previously_installed_versions[addon_id][pa]["download_url"], checksum);
+								}
+							});
+							previously_installed_versions_list_el.appendChild(previously_installed_version_item);
+						}
+						//previously_installed_version_item.textContent = JSON.stringify(this.previously_installed_versions[addon_id][pa]);
+					
+					}
+				}
+            }
+			
             //this.view.querySelector('#extension-candleappstore-selected-main').style.display = 'none';
             this.view.querySelector('#extension-candleappstore-busy-installing').style.display = 'none';
             this.view.querySelector('#extension-candleappstore-busy-uninstalling').style.display = 'none';
@@ -4546,7 +4598,7 @@
 			
 			const selected_icon_el = this.view.querySelector('#extension-candleappstore-selected-icon');
 			if(selected_icon_el){
-				this.view.querySelector('#extension-candleappstore-selected-icon').src = '/extensions/' + addon_id + '/images/menu-icon.svg';
+				this.view.querySelector('#extension-candleappstore-selected-icon').src = '/extensions/candleappstore/web_cache/icons/' + addon_id + '/menu-icon.svg';
 			}
             // clear opinion, which doesn't always exist
 			const selected_opinion_el = this.view.querySelector('#extension-candleappstore-selected-opinion');
@@ -4632,6 +4684,14 @@
 					this.view.querySelector('#extension-candleappstore-out-of-reach-hint').classList.add('extension-candleappstore-hidden');
 				}
 			}
+			
+			
+			
+			
+			
+			
+			
+			
 			
             
             // SHOW
@@ -4978,43 +5038,7 @@
                                     document.getElementById('extension-candleappstore-busy-installing-name').innerText = addon_slightly_nicer_name;
                                     document.getElementById('extension-candleappstore-selected-post-install-addon-name').innerText = addon_slightly_nicer_name;
                         			
-									if(typeof cloud_item["download_url"] == 'string' && cloud_item["download_url"].startsWith('http')){
-										window.API.postJson(
-											`/extensions/candleappstore/api/ajax`,
-											{
-												'action':'install_addon',
-												'addon_id':cloud_item["addon_id"],
-												'addon_url':cloud_item["download_url"],
-												'addon_checksum':cloud_item["checksum"]
-											}
-										)
-							            .then((body) => {
-											if(this.debug){
-												console.warn("candle store debug: got install_addon response: ", body);
-											}
-											if(typeof body.state == 'boolean' && body.state == true){
-												this.flash_message('Addon has been added to install queue');
-											
-								                this.selected_overlay_closed = true;
-								                selected.style.display = 'none';
-								                this.view.querySelector('#extension-candleappstore-installation-failed').style.display = 'none';
-								                this.view.style.zIndex = 'auto';
-												this.view.scrollTop = 0;
-											
-											}
-											else{
-												this.flash_message('Error, failed to add addon to install queue');
-											}
-										})
-										.catch((err) => {
-					        				console.error("candle store: caught error requesting installation of addon: ", err);
-											this.flash_message('Failed to request addon installation - connection error?');
-					                        //document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'none';
-					        			});
-									}
-									else{
-										this.flash_message('Error, this addon does not have a valid download URL');
-									}
+									this.request_install(cloud_item["addon_id"], cloud_item["download_url"], cloud_item["checksum"]);
 									
 									
 									/*
@@ -6582,6 +6606,52 @@
             
         }
         
+		
+		
+		
+		request_install(addon_id, download_url, checksum=null){
+			if(typeof addon_id == 'string' && addon_id.length && typeof download_url == 'string' && download_url.startsWith('http')){
+				window.API.postJson(
+					`/extensions/candleappstore/api/ajax`,
+					{
+						'action':'install_addon',
+						'addon_id':addon_id,
+						'addon_url':download_url,
+						'addon_checksum':checksum
+					}
+				)
+	            .then((body) => {
+					if(this.debug){
+						console.warn("candle store debug: got install_addon response: ", body);
+					}
+					if(typeof body.state == 'boolean' && body.state == true){
+						this.flash_message('Addon has been added to install queue');
+					
+		                this.selected_overlay_closed = true;
+		                selected.style.display = 'none';
+		                this.view.querySelector('#extension-candleappstore-installation-failed').style.display = 'none';
+		                this.view.style.zIndex = 'auto';
+						this.view.scrollTop = 0;
+					
+					}
+					else{
+						this.flash_message('Error, failed to add addon to install queue');
+					}
+				})
+				.catch((err) => {
+    				console.error("candle store: caught error requesting installation of addon: ", err);
+					this.flash_message('Failed to request addon installation - connection error?');
+                    //document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'none';
+    			});
+			}
+			else{
+				this.flash_message('Error, this addon does not have a valid download URL');
+			}
+		}
+		
+		
+		
+		
 		
 		
 		

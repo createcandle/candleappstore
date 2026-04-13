@@ -146,8 +146,12 @@ class CandleappstoreAdapter(Adapter):
 
         self.web_cache_dir_path = os.path.join(self.addon_path, 'web_cache')
         self.web_cache_data_dir_path = os.path.join(self.data_dir_path, 'web_cache')
-        if not os.path.isdir(str(self.web_cache_data_dir_path)):
-            os.system('mkdir -p ' + str(self.web_cache_data_dir_path))
+        self.web_cache_data_screenshots_dir_path = os.path.join(self.web_cache_data_dir_path, 'screenshots')
+        self.web_cache_data_icons_dir_path = os.path.join(self.web_cache_data_dir_path, 'icons')
+        if not os.path.isdir(str(self.web_cache_data_screenshots_dir_path)):
+            os.system('mkdir -p ' + str(self.web_cache_data_screenshots_dir_path))
+        if not os.path.isdir(str(self.web_cache_data_icons_dir_path)):
+            os.system('mkdir -p ' + str(self.web_cache_data_icons_dir_path))
         
         self.DEBUG = True
         
@@ -171,8 +175,10 @@ class CandleappstoreAdapter(Adapter):
                         os.system('mv ' + str(candleappstore_screenshot_source) + ' ' + str(candleappstore_screenshot_target))
                     
                     if os.path.isfile( os.path.join(self.web_cache_data_dir_path,'screenshots','candleappstore','screenshot.jpg')):
+                        # Make sure there is nothing in the addon folder before creating the symlink to the /data folder there
                         os.system('rm -rf ' + str(self.web_cache_dir_path))
                     
+                        # Create symlink between data and addon folder
                         soft_link = 'ln -s ' + str(self.web_cache_data_dir_path) + " " + str(self.web_cache_dir_path)
                         if self.DEBUG:
                             print("linking: " + soft_link)
@@ -954,7 +960,7 @@ class CandleappstoreAdapter(Adapter):
                                                     os.system('mv ' + str(self.work_dir_package_path) + ' ' + str(self.installing_addons_queue[addon_id]['target_dir']))
                                                 
                                                 if os.path.isdir(str(self.installing_addons_queue[addon_id]['target_dir'])) and not os.path.isdir(self.work_dir_package_path):
-                                                    self.installing_addons_queue[addon_id]['done_timestamp'] = time.time()
+                                                    
                                                     try:
                                                         if os.path.isdir(str(self.installing_addons_queue[addon_id]['target_dir']) + '_bak'):
                                                             # If there is at least a few of free disk space available, then creating an initial backup of the addon isn't a bad idea
@@ -1005,6 +1011,7 @@ class CandleappstoreAdapter(Adapter):
                                                         if self.DEBUG:
                                                             print("this version has been installed before. Not adding it to previously_installed_versions history: ", addon_id)
                                                     
+                                                    self.installing_addons_queue[addon_id]['done_timestamp'] = time.time()
                                                     self.busy_installing_addon = None
                                                 else:
                                                     if self.DEBUG:
@@ -1106,6 +1113,36 @@ class CandleappstoreAdapter(Adapter):
                                     else:
                                         if self.DEBUG:
                                             print("addon did not have default settings?: ", dirname)
+                                
+                        else:
+                            if self.DEBUG:
+                                print("Warning, addon dir did not have a manifest?  dirname,missing file: ", dirname, str(manifest_path))
+                    except Exception as ex:
+                        if self.DEBUG:
+                            print("error getting default addon settings from: " + str(manifest_path))
+                            
+                    # See if the addon has an icon, and if so, copy it to the web cache folder so it's always available, even if the addon is disabled
+                    try:
+                        possible_icon_names = ['menu-icon.svg','menu_icon.svg'];
+                        for possible_icon_name in possible_icon_names:
+                            
+                            icon_source_path = str(os.path.join(self.user_profile['addonsDir'],dirname,'images',str(possible_icon_name)))
+                            
+                            #print("manifest_path: " + str(manifest_path))
+                            if os.path.isfile(icon_source_path):
+                                if self.DEBUG:
+                                    print("spotted addon icon at: ", icon_source_path)
+                                
+                                target_web_cache_icon_dir = os.path.join(self.web_cache_data_icons_dir_path,dirname)
+                                if not os.path.isdir(target_web_cache_icon_dir):
+                                    os.system('mkdir -p ' + str(target_web_cache_icon_dir))
+                                
+                                target_web_cache_icon_path = os.path.join(target_web_cache_icon_dir,'menu-icon.svg')
+                                if not os.path.isfile(target_web_cache_icon_path):
+                                    if self.DEBUG:
+                                        print("Copying addon icon to: ", target_web_cache_icon_path)
+                                    os.system('cp ' + str(icon_source_path) + ' ' + str(target_web_cache_icon_path))
+                                
                                 
                         else:
                             if self.DEBUG:

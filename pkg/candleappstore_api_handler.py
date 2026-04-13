@@ -654,5 +654,3 @@ class CandleappstoreAPIHandler(APIHandler):
               content_type='application/json',
               content=json.dumps("API Error"),
             )
-
-

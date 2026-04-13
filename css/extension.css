@@ -206,7 +206,7 @@ body:not(.developer) .extension-candleappstore-show-if-developer{
 }
 
 #extension-hotspot-debug-warning,
-.extension-candleappstore-vlak{
+.extension-candleappstore-area{
     background-color:rgba(0,0,0,.1);
     padding:2rem;
     box-sizing:border-box;
@@ -217,13 +217,13 @@ body:not(.developer) .extension-candleappstore-show-if-developer{
     background-color:red;
 }
 
-.extension-candleappstore-vlak.extension-candleappstore-basic-info > *{
+.extension-candleappstore-area.extension-candleappstore-basic-info > *{
     display:block;
     width:100%;
     margin-bottom:.5rem;
 }
 
-.extension-candleappstore-vlak .extension-candleappstore-basic-info > *:before{
+.extension-candleappstore-area .extension-candleappstore-basic-info > *:before{
     content:'* ';
 }
 
@@ -2439,6 +2439,14 @@ body.safe-mode:not(.developer) #extension-candleappstore-tab-button-shop{
 	margin-right:1rem;
 }
 
+
+
+/*  PREVIOUSLY INSTALLED VERSIONS  */
+
+#extension-candleappstore-previously-installed-versions-list:empty::after{
+	content:'No known previously installed versions';
+	font-style:italic;
+}
 
 
 
