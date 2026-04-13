@@ -1246,7 +1246,9 @@
 										console.log("candle store debug: an update is available for: " + this.api_addons_data[i].id, this.api_addons_data[i], this.cloud_app_data[u]);
 									}
 									let addon_cloud_data = this.get_cloud_addon_data(this.api_addons_data[i].id);
-									console.log("candle store debug: check_for_updates: parsed addon_cloud_data: ", addon_cloud_data);
+									if(this.debug){
+										console.log("candle store debug: check_for_updates: parsed addon_cloud_data: ", addon_cloud_data);
+									}
 									if(addon_cloud_data){
 										let checksum = null;
 										if(typeof addon_cloud_data['addon_id'] == 'string' && typeof addon_cloud_data['download_url'] == 'string'){
@@ -1255,15 +1257,9 @@
 												checksum = addon_cloud_data['checksum'];
 											}
 											
-											if(typeof addon_cloud_data['updated_time'] == 'number'){
-												if(this.developer || addon_cloud_data['updated_time'] < a_week_ago){
-				                                    this.addons_to_update.push(addon_cloud_data['addon_id']);
-				                                    this.addons_to_update_full[addon_cloud_data['addon_id']] = {'addon_id':addon_cloud_data['addon_id'], 'url':addon_cloud_data['download_url'], 'checksum':checksum};
-												}
-											}
-											else{
-			                                    this.addons_to_update.push(addon_cloud_data['addon_id']);
-			                                    this.addons_to_update_full[addon_cloud_data['addon_id']] = {'addon_id':addon_cloud_data['addon_id'], 'url':addon_cloud_data['download_url'], 'checksum':checksum};
+											if( this.developer || typeof addon_cloud_data['updated_time'] != 'number' || (typeof addon_cloud_data['updated_time'] == 'number' && addon_cloud_data['updated_time'] < a_week_ago)){
+				                            	this.addons_to_update.push(addon_cloud_data['addon_id']);
+				                                this.addons_to_update_full[addon_cloud_data['addon_id']] = {'addon_id':addon_cloud_data['addon_id'], 'url':addon_cloud_data['download_url'], 'checksum':checksum};
 											}
 										}
 										
@@ -3185,14 +3181,14 @@
 				// update the candle store first...
 				let first_addon_to_update = 'candleappstore';
 				if(typeof this.addons_to_update_full['candleappstore'] == 'undefined'){
+					// ...or a random addon from the list. This ensures that is case an addon can't update properly, at least on a fresh attempt a different addon might get through
 					first_addon_to_update = Math.floor(Math.random() * this.addons_to_update.length);
 				}
-				// ...or a random addon from the list. This ensures that is case an addon can't update properly, at least on a fresh attempt a different addon might get through
 				this.request_install( first_addon_to_update, addons_to_update_full[first_addon_to_update]['url'], addons_to_update_full[first_addon_to_update]['checksum'], true); // true = this is an update request
-				
+			
 				// Then request all the rest with one second intervals
 				for( let au = 0; au < this.addons_to_update.length; au++){
-					
+				
 					const next_addon_to_update = this.addons_to_update[au];
 					if(next_addon_to_update != first_addon_to_update){
 						setTimeout(() => {
@@ -3722,6 +3718,16 @@
 												window.API.setAddonSetting( release_addon_id, false)
 		                                        .then((result) => {
 													restart_addon_button_el.classList.remove('extension-candleappstore-extra-fade');
+		                                        })
+												.catch((err) => {
+													if(this.debug){
+														console.error("candle store debug: caught error restarting addon: ", release_addon_id, err);
+													}
+													restart_addon_button_el.classList.remove('extension-candleappstore-fade');
+													restart_addon_button_el.classList.remove('extension-candleappstore-extra-fade');
+													restart_addon_button_el.classList.remove('extension-candleappstore-busy-updating');
+												})
+												.finally(() => {
 		                                        	setTimeout(() => {
 		                                        		window.API.setAddonSetting( release_addon_id, true)
 														.then((result) => {
@@ -3740,15 +3746,7 @@
 															restart_addon_button_el.classList.remove('extension-candleappstore-extra-fade');
 															restart_addon_button_el.classList.remove('extension-candleappstore-busy-updating');
 														})
-		                                        	},2000);
-		                                        })
-												.catch((err) => {
-													if(this.debug){
-														console.error("candle store debug: caught error restarting addon: ", release_addon_id, err);
-													}
-													restart_addon_button_el.classList.remove('extension-candleappstore-fade');
-													restart_addon_button_el.classList.remove('extension-candleappstore-extra-fade');
-													restart_addon_button_el.classList.remove('extension-candleappstore-busy-updating');
+		                                        	},3000);
 												})
 											})
 											
@@ -4269,8 +4267,9 @@
                                         //console.log("checksum: ", cloud_addon_data.checksum);
                                         
                                         //console.log('this.addons_to_update: ', this.addons_to_update);
+										
+						                
                                         this.request_install(cloud_addon_data.addon_id, cloud_addon_data.download_url, cloud_addon_data.checksum, true); // true = this is an update
-                                        this.addons_to_update = this.addons_to_update.filter(e => e !== cloud_addon_data.addon_id);
                                         
 										
 										console.log("new this.addons_to_update: ", this.addons_to_update);
@@ -6662,51 +6661,83 @@
             
         }
         
-		
+		// TODO: what happens if API.setAddonSetting is called for an addon that is not installed? If its not too bed, then just always call it?
 		request_install(addon_id, download_url, checksum=null, update=false){
 			if(typeof addon_id == 'string' && addon_id.length && typeof download_url == 'string' && download_url.startsWith('http')){
-				window.API.postJson(
-					`/extensions/candleappstore/api/ajax`,
-					{
-						'action':'install_addon',
-						'addon_id':addon_id,
-						'addon_url':download_url,
-						'addon_checksum':checksum,
-						'update':update
-					}
-				)
-	            .then((body) => {
-					if(this.debug){
-						console.warn("candle store debug: got install_addon response: ", body);
-					}
-					if(typeof body.state == 'boolean' && body.state == true){
-						if(update){
-							this.flash_message(addon_id + ' has been added to update queue');
+				
+				const really_request_install = () => {
+					window.API.postJson(
+						`/extensions/candleappstore/api/ajax`,
+						{
+							'action':'install_addon',
+							'addon_id':addon_id,
+							'addon_url':download_url,
+							'addon_checksum':checksum,
+							'update':update
+						}
+					)
+		            .then((body) => {
+						if(this.debug){
+							console.warn("candle store debug: really_request_install: got install_addon response: ", body);
+						}
+						if(typeof body.state == 'boolean' && body.state == true){
+							if(update){
+								this.flash_message(addon_id + ' has been added to update queue');
+							}
+							else{
+								this.flash_message(addon_id + ' has been added to install queue');
+							}
+						
+							this.addons_to_update = this.addons_to_update.filter(e => e !== addon_id);
+						
+			                this.selected_overlay_closed = true;
+							this.view.style.zIndex = 'auto';
+							this.view.querySelector('#extension-candleappstore-selected').style.display = 'none';
+			                this.view.querySelector('#extension-candleappstore-installation-failed').style.display = 'none';
+							this.view.scrollTop = 0;
+					
 						}
 						else{
-							this.flash_message(addon_id + ' has been added to install queue');
+							this.flash_message('Error, failed to add ' + addon_id + ' to install queue');
 						}
-						
-					
-		                this.selected_overlay_closed = true;
-						this.view.style.zIndex = 'auto';
-						this.view.querySelector('#extension-candleappstore-selected').style.display = 'none';
-		                this.view.querySelector('#extension-candleappstore-installation-failed').style.display = 'none';
-						this.view.scrollTop = 0;
-					
-					}
-					else{
-						this.flash_message('Error, failed to add ' + addon_id + ' to install queue');
-					}
-				})
-				.catch((err) => {
-    				console.error("candle store: caught error requesting installation of addon: ", err);
-					this.flash_message('Failed to request addon installation - connection error?');
-                    //document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'none';
-    			});
+					})
+					.catch((err) => {
+	    				if(this.debug){
+							console.error("candle store: really_request_install: caught error requesting installation of addon: ", err);
+						}
+						this.flash_message('Failed to request addon installation - connection error?');
+	                    //document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'none';
+	    			});
+				}
+				
+				
+				//if(update && addon_id != 'candleappstore'){
+				if(addon_id != 'candleappstore'){
+	                window.API.setAddonSetting( addon_id, false)
+	                .then((result) => {
+	                	if(this.debug){
+							console.log("candle store debug: request_install: requested addon to be stopped first. Response: ", result);
+						}
+	                })
+					.catch((err) => {
+						if(this.debug){
+							console.error("candle store debug: request_install: caught error trying to stop addon first: ", err);
+						}
+					})
+					.finally(() => {
+						// No matter what, install the update anyway
+						really_request_install();
+					});
+	                
+				}
+                else{
+                	really_request_install();
+                }
+				
+				
 			}
 			else{
-				this.flash_message('Error, ' + addon_id + ' does not have a valid download URL');
+				this.flash_message('Error, ' + addon_id + ' addon does not have a valid download URL');
 			}
 		}
 		
