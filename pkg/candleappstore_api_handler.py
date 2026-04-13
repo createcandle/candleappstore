@@ -203,15 +203,16 @@ class CandleappstoreAPIHandler(APIHandler):
                     try:
                         if 'addon_id' in request.body and isinstance(request.body['addon_id'], str) and \
                           'addon_url' in request.body and isinstance(request.body['addon_url'], str) and \
-                          'addon_checksum' in request.body and isinstance(request.body['addon_checksum'], str):
+                          'addon_checksum' in request.body and isinstance(request.body['addon_checksum'], str) and \
+                          'update' in request.body and isinstance(request.body['update'], bool):
                         
                             if self.DEBUG:
                                 print("install_addon: calling adapter.install_addon for addon_id: ", request.body['addon_id'])
                                                         
-                            state = self.adapter.install_addon(request.body['addon_id'],request.body['addon_url'],request.body['addon_checksum'])
+                            state = self.adapter.install_addon(request.body['addon_id'],request.body['addon_url'],request.body['addon_checksum'], request.body['update'])
                         
                     except Exception as ex:
-                        print("caught error in api install_addon request: ", ex)
+                        print("caught error handling api install_addon request: ", ex)
                         state = False
                     
                     return APIResponse(

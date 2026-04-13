@@ -1193,7 +1193,7 @@
 				}
 				
                 this.addons_to_update = []; // Holds only addon_id strings
-                this.addons_to_update_full = []; // holds complete dictionaries
+                this.addons_to_update_full = {}; // holds complete dictionaries
                 
                 for(let i = 0; i < this.api_addons_data.length; i++){
                     //console.log("generating. item data: ", data[i]);
@@ -1237,19 +1237,36 @@
 									}
 								}
 								
-                                if(cloud_version_int > local_version_int){
+								if(this.debug){
+									//console.log("candle store debug: check_for_updates: this.api_addons_data[i]: ", this.api_addons_data[i]);
+									//console.log("candle store debug: check_for_updates: this.cloud_app_data[u]: ", this.cloud_app_data[u]);
+								}
+                                if(cloud_version_int > local_version_int){ //  && typeof this.api_addons_data[i].url == 'string'
                                     if(this.debug){
 										console.log("candle store debug: an update is available for: " + this.api_addons_data[i].id, this.api_addons_data[i], this.cloud_app_data[u]);
 									}
-									if(typeof this.cloud_app_data[u]['updated_time'] == 'number'){
-										if(this.developer || this.cloud_app_data[u]['updated_time'] < a_week_ago){
-		                                    this.addons_to_update.push(this.api_addons_data[i].id);
-		                                    this.addons_to_update_full.push({'addon_id':this.api_addons_data[i].id,'url':this.api_addons_data[i].url});
+									let addon_cloud_data = this.get_cloud_addon_data(this.api_addons_data[i].id);
+									console.log("candle store debug: check_for_updates: parsed addon_cloud_data: ", addon_cloud_data);
+									if(addon_cloud_data){
+										let checksum = null;
+										if(typeof addon_cloud_data['addon_id'] == 'string' && typeof addon_cloud_data['download_url'] == 'string'){
+											
+											if(typeof addon_cloud_data['checksum'] == 'string' && addon_cloud_data['checksum'].length > 5){
+												checksum = addon_cloud_data['checksum'];
+											}
+											
+											if(typeof addon_cloud_data['updated_time'] == 'number'){
+												if(this.developer || addon_cloud_data['updated_time'] < a_week_ago){
+				                                    this.addons_to_update.push(addon_cloud_data['addon_id']);
+				                                    this.addons_to_update_full[addon_cloud_data['addon_id']] = {'addon_id':addon_cloud_data['addon_id'], 'url':addon_cloud_data['download_url'], 'checksum':checksum};
+												}
+											}
+											else{
+			                                    this.addons_to_update.push(addon_cloud_data['addon_id']);
+			                                    this.addons_to_update_full[addon_cloud_data['addon_id']] = {'addon_id':addon_cloud_data['addon_id'], 'url':addon_cloud_data['download_url'], 'checksum':checksum};
+											}
 										}
-									}
-									else{
-	                                    this.addons_to_update.push(this.api_addons_data[i].id);
-	                                    this.addons_to_update_full.push({'addon_id':this.api_addons_data[i].id,'url':this.api_addons_data[i].url});
+										
 									}
                                     
                                 }
@@ -1327,7 +1344,8 @@
         // Returns a single item from the large cloud data list of addons. It does not have details.
         get_cloud_addon_data(desired_addon_id){
             if(this.debug){
-                console.log("candle store debug: in get_cloud_addon_data. this.cloud_app_data: ", this.cloud_app_data);
+                console.log("candle store debug: in get_cloud_addon_data.");
+				//console.log("candle store debug: in get_cloud_addon_data. this.cloud_app_data: ", this.cloud_app_data);
                 console.log("candle store debug: get_cloud_addon_data is looking for: ", desired_addon_id);
             }
             
@@ -1552,7 +1570,13 @@
 	                                    }
 										
 										if(optimal_version == null){
-											if( language.startsWith('node') && this.node_version == '24' && node12_available == true){
+											if( language.startsWith('python') && this.python_version == '3.13' && python39_available == true){
+												if(this.debug){
+													console.log("candle store debug: forcing optimal version to python39")
+												}
+												optimal_version = '3.9';
+											}
+											else if( language.startsWith('node') && this.node_version == '24' && node12_available == true){
 												if(this.debug){
 													console.log("candle store debug: forcing optimal version to node12")
 												}
@@ -3152,15 +3176,35 @@
         //
         
         update_all(){
-            if(this.updating_all == false){
+            if(this.updating_all == false && this.addons_to_update.length > 0){
                 this.updating_all = true;
                 document.body.classList.add("extension-candleappstore-busy-updating-all");
                 document.getElementById('extension-candleappstore-update-all-button').style.display = 'none'; // superfluous, button already hides itself.
-                this.update_loop();
+                //this.update_loop();
+				
+				// update the candle store first...
+				let first_addon_to_update = 'candleappstore';
+				if(typeof this.addons_to_update_full['candleappstore'] == 'undefined'){
+					first_addon_to_update = Math.floor(Math.random() * this.addons_to_update.length);
+				}
+				// ...or a random addon from the list. This ensures that is case an addon can't update properly, at least on a fresh attempt a different addon might get through
+				this.request_install( first_addon_to_update, addons_to_update_full[first_addon_to_update]['url'], addons_to_update_full[first_addon_to_update]['checksum'], true); // true = this is an update request
+				
+				// Then request all the rest with one second intervals
+				for( let au = 0; au < this.addons_to_update.length; au++){
+					
+					const next_addon_to_update = this.addons_to_update[au];
+					if(next_addon_to_update != first_addon_to_update){
+						setTimeout(() => {
+							this.request_install(next_addon_to_update, addons_to_update_full[next_addon_to_update]['url'], addons_to_update_full[next_addon_to_update]['checksum'], true); 
+						},1000 * (au + 1));
+					}
+				}
+				
             }
         }
     
-    
+    	/*
         update_loop(){
             //console.log("in update_loop");
             if(this.addons_to_update.length > 0 ){
@@ -3228,7 +3272,7 @@
             }
         }
     
-    
+    	*/
     
     
     
@@ -4195,7 +4239,7 @@
                                     //console.log(event);
                                     event.stopImmediatePropagation();
                                     
-                                    document.getElementById('extension-candleappstore-update-all-button').style.display = 'none';
+                                    //document.getElementById('extension-candleappstore-update-all-button').style.display = 'none';
                                     
                                     
                                     const this_addon_id = event.target.getAttribute('data-addon-id');
@@ -4211,7 +4255,7 @@
                                     //console.log("event.path[2] : ", event.path[2] );
                                     //event.path[2].classList.add("extension-candleappstore-busy-updating");
                                 
-                                    event.target.parentNode.parentNode.parentNode.classList.add("extension-candleappstore-busy-updating");
+                                    //event.target.parentNode.parentNode.parentNode.classList.add("extension-candleappstore-busy-updating");
                                     //extension-candleappstore-basic-options
                                 
                                 
@@ -4225,7 +4269,18 @@
                                         //console.log("checksum: ", cloud_addon_data.checksum);
                                         
                                         //console.log('this.addons_to_update: ', this.addons_to_update);
+                                        this.request_install(cloud_addon_data.addon_id, cloud_addon_data.download_url, cloud_addon_data.checksum, true); // true = this is an update
+                                        this.addons_to_update = this.addons_to_update.filter(e => e !== cloud_addon_data.addon_id);
                                         
+										
+										console.log("new this.addons_to_update: ", this.addons_to_update);
+										
+										const parent_item_el = event.target.closest('.extension-candleappstore-item');
+										if(parent_item_el){
+											parent_item_el.classList.add("extension-candleappstore-busy-updating");
+										}
+										
+										/*
                                         window.API.updateAddon( cloud_addon_data.addon_id, cloud_addon_data.download_url, cloud_addon_data.checksum )
                                         .then((result) => { 
                 							//console.log("addon update result: ");
@@ -4263,6 +4318,7 @@
 											this.flash_message('Could not update. Connection error?');
                                             
                 						});
+										*/
                                         
                                     }
                         
@@ -6607,9 +6663,7 @@
         }
         
 		
-		
-		
-		request_install(addon_id, download_url, checksum=null){
+		request_install(addon_id, download_url, checksum=null, update=false){
 			if(typeof addon_id == 'string' && addon_id.length && typeof download_url == 'string' && download_url.startsWith('http')){
 				window.API.postJson(
 					`/extensions/candleappstore/api/ajax`,
@@ -6617,7 +6671,8 @@
 						'action':'install_addon',
 						'addon_id':addon_id,
 						'addon_url':download_url,
-						'addon_checksum':checksum
+						'addon_checksum':checksum,
+						'update':update
 					}
 				)
 	            .then((body) => {
@@ -6625,17 +6680,23 @@
 						console.warn("candle store debug: got install_addon response: ", body);
 					}
 					if(typeof body.state == 'boolean' && body.state == true){
-						this.flash_message('Addon has been added to install queue');
+						if(update){
+							this.flash_message(addon_id + ' has been added to update queue');
+						}
+						else{
+							this.flash_message(addon_id + ' has been added to install queue');
+						}
+						
 					
 		                this.selected_overlay_closed = true;
-		                selected.style.display = 'none';
+						this.view.style.zIndex = 'auto';
+						this.view.querySelector('#extension-candleappstore-selected').style.display = 'none';
 		                this.view.querySelector('#extension-candleappstore-installation-failed').style.display = 'none';
-		                this.view.style.zIndex = 'auto';
 						this.view.scrollTop = 0;
 					
 					}
 					else{
-						this.flash_message('Error, failed to add addon to install queue');
+						this.flash_message('Error, failed to add ' + addon_id + ' to install queue');
 					}
 				})
 				.catch((err) => {
@@ -6645,7 +6706,7 @@
     			});
 			}
 			else{
-				this.flash_message('Error, this addon does not have a valid download URL');
+				this.flash_message('Error, ' + addon_id + ' does not have a valid download URL');
 			}
 		}
 		

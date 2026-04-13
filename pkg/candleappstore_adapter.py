@@ -732,9 +732,9 @@ class CandleappstoreAdapter(Adapter):
             
 
 
-    def install_addon(self,addon_id,addon_url=None,addon_checksum=None):
+    def install_addon(self,addon_id,addon_url=None,addon_checksum=None,update=False):
         if self.DEBUG:
-            print("\n\nin install_addon. ", addon_id, addon_url, addon_checksum)
+            print("\n\n+\nin install_addon.  \naddon_id: ", addon_id, "\naddon_url: ", addon_url, "\naddon_checksum: ", addon_checksum, "\nupdate: ", update, "\n")
             
         if isinstance(addon_id,str) and len(addon_id) > 1:
             try:
@@ -784,7 +784,8 @@ class CandleappstoreAdapter(Adapter):
                                 'target_dir':target_dir,
                                 'tar_name':tar_name,
                                 'message':'Waiting to start',
-                                'download_attempts':0
+                                'download_attempts':0,
+                                'update':update
                             }
                 elif not addon_id in list(self.installing_addons_queue.keys()):
                     if self.DEBUG:
@@ -859,7 +860,12 @@ class CandleappstoreAdapter(Adapter):
                                 chunk_size=8192
                                 with open(str(self.installing_addons_queue[addon_id]['addon_tar_path']), 'wb') as f:
                                     self.installing_addons_queue[addon_id]['download_start_timestamp'] = time.time()
-                                    self.installing_addons_queue[addon_id]['message'] = 'Downloading'
+                                    
+                                    if installing_addons_queue[addon_id]['update']:
+                                        self.installing_addons_queue[addon_id]['message'] = 'Downloading update'
+                                    else:
+                                        self.installing_addons_queue[addon_id]['message'] = 'Downloading'
+                                        
                                     if self.DEBUG:
                                         print("\n\n\n--- DOWNLOADING ---\n" + str(self.installing_addons_queue[addon_id]['addon_url']) + "\nTo: " + str(self.installing_addons_queue[addon_id]['addon_tar_path']) + "\n\n\n")
                                 
@@ -976,11 +982,17 @@ class CandleappstoreAdapter(Adapter):
                                                             print("caught error after addon was just installed: ", ex)
                                                     
                                                     time.sleep(1)
-                                                    self.installing_addons_queue[addon_id]['message'] = "Analyzing new addon's features"
+                                                    if installing_addons_queue[addon_id]['update']:
+                                                        self.installing_addons_queue[addon_id]['message'] = "Analyzing update's features"
+                                                    else:
+                                                        self.installing_addons_queue[addon_id]['message'] = "Analyzing new addon's features"
                                                     self.installing_addons_queue[addon_id]['has_ui'] = self.check_if_addon_has_ui(addon_id)
                                                     self.installing_addons_queue[addon_id]['has_things'] = self.check_if_addon_has_things(addon_id)
                                                     time.sleep(1)
-                                                    self.installing_addons_queue[addon_id]['message'] = 'Installation complete'
+                                                    if installing_addons_queue[addon_id]['update']:
+                                                        self.installing_addons_queue[addon_id]['message'] = 'Update complete'
+                                                    else:
+                                                        self.installing_addons_queue[addon_id]['message'] = 'Installation complete'
                                                     
                                                     if 'previously_installed_versions' not in self.persistent_data:
                                                         self.persistent_data['previously_installed_versions'] = {}
