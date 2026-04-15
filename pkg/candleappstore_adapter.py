@@ -144,7 +144,7 @@ class CandleappstoreAdapter(Adapter):
         if os.path.isdir(self.work_dir):
             os.system('rm -rf ' + os.path.join(str(self.work_dir),'*'))
 
-        self.web_cache_dir_path = os.path.join(self.addon_path, 'web_cache')
+        self.web_cache_addon_dir_path = os.path.join(self.addon_path, 'web_cache')
         self.web_cache_data_dir_path = os.path.join(self.data_dir_path, 'web_cache')
         self.web_cache_data_screenshots_dir_path = os.path.join(self.web_cache_data_dir_path, 'screenshots')
         self.web_cache_data_icons_dir_path = os.path.join(self.web_cache_data_dir_path, 'icons')
@@ -153,12 +153,12 @@ class CandleappstoreAdapter(Adapter):
         if not os.path.isdir(str(self.web_cache_data_icons_dir_path)):
             os.system('mkdir -p ' + str(self.web_cache_data_icons_dir_path))
         
-        self.DEBUG = True
+        #self.DEBUG = True
         
         # Create soft link so that the data/web_cache dir becomes web-accessible
         if os.path.isdir(str(self.web_cache_data_dir_path)):
-            if os.path.isdir(str(self.web_cache_dir_path)):
-                symlink_check = str(run_command('stat ' + str(self.web_cache_dir_path)))
+            if os.path.isdir(str(self.web_cache_addon_dir_path)):
+                symlink_check = str(run_command('stat ' + str(self.web_cache_addon_dir_path)))
                 if 'symbolic link' in symlink_check:
                     if self.DEBUG:
                         print("web_cache dir is already a symbolic link")
@@ -166,24 +166,26 @@ class CandleappstoreAdapter(Adapter):
                     if self.DEBUG:
                         print("web_cache dir is not a symbolic link yet")
                     
-                    candleappstore_screenshot_source = os.path.join(self.web_cache_dir_path,'screenshots','candleappstore','screenshot.jpg')
-                    candleappstore_screenshot_target = os.path.join(self.web_cache_data_dir_path,'screenshots','candleappstore','screenshot.jpg')
+                    candleappstore_screenshot_source = os.path.join(self.web_cache_addon_dir_path,'screenshots','candleappstore_screenshot.jpg')
+                    candleappstore_screenshot_target = os.path.join(self.web_cache_data_dir_path,'screenshots','candleappstore_screenshot.jpg')
                     if os.path.isfile(candleappstore_screenshot_source) and not os.path.isfile(candleappstore_screenshot_target):
                         if self.DEBUG:
                             print("moving candleappstore screenshot.jpg")
-                        os.system('mkdir -p ' + os.path.join(str(self.web_cache_data_dir_path),'screenshots','candleappstore'))
+                        os.system('mkdir -p ' + os.path.join(str(self.web_cache_data_dir_path),'screenshots'))
                         os.system('mv ' + str(candleappstore_screenshot_source) + ' ' + str(candleappstore_screenshot_target))
                     
-                    if os.path.isfile( os.path.join(self.web_cache_data_dir_path,'screenshots','candleappstore','screenshot.jpg')):
+                    if os.path.isfile( os.path.join(self.web_cache_data_dir_path,'screenshots','candleappstore_screenshot.jpg')):
                         # Make sure there is nothing in the addon folder before creating the symlink to the /data folder there
-                        os.system('rm -rf ' + str(self.web_cache_dir_path))
+                        os.system('rm -rf ' + str(self.web_cache_addon_dir_path))
                     
                         # Create symlink between data and addon folder
-                        soft_link = 'ln -s ' + str(self.web_cache_data_dir_path) + " " + str(self.web_cache_dir_path)
+                        soft_link = 'ln -s ' + str(self.web_cache_data_dir_path) + " " + str(self.web_cache_addon_dir_path)
                         if self.DEBUG:
-                            print("linking: " + soft_link)
+                            print("soft link command:\n" + soft_link)
                         os.system(soft_link)
-            
+                    else:
+                        #if self.DEBUG:
+                        print("error, moving initial screenshot to web_cache dir failed")                        
 
         # Make sure the data directory exists
         try:
@@ -1291,7 +1293,7 @@ class CandleappstoreAdapter(Adapter):
                     if self.DEBUG:
                         print("web_cache: url_to_cache: ", url_to_cache)
                     if 'to' in url_to_cache.keys():
-                        target_file_path = self.web_cache_dir_path + '/' + url_to_cache['to']
+                        target_file_path = self.web_cache_data_dir_path + '/' + url_to_cache['to']
                         if self.DEBUG:
                             print("web_cache:  target_file_path: ", target_file_path)
                         if not os.path.isfile(target_file_path) and str(url_to_cache['from']).startswith('http'): # and (str(url_to_cache['from']).endswith('.jpg') or str(url_to_cache['from']).endswith('.png')):

@@ -3573,11 +3573,11 @@
 													const potential_screenshot_urls = [
 																{
 																	'from': base_url + '/raw/main/screenshot.png?raw=true',
-																	'to': addon_id + '_screenshot.png'
+																	'to': 'screenshots/' + addon_id + '_screenshot.png'
 																},
 																{
 																	'from': base_url + '/raw/main/screenshot.jpg?raw=true',
-																	'to': addon_id + '_screenshot.jpg'
+																	'to': 'screenshots/' + addon_id + '_screenshot.jpg'
 																}
 															]
 													

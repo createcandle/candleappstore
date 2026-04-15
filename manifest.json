@@ -55,7 +55,7 @@
     }
   },
   "short_name": "candleapps",
-  "version": "0.6.14",
+  "version": "0.6.15",
   "web_accessible_resources": [
     "css/*.css",
     "images/*.svg",
@@ -68,6 +68,14 @@
 	"web_cache/*.gif",
 	"web_cache/*.jpeg",
 	"web_cache/*.png",
+	"web_cache/icons/*.svg",
+	"web_cache/icons/*.png",
+	"web_cache/icons/*/*.svg",
+	"web_cache/icons/*/*.png",
+	"web_cache/icons/*/*.gif",
+	"web_cache/screenshots/*.png",
+	"web_cache/screenshots/*.jpg",
+	"web_cache/screenshots/*.jpeg",
     "js/*.js",
     "views/*.html"
   ]
