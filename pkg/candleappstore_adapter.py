@@ -861,7 +861,7 @@ class CandleappstoreAdapter(Adapter):
                                 with open(str(self.installing_addons_queue[addon_id]['addon_tar_path']), 'wb') as f:
                                     self.installing_addons_queue[addon_id]['download_start_timestamp'] = time.time()
                                     
-                                    if installing_addons_queue[addon_id]['update']:
+                                    if self.installing_addons_queue[addon_id]['update']:
                                         self.installing_addons_queue[addon_id]['message'] = 'Downloading update'
                                     else:
                                         self.installing_addons_queue[addon_id]['message'] = 'Downloading'
@@ -982,14 +982,14 @@ class CandleappstoreAdapter(Adapter):
                                                             print("caught error after addon was just installed: ", ex)
                                                     
                                                     time.sleep(1)
-                                                    if installing_addons_queue[addon_id]['update']:
+                                                    if self.installing_addons_queue[addon_id]['update']:
                                                         self.installing_addons_queue[addon_id]['message'] = "Analyzing update's features"
                                                     else:
                                                         self.installing_addons_queue[addon_id]['message'] = "Analyzing new addon's features"
                                                     self.installing_addons_queue[addon_id]['has_ui'] = self.check_if_addon_has_ui(addon_id)
                                                     self.installing_addons_queue[addon_id]['has_things'] = self.check_if_addon_has_things(addon_id)
                                                     time.sleep(1)
-                                                    if installing_addons_queue[addon_id]['update']:
+                                                    if self.installing_addons_queue[addon_id]['update']:
                                                         self.installing_addons_queue[addon_id]['message'] = 'Update complete'
                                                     else:
                                                         self.installing_addons_queue[addon_id]['message'] = 'Installation complete'
@@ -1128,7 +1128,7 @@ class CandleappstoreAdapter(Adapter):
                                 
                         else:
                             if self.DEBUG:
-                                print("Warning, addon dir did not have a manifest?  dirname,missing file: ", dirname, str(manifest_path))
+                                print("\nERROR, addon did not have a manifest?  manifest_path: \n", str(manifest_path))
                     except Exception as ex:
                         if self.DEBUG:
                             print("error getting default addon settings from: " + str(manifest_path))

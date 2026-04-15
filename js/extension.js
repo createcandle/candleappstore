@@ -899,7 +899,7 @@
 													}
 													
 													
-													window.API.setAddonConfig(addon_id, {'enabled':true})
+													window.API.setAddonConfig(addon_id, {'enabled':true}) // I don't believe this does anything / is correct
 													.then((result) => { 
 														if(this.debug){
 															console.warn("candle store debug: API.setAddonConfig response: ", result);
@@ -1670,17 +1670,11 @@
 	                                                    }
                                                 
                                                 
-	                                                    // TODO: node prefered version checking. It should generally prefer version 12.
-	                                                    if(node12_available && packs[p]['url'].indexOf('v12') == -1){
-	                                                        if(this.debug){
-	                                                            console.log("candle store debug: A node 12 version is available, but this is not it. Skipping.");
-	                                                        }
-	                                                        continue;
-	                                                    }
+	                                                    
 												
 	                                                    if(node24_available && (packs[p]['url'].indexOf('v18') != -1 || packs[p]['url'].indexOf('v20') != -1 || packs[p]['url'].indexOf('v12') != -1)){
 	                                                        if(this.debug){
-	                                                            console.log("candle store debug: A node 24 version is available, but this is not it. Skipping.");
+	                                                            console.log("candle store debug: A node 24 version is available, but this is not it. Skipping: ", packs[p]['url']);
 	                                                        }
 	                                                        continue;
 	                                                    }
@@ -1690,6 +1684,14 @@
 	                                                            console.log("candle store debug: A node 20 version is available, but this is not it. Skipping.");
 	                                                        }
 	                                                        continue;
+	                                                    }
+														
+	                                                    // TODO: node prefered version checking. It should generally prefer version 12.
+	                                                    if(node12_available && node24_available == false && node20_available == false){ //  && packs[p]['url'].indexOf('v12') == -1
+	                                                        if(this.debug){
+	                                                            console.log("candle store debug: Only a node 12 version is available. Taking whatever download URL is available ", packs[p]['url']);
+	                                                        }
+	                                                        //continue;
 	                                                    }
 													
 														if(typeof packs[p]['url'] == 'string' && packs[p]['url'].startsWith('http')){
@@ -1820,17 +1822,6 @@
                 console.log("candle store debug: show called");
             }
 			
-			//console.log("this.content:");
-			//console.log(this.content);
-            //console.log("Window: ");
-            //console.log(window);
-            //console.log("API: ");
-            //console.log(window.API);
-            //console.log(window.API.getInstalledAddons());
-            //console.log(window.API.getAddonConfig("airport"));
-            //console.log(window.API.uninstallAddon);
-            //window.API.uninstallAddon("bla");
-            
             
 
             // get a z-index above the main menu button while overlay with back button is active
@@ -4665,6 +4656,7 @@
             this.view.querySelector('#extension-candleappstore-selected-tags').innerHTML = '<span class="extension-candleappstore-tag extension-candleappstore-invisible">...</span>';
             
 			
+			this.view.querySelector('.extension-candleappstore-selected-opinion').innerHTML = '';
 			
             // Addon name
             if(typeof data.name != 'undefined'){
@@ -5184,8 +5176,17 @@
                                 }
 								*/
                             }
+							else{
+                                if(this.debug){
+                                	console.log('candle store debug: WARNING, this addon cloud data is incomplete?   cloud_item: ', cloud_item);
+                                }
+							}
 							
-							
+						}
+						else{
+                            if(this.debug){
+                            	console.log('candle store debug: not adding install button because this addon is already installed: ', cloud_item);
+                            }
 						}
 	                    // ADD UNINSTALL BUTTON
                 		// moved lower..
@@ -5380,7 +5381,7 @@
                     }
                     else{
                         if(this.debug){
-							console.log("candle store debug: no cloud data for this addon yet: ", addon_id);
+							console.warn("candle store debug: no cloud data for this addon yet: ", addon_id);
 							console.log("candle store debug:  - this.received_cloud_data: ", this.received_cloud_data);
 						}
 						if(!installed){
@@ -6661,8 +6662,13 @@
             
         }
         
-		// TODO: what happens if API.setAddonSetting is called for an addon that is not installed? If its not too bed, then just always call it?
+		// TODO: what happens if API.setAddonSetting is called for an addon that is not installed? If its not too bad, then just always call it?
+		// TODO: No, it was actually catastrophic, backend raised an error
 		request_install(addon_id, download_url, checksum=null, update=false){
+			if(this.debug){
+				console.warn("candle store debug: in request_install.  addon_id, download_url, checksum: ", addon_id, download_url, checksum);
+				console.warn("this.api_addons_data: ", this.api_addons_data);
+			}
 			if(typeof addon_id == 'string' && addon_id.length && typeof download_url == 'string' && download_url.startsWith('http')){
 				
 				const really_request_install = () => {
@@ -6703,40 +6709,62 @@
 					})
 					.catch((err) => {
 	    				if(this.debug){
-							console.error("candle store: really_request_install: caught error requesting installation of addon: ", err);
+							console.error("candle store debug: really_request_install: caught error requesting installation of addon: ", err);
 						}
 						this.flash_message('Failed to request addon installation - connection error?');
 	                    //document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'none';
 	    			});
 				}
 				
-				
+				this.api_addons_data
 				//if(update && addon_id != 'candleappstore'){
-				if(addon_id != 'candleappstore'){
-	                window.API.setAddonSetting( addon_id, false)
-	                .then((result) => {
-	                	if(this.debug){
-							console.log("candle store debug: request_install: requested addon to be stopped first. Response: ", result);
-						}
-	                })
-					.catch((err) => {
-						if(this.debug){
-							console.error("candle store debug: request_install: caught error trying to stop addon first: ", err);
-						}
-					})
-					.finally(() => {
-						// No matter what, install the update anyway
-						really_request_install();
-					});
-	                
-				}
-                else{
-                	really_request_install();
-                }
 				
+				//let is_currently_installed = false;
+				if(addon_id == 'candleappstore'){
+					really_request_install(); // The Candle Store does not get stopped first. Instead once complete, the entire gateway is restarted instead.
+				}
+				else{
+					let already_installed = false;
+					for(let ci = 0; ci < this.api_addons_data.length; ci++){
+						if(this.debug){
+							console.log("candle store debug: request_install: checking if already installed: ", addon_id, ' =?= ', this.api_addons_data[ci]['id']);
+						}
+						if(typeof this.api_addons_data[ci]['id'] == 'string' && this.api_addons_data[ci]['id'] == addon_id){
+							if(this.debug){
+								console.log("candle store debug: request_install: this addon is already installed, so also setting it to disabled: ", addon_id);
+							}
+							already_installed = true;
+							break
+						}	
+					}
+					if(already_installed){
+		                window.API.setAddonSetting( addon_id, false)
+		                .then((result) => {
+		                	if(this.debug){
+								console.log("candle store debug: request_install: requested addon to be stopped first. Response: ", result);
+							}
+		                })
+						.catch((err) => {
+							if(this.debug){
+								console.error("candle store debug: request_install: caught error trying to stop addon first: ", err);
+							}
+						})
+						.finally(() => {
+							// No matter what, install the update anyway
+							really_request_install();
+						});
+					}
+					else{
+						// no need to stop the addon first, as it's not already installed.
+						really_request_install();
+					}
+				}
 				
 			}
 			else{
+				if(this.debug){
+					console.error("candle store debug: request_install: addon does not have a valid download URL: ", addon_id);
+				}
 				this.flash_message('Error, ' + addon_id + ' addon does not have a valid download URL');
 			}
 		}
