@@ -16,7 +16,8 @@
       "exec": "python3 {path}/main.py",
       "primary_type": "extension",
       "strict_max_version": "*",
-      "strict_min_version": "0.10.0"
+      "strict_min_version": "0.10.0",
+      "enabled": true
     }
   },
   "homepage_url": "https://www.candlesmarthome.com/app_store",
