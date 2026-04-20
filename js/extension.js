@@ -4590,7 +4590,9 @@
 			const selected = this.view.querySelector('#extension-candleappstore-selected');
 			
 			if(!selected){
-				console.error("candle store: could not find selected element");
+				if(this.debug){
+					console.error("candle store debug: could not find selected element");
+				}
 				return
 			}
             // Hides the data that might need to be loaded in from the Candle webserver (which can take a little time) in one swoop
@@ -4602,39 +4604,50 @@
             	previously_installed_versions_list_el.innerHTML = '';
 				
 				// Create list of previously installed versions, if known
-				if(typeof this.previously_installed_versions[addon_id] != 'undefined' && Array.isArray(this.previously_installed_versions[addon_id])){
-					for(let pa = 0; pa < this.previously_installed_versions[addon_id].length; p++){
-						const previously_installed_version_item = document.createElement('div');
-						previously_installed_version_item.classList.add('extension-candleappstore-previously-installed-item');
-						previously_installed_version_item.classList.add('extension-candleappstore-area');
-						
-						if(typeof this.previously_installed_versions[addon_id][pa]['first_install_timestamp'] == 'number' && typeof this.previously_installed_versions[addon_id][pa]['addon_url'] == 'string' && this.previously_installed_versions[addon_id][pa]['addon_url'].startsWith('http') && this.previously_installed_versions[addon_id][pa]['addon_url'].indexOf('/') != -1){
-						
-							const previously_installed_version_date = document.createElement('span');
-							previously_installed_version_date.classList.add('extension-candleappstore-previously-installed-item-date');
-							previously_installed_version_date.textContent = new Date( this.previously_installed_versions[addon_id][pa]['first_install_timestamp'] * 1000 ).toLocaleDateString();
-							previously_installed_version_item.appendChild(previously_installed_version_date);
-						
-							const previously_installed_version_url = document.createElement('span');
-							previously_installed_version_url.classList.add('extension-candleappstore-previously-installed-item-url');
-							previously_installed_version_date.textContent = this.previously_installed_versions[addon_id][pa]['url'].split("/").pop();
-							previously_installed_version_item.appendChild(previously_installed_version_url);
-						
-							previously_installed_version_item.addEventListener('click', () => {
-								if(confirm("Install older version?")){
-									let checksum = null;
-									if(typeof this.previously_installed_versions[addon_id][pa]["checksum"] == 'string'){
-										checksum = this.previously_installed_versions[addon_id][pa]["checksum"];
-									}
-									this.request_install(addon_id, this.previously_installed_versions[addon_id][pa]["download_url"], checksum);
-								}
-							});
-							previously_installed_versions_list_el.appendChild(previously_installed_version_item);
+				try{
+					if(typeof this.previously_installed_versions[addon_id] != 'undefined' && Array.isArray(this.previously_installed_versions[addon_id])){
+						if(this.debug){
+							console.log("candle store debug: previously_installed_versions: ", addon_id, this.previously_installed_versions[addon_id]);
 						}
-						//previously_installed_version_item.textContent = JSON.stringify(this.previously_installed_versions[addon_id][pa]);
+						for(let pa = 0; pa < this.previously_installed_versions[addon_id].length; pa++){
+							const previously_installed_version_item = document.createElement('div');
+							previously_installed_version_item.classList.add('extension-candleappstore-previously-installed-item');
+							previously_installed_version_item.classList.add('extension-candleappstore-area');
+						
+							if(typeof this.previously_installed_versions[addon_id][pa]['first_install_timestamp'] == 'number' && typeof this.previously_installed_versions[addon_id][pa]['addon_url'] == 'string' && this.previously_installed_versions[addon_id][pa]['addon_url'].startsWith('http') && this.previously_installed_versions[addon_id][pa]['addon_url'].indexOf('/') != -1){
+						
+								const previously_installed_version_date = document.createElement('span');
+								previously_installed_version_date.classList.add('extension-candleappstore-previously-installed-item-date');
+								previously_installed_version_date.textContent = new Date( this.previously_installed_versions[addon_id][pa]['first_install_timestamp'] * 1000 ).toLocaleDateString();
+								previously_installed_version_item.appendChild(previously_installed_version_date);
+						
+								const previously_installed_version_url = document.createElement('span');
+								previously_installed_version_url.classList.add('extension-candleappstore-previously-installed-item-url');
+								previously_installed_version_date.textContent = this.previously_installed_versions[addon_id][pa]['addon_url'].split("/").pop();
+								previously_installed_version_item.appendChild(previously_installed_version_url);
+						
+								previously_installed_version_item.addEventListener('click', () => {
+									if(confirm("Install older version?")){
+										let checksum = null;
+										if(typeof this.previously_installed_versions[addon_id][pa]["addon_checksum"] == 'string'){
+											checksum = this.previously_installed_versions[addon_id][pa]["addon_checksum"];
+										}
+										this.request_install(addon_id, this.previously_installed_versions[addon_id][pa]["addon_url"], checksum);
+									}
+								});
+								previously_installed_versions_list_el.appendChild(previously_installed_version_item);
+							}
+							//previously_installed_version_item.textContent = JSON.stringify(this.previously_installed_versions[addon_id][pa]);
 					
+						}
 					}
 				}
+				catch(err){
+					if(this.debug){
+						console.error('candle store debug: caught error creating previously instaled versions list: ', err);
+					}
+				}
+				
             }
 			
             //this.view.querySelector('#extension-candleappstore-selected-main').style.display = 'none';

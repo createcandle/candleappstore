@@ -346,7 +346,7 @@ body:not(.developer) .extension-candleappstore-show-if-developer{
     flex-direction:column;
 	/*background-color: #46769C;*/
     background-color:rgba(0,0,0,.2);
-	border-radius:.5rem;
+	border-radius:1rem;
 	position: relative;
 	width:100%;
 	margin-top: 2rem;
@@ -2448,6 +2448,14 @@ body.safe-mode:not(.developer) #extension-candleappstore-tab-button-shop{
 	font-style:italic;
 }
 
+#extension-candleappstore-previously-installed-versions-list:not(:empty)::before{
+	content:'Previously installed versions';
+    font-size: 1.8rem;
+    display: block;
+    font-weight: bold;
+	margin: 4rem 0 .5rem 0;
+}
+
 
 
 /*  spinner  */
@@ -2714,7 +2722,7 @@ body.safe-mode:not(.developer) #extension-candleappstore-tab-button-shop{
 	}
 	*/
 
-	#extension-candleappstore-filter-select-container > div{
+	#extension-candleappstore-filter-select-container > div:not(:first-of-type){
 		margin-left:4rem;
 	}
 

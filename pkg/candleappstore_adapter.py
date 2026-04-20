@@ -1133,7 +1133,7 @@ class CandleappstoreAdapter(Adapter):
                                 print("\nERROR, addon did not have a manifest?  manifest_path: \n", str(manifest_path))
                     except Exception as ex:
                         if self.DEBUG:
-                            print("error getting default addon settings from: " + str(manifest_path))
+                            print("caught error getting default addon settings from manifest: ", ex)
                             
                     # See if the addon has an icon, and if so, copy it to the web cache folder so it's always available, even if the addon is disabled
                     try:
@@ -1142,7 +1142,8 @@ class CandleappstoreAdapter(Adapter):
                             
                             icon_source_path = str(os.path.join(self.user_profile['addonsDir'],dirname,'images',str(possible_icon_name)))
                             
-                            #print("manifest_path: " + str(manifest_path))
+                            #if self.DEBUG:
+                            #    print("testing icon_source_path: " + str(icon_source_path))
                             if os.path.isfile(icon_source_path):
                                 if self.DEBUG:
                                     print("spotted addon icon at: ", icon_source_path)
@@ -1156,14 +1157,10 @@ class CandleappstoreAdapter(Adapter):
                                     if self.DEBUG:
                                         print("Copying addon icon to: ", target_web_cache_icon_path)
                                     os.system('cp ' + str(icon_source_path) + ' ' + str(target_web_cache_icon_path))
-                                
-                                
-                        else:
-                            if self.DEBUG:
-                                print("Warning, addon dir did not have a manifest?  dirname,missing file: ", dirname, str(manifest_path))
+ 
                     except Exception as ex:
                         if self.DEBUG:
-                            print("error getting default addon settings from: " + str(manifest_path))
+                            print("caught error looking for icon: ", ex)
                     
         except Exception as ex:
             if self.DEBUG:
