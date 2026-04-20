@@ -71,12 +71,17 @@ class CandleappstoreAdapter(Adapter):
         self.app_store_url = 'https://www.candlesmarthome.com/appstore/'
         
         
+        
         self.boot_path = '/boot'
         if os.path.exists('/boot/firmware'):
             self.boot_path = '/boot/firmware'
         
-        self.candle_version = '2.0.0'
-        self.candle_mayor_version = 2
+        self.webthings_gateway = False
+        if os.path.isfile(self.boot_path + '/webthings_gateway_version.txt'):
+            self.webthings_gateway = True
+            
+        self.candle_version = '3.0.0'
+        self.candle_mayor_version = 3
         if os.path.isfile(self.boot_path + '/candle_version.txt'):
             fresh_candle_version = str(run_command('cat ' + str(self.boot_path) + '/candle_version.txt')).strip().rstrip()
             if '.' in fresh_candle_version:

@@ -142,6 +142,7 @@ class CandleappstoreAPIHandler(APIHandler):
                                           'installing_addons_queue':self.adapter.installing_addons_queue,
                                           'busy_installing_addon':self.adapter.busy_installing_addon,
                                           'previously_installed_versions':self.adapter.persistent_data['previously_installed_versions'],
+                                          'webthings_gateway':self.adapter.webthings_gateway,
                                           'debug':self.adapter.DEBUG
                                       }),
                     )

@@ -414,6 +414,9 @@
                 this.last_versions_allowed_for_candle_v2 = body['last_versions_allowed_for_candle_v2'];
 			}
 			
+			if(typeof body['webthings_gateway'] == 'boolean' && body['webthings_gateway'] == true){
+				document.body.classList.add('webthings-gateway');
+			}
 			
             
 			

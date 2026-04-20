@@ -1,4 +1,4 @@
-"""Candle app store adapter for Candle controller."""
+"""Candle store adapter for Candle controller."""
 
 from os import path
 import functools
@@ -21,10 +21,10 @@ print = functools.partial(print, flush=True)
 
 
 def cleanup(signum, frame):
-    print("In cleanup function of main.py")
+    #print("In cleanup function of main.py")
     """Clean up any resources before exiting."""
     if _ADAPTER is not None:
-        print("trying unload")
+        #print("trying unload")
         _ADAPTER.unload()
         _ADAPTER.close_proxy()
 

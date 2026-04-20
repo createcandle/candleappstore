@@ -2330,6 +2330,15 @@ button.extension-candleappstore-extra-fade,
     display:none;
 }
 
+.webthings-gateway #update-settings-link:not(.hidden),
+.webthings-gateway #authorization-settings-link:not(.hidden),
+.webthings-gateway #experiment-settings-link:not(.hidden),
+.webthings-gateway #developer-settings-link:not(.hidden),
+.webthings-gateway #discover-addons-button:not(.hidden),
+.webthings-gateway #installed-addons-list:not(.hidden){
+    display:block;
+}
+
 .developer #update-settings-link:not(.hidden),
 .developer #authorization-settings-link:not(.hidden),
 .developer #experiment-settings-link:not(.hidden),
