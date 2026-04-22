@@ -76,6 +76,10 @@ class CandleappstoreAdapter(Adapter):
         if os.path.exists('/boot/firmware'):
             self.boot_path = '/boot/firmware'
         
+        self.use_gateway_install = False
+        if not os.path.isfile(self.boot_path + '/candle_version.txt'):
+            self.use_gateway_install  = False
+        
         self.webthings_gateway = False
         if os.path.isfile(self.boot_path + '/webthings_gateway_version.txt'):
             self.webthings_gateway = True
@@ -613,6 +617,11 @@ class CandleappstoreAdapter(Adapter):
                 print("-Keep addon data when uninstalling preference was in config: " + str(config['Keep addon data when uninstalling']))
             self.keep_data_on_uninstall = bool(config['Keep addon data when uninstalling'])
         
+        if 'Use old install system' in config:
+            if self.DEBUG:
+                print("Use old install system preference was in config: " + str(config['Use old install system']))
+            self.use_gateway_install = bool(config['Use old install system'])
+
 
         if 'Show developer options' in config:
             if self.DEBUG:

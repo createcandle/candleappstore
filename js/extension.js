@@ -112,7 +112,8 @@
 			this.last_main_poll_time = 0
             
             this.app_store_url = "https://www.candlesmarthome.com/extensions/appstore/";
-            
+            this.use_gateway_install = false;
+			
             this.apps_overview = {};
             this.installed = []; // has data about folders in the addons folder. Comes from app store addon, and is then updated if addons are installed or uninstalled.
             this.cloud_app_data = []; // list of available apps, comes from the web via app store addon. #TODO: buffer this data locally to protect privacy
@@ -416,6 +417,13 @@
 			
 			if(typeof body['webthings_gateway'] == 'boolean' && body['webthings_gateway'] == true){
 				document.body.classList.add('webthings-gateway');
+			}
+			
+			if(typeof body['use_gateway_install'] == 'boolean'){
+				this.use_gateway_install = body['use_gateway_install'];
+				if(this.debug && location.pathname == '/extensions/candleappstore'){
+					console.log("candle store debug: parse_body: this.use_gateway_install is now: ", this.use_gateway_install);
+				}
 			}
 			
             
@@ -3194,7 +3202,7 @@
             }
         }
     
-    	/*
+    	
         update_loop(){
             //console.log("in update_loop");
             if(this.addons_to_update.length > 0 ){
@@ -3262,7 +3270,7 @@
             }
         }
     
-    	*/
+    	
     
     
     
@@ -4461,6 +4469,7 @@
         
         // Update after install (turned into separate function to avoid nested api calls)
         
+		// This is part fo the 'old' Gateway update and install system
         update_after_install(addon_data){
             if(this.debug){
                 console.log("candle store: in update_after_install. addon_data: ", addon_data);
@@ -4474,7 +4483,7 @@
                 this.api_addons_data = result;
                 this.generate_overview('shop');
                 
-                if(addon_data["has_ui"] == "1"){
+                if(typeof addon_data["has_ui"] == 'string' && addon_data["has_ui"] == "1"){
                     // TODO: ask the user if they want to check it out first?
                     if(addon_data["addon_id"] == 'candle-theme'){
                         setTimeout(function(){
@@ -4491,7 +4500,7 @@
                 
                 if(addon_data["addon_id"] != 'zigbee2mqtt-adapter'){
                     document.getElementById("extension-candleappstore-selected-post-install-addon-name").innerText = addon_data["addon_id"];
-                    document.getElementById("extension-candleappstore-selected-post-install").style.display = 'block'; 
+                    //document.getElementById("extension-candleappstore-selected-post-install").style.display = 'block'; 
                 }
                 else{
                     window.location.pathname = '/extensions/zigbee2mqtt-adapter';
@@ -4500,8 +4509,10 @@
                 //document.getElementById("extension-candleappstore-post-install-settings-button").setAttribute("data-addon_id", data['versions'][v]["addon_id"]);
                 document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
             
-			}).catch((e) => {
-				console.error("candle store: get getInstalledAddons info catch (error?): ", e);
+			}).catch((err) => {
+				if(this.debug){
+					console.error("candle store debug: update_after_install: get getInstalledAddons info catch (error?): ", err);
+				}
                 //console.log(e);
                 document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
 			});
@@ -5280,6 +5291,9 @@
 								}
 								// Superfluous check
 								if(typeof cloud_item["previous_download_url"] == 'string' && cloud_item["previous_download_url"].startsWith('http')){
+									
+									this.request_install(cloud_item["addon_id"], cloud_item["previous_download_url"], previous_checksum);
+									/*
 									window.API.postJson(
 										`/extensions/candleappstore/api/ajax`,
 										{
@@ -5314,6 +5328,7 @@
 										this.flash_message('Failed to request addon installation - connection error?');
 				                        //document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'none';
 				        			});
+									*/
 								}
 								else{
 									this.flash_message('Error, this addon does not have a valid download URL');
@@ -6687,94 +6702,225 @@
 			}
 			if(typeof addon_id == 'string' && addon_id.length && typeof download_url == 'string' && download_url.startsWith('http')){
 				
-				const really_request_install = () => {
-					window.API.postJson(
-						`/extensions/candleappstore/api/ajax`,
-						{
-							'action':'install_addon',
-							'addon_id':addon_id,
-							'addon_url':download_url,
-							'addon_checksum':checksum,
-							'update':update
-						}
-					)
-		            .then((body) => {
-						if(this.debug){
-							console.warn("candle store debug: really_request_install: got install_addon response: ", body);
-						}
-						if(typeof body.state == 'boolean' && body.state == true){
-							if(update){
-								this.flash_message(addon_id + ' has been added to update queue');
-							}
-							else{
-								this.flash_message(addon_id + ' has been added to install queue');
-							}
-						
-							this.addons_to_update = this.addons_to_update.filter(e => e !== addon_id);
-						
-			                this.selected_overlay_closed = true;
-							this.view.style.zIndex = 'auto';
-							this.view.querySelector('#extension-candleappstore-selected').style.display = 'none';
-			                this.view.querySelector('#extension-candleappstore-installation-failed').style.display = 'none';
-							this.view.scrollTop = 0;
+				if(this.use_gateway_install){
+					if(this.debug){
+                        console.warn("candle store debug: installing addon via the gateway method: ", addon_id);
+                    }
 					
-						}
-						else{
-							this.flash_message('Error, failed to add ' + addon_id + ' to install queue');
-						}
-					})
-					.catch((err) => {
-	    				if(this.debug){
-							console.error("candle store debug: really_request_install: caught error requesting installation of addon: ", err);
-						}
-						this.flash_message('Failed to request addon installation - connection error?');
-	                    //document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'none';
-	    			});
-				}
-				
-				this.api_addons_data
-				//if(update && addon_id != 'candleappstore'){
-				
-				//let is_currently_installed = false;
-				if(addon_id == 'candleappstore'){
-					really_request_install(); // The Candle Store does not get stopped first. Instead once complete, the entire gateway is restarted instead.
-				}
-				else{
-					let already_installed = false;
-					for(let ci = 0; ci < this.api_addons_data.length; ci++){
-						if(this.debug){
-							console.log("candle store debug: request_install: checking if already installed: ", addon_id, ' =?= ', this.api_addons_data[ci]['id']);
-						}
-						if(typeof this.api_addons_data[ci]['id'] == 'string' && this.api_addons_data[ci]['id'] == addon_id){
+					
+					if(update){
+						
+	                    window.API.updateAddon( addon_id, download_url, checksum )
+	                    .then((result) => {
 							if(this.debug){
-								console.log("candle store debug: request_install: this addon is already installed, so also setting it to disabled: ", addon_id);
+								console.log('candle store debug: request_install: gateway method: update: addon updated succesfully: ', addon_id);
 							}
-							already_installed = true;
-							break
-						}	
-					}
-					if(already_installed){
-		                window.API.setAddonSetting( addon_id, false)
-		                .then((result) => {
-		                	if(this.debug){
-								console.log("candle store debug: request_install: requested addon to be stopped first. Response: ", result);
+	                        this.addons_to_update = this.addons_to_update.filter(e => e !== addon_id);
+                		
+							if(addon_id == 'candleappstore'){
+	                            setTimeout(function(){
+	                                window.location.reload(true);
+	                            }, 500);
 							}
-		                })
-						.catch((err) => {
-							if(this.debug){
-								console.error("candle store debug: request_install: caught error trying to stop addon first: ", err);
+	                        else if(this.addons_to_update.length == 0 ){
+	                            this.view.querySelector('#extension-candleappstore-tab-button-updates').classList.remove('extension-candleappstore-tab-button-updates-available');
+	                            this.view.querySelector('#extension-candleappstore-updates-list').innerHTML = "All your addons are up to date";
+	                            this.view.querySelector('#extension-candleappstore-update-all-button').style.display = 'none';
+	                            document.body.classList.remove("extension-candleappstore-busy-updating-all");
+	                            this.updating_all = false;
+                            
+	                            setTimeout(function(){
+	                                window.location.reload(true); // harsh, but no UI's without backends this way.
+	                            }, 2500);
+	                        }
+	                        else{
+	                            //console.log('on to the next addon.');
+	                            this.generate_overview('updates');
+	                            
+								setTimeout(() => {
+									if(this.updating_all){
+										this.update_loop();
+									}
+	                            },3000);
+	                        }
+                
+	        			}).catch((err) => {
+	        				if(this.debug){
+								console.error("candle store debug: update addons loop caught error: ", err);
 							}
-						})
-						.finally(() => {
-							// No matter what, install the update anyway
-							really_request_install();
-						});
+	                        this.view.querySelector('#extension-candleappstore-updates-list').innerHTML = "A connection error occured while updating all addons";
+	                        document.body.classList.remove("extension-candleappstore-busy-updating-all");
+	                        this.view.querySelector('#extension-candleappstore-update-all-button').style.display = 'block';
+	                        this.updating_all = false
+                
+	        			});
+						
+						
 					}
 					else{
-						// no need to stop the addon first, as it's not already installed.
-						really_request_install();
+	                    window.API.installAddon( addon_id, download_url, checksum )
+	                    .then((result) => { 
+							if(this.debug){
+	                            console.log("candle store debug: gateway API.installAddon result: ", result);
+	                        }
+	                        this.api_addons_data = []; // Remove the existing data about addons so that it will be re-requested from the window.API
+            
+	                        if(typeof result.enabled != "undefined"){
+	                            if(this.debug){
+									console.log("addon installed succesfully");
+								}
+	                            this.installed.push(addon_id);
+	                            if(result.enabled == true){
+									if(this.debug){
+										console.log("candle store debug: newlty installed addon is enabled");
+									}
+	                            }
+	                            else{
+									if(this.debug){
+	                                	//console.log("- addon is NOT enabled");
+	                                	console.log("candle store debug: addon installed ok, but is disabled?");
+									}
+	                            }
+	                        }
+	                        else{
+								if(this.debug){
+									console.error("candle store debug: installation failed, severely");
+								}
+	                            this.flash_message('Error: could not install');
+	                        }
+        
+	                        this.update_after_install({'addon_in':addon_id});
+                
+	                        // Remove addon name from being installed list
+	                        for (var t = this.addons_being_installed.length-1; t >= 0; t--) {
+	                            if (this.addons_being_installed[t] == addon_id) {
+	                                this.addons_being_installed.splice(t, 1);
+	                            }
+	                        }
+                        
+							if(this.debug){
+	                            console.log("candle store debug:requesting fresh addon default settings");
+	                        }
+	                        this.update_addon_settings_defaults();
+						
+							this.flash_message("Addon installation complete: " + str(addon_id));
+                        
+						}).catch((err) => {
+							if(this.debug){
+								console.log("candle store debug: installation catch (error?): ", err);
+							}
+						
+							this.flash_message("Addon installation failed: " + str(addon_id));
+	                        //document.getElementById("extension-candleappstore-busy-installing").style.display = 'none';
+	                        //document.getElementById("extension-candleappstore-installation-failed").style.display = 'block';
+                
+	                        // Remove addon name from being installed list
+	                        for (var t = this.addons_being_installed.length-1; t >= 0; t--) {
+	                            if (this.addons_being_installed[t] == addon_id) {
+	                                this.addons_being_installed.splice(t, 1);
+	                            }
+	                        }
+                
+						});
 					}
+                    
+					
 				}
+				else{
+					
+					// Use the Candle install method
+					const really_request_install = () => {
+						window.API.postJson(
+							`/extensions/candleappstore/api/ajax`,
+							{
+								'action':'install_addon',
+								'addon_id':addon_id,
+								'addon_url':download_url,
+								'addon_checksum':checksum,
+								'update':update
+							}
+						)
+			            .then((body) => {
+							if(this.debug){
+								console.warn("candle store debug: really_request_install: got install_addon response: ", body);
+							}
+							if(typeof body.state == 'boolean' && body.state == true){
+								if(update){
+									this.flash_message(addon_id + ' has been added to update queue');
+								}
+								else{
+									this.flash_message(addon_id + ' has been added to install queue');
+								}
+						
+								this.addons_to_update = this.addons_to_update.filter(e => e !== addon_id);
+								
+				                this.selected_overlay_closed = true;
+								this.view.style.zIndex = 'auto';
+								this.view.querySelector('#extension-candleappstore-selected').style.display = 'none';
+				                this.view.querySelector('#extension-candleappstore-installation-failed').style.display = 'none';
+								this.view.scrollTop = 0;
+					
+							}
+							else{
+								this.flash_message('Error, failed to add ' + addon_id + ' to install queue');
+							}
+						})
+						.catch((err) => {
+		    				if(this.debug){
+								console.error("candle store debug: really_request_install: caught error requesting installation of addon: ", err);
+							}
+							this.flash_message('Failed to request addon installation - connection error?');
+		                    //document.getElementById("extension-candleappstore-developer-busy-installing-app").style.display = 'none';
+		    			});
+					}
+				
+					//this.api_addons_data
+					//if(update && addon_id != 'candleappstore'){
+				
+					//let is_currently_installed = false;
+					if(addon_id == 'candleappstore'){
+						really_request_install(); // The Candle Store does not get stopped first. Instead once complete, the entire gateway is restarted instead.
+					}
+					else{
+						let already_installed = false;
+						for(let ci = 0; ci < this.api_addons_data.length; ci++){
+							if(this.debug){
+								console.log("candle store debug: request_install: checking if already installed: ", addon_id, ' =?= ', this.api_addons_data[ci]['id']);
+							}
+							if(typeof this.api_addons_data[ci]['id'] == 'string' && this.api_addons_data[ci]['id'] == addon_id){
+								if(this.debug){
+									console.log("candle store debug: request_install: this addon is already installed, so also setting it to disabled: ", addon_id);
+								}
+								already_installed = true;
+								break
+							}	
+						}
+						if(already_installed){
+			                window.API.setAddonSetting( addon_id, false)
+			                .then((result) => {
+			                	if(this.debug){
+									console.log("candle store debug: request_install: requested addon to be stopped first. Response: ", result);
+								}
+			                })
+							.catch((err) => {
+								if(this.debug){
+									console.error("candle store debug: request_install: caught error trying to stop addon first: ", err);
+								}
+							})
+							.finally(() => {
+								// No matter what, install the update anyway
+								really_request_install();
+							});
+						}
+						else{
+							// no need to stop the addon first, as it's not already installed.
+							really_request_install();
+						}
+					}
+					
+				}
+				
+				
 				
 			}
 			else{
