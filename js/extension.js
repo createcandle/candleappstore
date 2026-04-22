@@ -3186,7 +3186,7 @@
 					// ...or a random addon from the list. This ensures that is case an addon can't update properly, at least on a fresh attempt a different addon might get through
 					first_addon_to_update = Math.floor(Math.random() * this.addons_to_update.length);
 				}
-				this.request_install( first_addon_to_update, addons_to_update_full[first_addon_to_update]['url'], addons_to_update_full[first_addon_to_update]['checksum'], true); // true = this is an update request
+				this.request_install( first_addon_to_update, this.addons_to_update_full[first_addon_to_update]['url'], this.addons_to_update_full[first_addon_to_update]['checksum'], true); // true = this is an update request
 			
 				// Then request all the rest with one second intervals
 				for( let au = 0; au < this.addons_to_update.length; au++){
@@ -3194,7 +3194,7 @@
 					const next_addon_to_update = this.addons_to_update[au];
 					if(next_addon_to_update != first_addon_to_update){
 						setTimeout(() => {
-							this.request_install(next_addon_to_update, addons_to_update_full[next_addon_to_update]['url'], addons_to_update_full[next_addon_to_update]['checksum'], true); 
+							this.request_install(next_addon_to_update, this.addons_to_update_full[next_addon_to_update]['url'], this.addons_to_update_full[next_addon_to_update]['checksum'], true); 
 						},1000 * (au + 1));
 					}
 				}
