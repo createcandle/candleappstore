@@ -770,6 +770,10 @@
         }
 
 
+
+
+
+
 		generate_installing_overview(){
 			if(this.debug && location.pathname == '/extensions/candleappstore'){
 				console.log("candle store debug: in generate_installing_overview.  this.busy_installing_addon: ", this.busy_installing_addon);
@@ -818,6 +822,7 @@
 								if(this.debug){
 									console.log("candle store debug: OK, this addon is officially installed: ", addon_id);
 								}
+								
 								// TODO: enable it here if it hasn't been enabled yet?
 								break
 							}
@@ -827,14 +832,13 @@
 								console.log("candle store debug: this addon is not officially installed yet: ", addon_id);
 							}
 						}
-					
+						
 						let addon_item_el = installing_overview_el.querySelector('#extension-candleappstore-installing-overview-' + addon_id);
 						if(!addon_item_el){
 							addon_item_el = document.createElement('div');
 							addon_item_el.setAttribute('id','extension-candleappstore-installing-overview-' + addon_id);
 							addon_item_el.classList.add('extension-candleappstore-installing-item');
 							addon_item_el.classList.add('extension-candleappstore-area');
-							
 							
 							const addon_item_close_button_el = document.createElement('div');
 							addon_item_close_button_el.classList.add('extension-candleappstore-installing-item-close-button');
@@ -875,6 +879,15 @@
 									addon_progress_bar_el.style.width = '100%';
 									addon_progress_bar_el.style.background = '#060';
 									
+									// Ensure busy-updating class s removed from item on update page if this was an update, and the update is done.
+									if(typeof details.update == 'boolean' && details.update == true){
+										const update_page_list_item_el = this.view.querySelector('#extension-candleappstore-updates-list .extension-candleappstore-item.extension-candleappstore-busy-updating[data-addon-id="' + addon_id + '"]');
+										if(update_page_list_item_el){
+											update_page_list_item_el.classList.remove('extension-candleappstore-busy-updating');
+										}
+									}
+									
+									// Show big buttons with opions on what to do next after the addon has been installed/updated.
 									let installed_addon_options_el = addon_item_el.querySelector('.extension-candleappstore-installing-item-options-container');
 									if(!installed_addon_options_el){
 										installed_addon_options_el = document.createElement('div');
@@ -6692,6 +6705,18 @@
             }
             
         }
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
         
 		// TODO: what happens if API.setAddonSetting is called for an addon that is not installed? If its not too bad, then just always call it?
 		// TODO: No, it was actually catastrophic, backend raised an error
@@ -7046,6 +7071,8 @@
             }
 			
 		}
+		
+		
 		
 		
 		show_things_attributes(){
