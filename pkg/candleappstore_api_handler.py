@@ -227,9 +227,10 @@ class CandleappstoreAPIHandler(APIHandler):
                     state = False
                     try:
                         if 'addon_id' in request.body and isinstance(request.body['addon_id'], str):  
-                            if request.body['addon_id'] in self.installing_addons_queue:
-                                del self.installing_addons_queue[ request.body['addon_id'] ]
-                            state = self.adapter.install_addon(request.body['addon_id'],request.body['addon_url'],request.body['addon_checksum'])
+                            if request.body['addon_id'] in self.adapter.installing_addons_queue:
+                                del self.adapter.installing_addons_queue[ request.body['addon_id'] ]
+                                state = True
+                            #state = self.adapter.install_addon(request.body['addon_id'],request.body['addon_url'],request.body['addon_checksum'])
                             
                     except Exception as ex:
                         print("caught error in api install_addon request: ", ex)
@@ -238,7 +239,11 @@ class CandleappstoreAPIHandler(APIHandler):
                     return APIResponse(
                       status=200,
                       content_type='application/json',
-                      content=json.dumps({'state':state,'previously_installed_versions':self.adapter.persistent_data['previously_installed_versions']}),
+                      content=json.dumps({
+                            'state':state,
+                            'previously_installed_versions':self.adapter.persistent_data['previously_installed_versions'],
+                            'installing_addons_queue':self.adapter.installing_addons_queue
+                            }),
                     )
                         
                         

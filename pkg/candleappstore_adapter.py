@@ -696,55 +696,58 @@ class CandleappstoreAdapter(Adapter):
                 
                 should_install_this_addon = None
                 timestamp_to_beat = time.time()
-                
-                if 'candleappstore' in addons_to_install_list and 'failed_timestamp' in self.installing_addons_queue['candleappstore'] and self.installing_addons_queue['candleappstore']['failed_timestamp'] == None and 'done_timestamp' in self.installing_addons_queue['candleappstore'] and self.installing_addons_queue['candleappstore']['done_timestamp'] == None:
-                    should_install_this_addon = 'candleappstore'
-                elif 'power-settings' in addons_to_install_list and 'failed_timestamp' in self.installing_addons_queue['power-settings'] and self.installing_addons_queue['power-settings']['failed_timestamp'] == None and 'done_timestamp' in self.installing_addons_queue['power-setting'] and self.installing_addons_queue['power-setting']['done_timestamp'] == None:
-                    should_install_this_addon = 'power-settings'
-                elif 'candle-theme' in addons_to_install_list and 'failed_timestamp' in self.installing_addons_queue['candle-theme'] and self.installing_addons_queue['candle-theme']['failed_timestamp'] == None and 'done_timestamp' in self.installing_addons_queue['candle-theme'] and self.installing_addons_queue['candle-theme']['done_timestamp'] == None:
-                    should_install_this_addon = 'candle-theme'
-                else:
-                    #should_install_this_addon = addons_to_install_list[0]
-                    for candidate in addons_to_install_list:
-                        #if self.DEBUG:
-                        #    print("candidate addon to install next: ", candidate, self.installing_addons_queue[candidate])
-                        
-                        if not 'failed_timestamp' in self.installing_addons_queue[candidate]:
-                            if self.DEBUG:
-                                print("\nERROR, missing failed_timestamp from installing_addons_queue somehow. Candidate: ". candidate)
-                            del self.installing_addons_queue[candidate]
-                        
-                        
-                        if self.installing_addons_queue[candidate]['done_timestamp'] != None:
-                            if int(self.installing_addons_queue[candidate]['done_timestamp']) < time.time() - 3600:
-                                del self.installing_addons_queue[candidate]
-                            continue
-                        
-                        if self.installing_addons_queue[candidate]['failed_timestamp'] != None:
-                            if int(self.installing_addons_queue[candidate]['failed_timestamp']) < time.time() - 120:
-                                del self.installing_addons_queue[candidate]
-                            if self.DEBUG:
-                                print("skipping installation of addon whose installation has already failed: ", candidate)
-                            continue
-                        
-                        if 'request_timestamp' in self.installing_addons_queue[candidate] and int(self.installing_addons_queue[candidate]['request_timestamp']) < timestamp_to_beat:
-                            if self.DEBUG:
-                                print("this addon installation was requested even earlier: ", candidate)
+                try:
+                    if 'candleappstore' in addons_to_install_list and 'failed_timestamp' in self.installing_addons_queue['candleappstore'].keys() and self.installing_addons_queue['candleappstore']['failed_timestamp'] == None and 'done_timestamp' in self.installing_addons_queue['candleappstore'].keys() and self.installing_addons_queue['candleappstore']['done_timestamp'] == None:
+                        should_install_this_addon = 'candleappstore'
+                    elif 'power-settings' in addons_to_install_list and 'failed_timestamp' in self.installing_addons_queue['power-settings'].keys() and self.installing_addons_queue['power-settings']['failed_timestamp'] == None and 'done_timestamp' in self.installing_addons_queue['power-settings'].keys() and self.installing_addons_queue['power-settings']['done_timestamp'] == None:
+                        should_install_this_addon = 'power-settings'
+                    elif 'candle-theme' in addons_to_install_list and 'failed_timestamp' in self.installing_addons_queue['candle-theme'].keys() and self.installing_addons_queue['candle-theme']['failed_timestamp'] == None and 'done_timestamp' in self.installing_addons_queue['candle-theme'].keys() and self.installing_addons_queue['candle-theme']['done_timestamp'] == None:
+                        should_install_this_addon = 'candle-theme'
+                    else:
+                        #should_install_this_addon = addons_to_install_list[0]
+                        for candidate in addons_to_install_list:
+                            #if self.DEBUG:
+                            #    print("candidate addon to install next: ", candidate, self.installing_addons_queue[candidate])
                             
-                            if int(self.installing_addons_queue[candidate]['request_timestamp']) < time.time() - (3600 * 2) and 'download_start_timestamp' in self.installing_addons_queue[candidate] and self.installing_addons_queue[candidate]['download_start_timestamp'] == None:
+                            if not 'failed_timestamp' in self.installing_addons_queue[candidate]:
                                 if self.DEBUG:
-                                    print("this addon installation was requested over two hours ago, and somehow still hasn't started downloading? Removing it: ", candidate)
+                                    print("\nERROR, missing failed_timestamp from installing_addons_queue somehow. Candidate: ". candidate)
                                 del self.installing_addons_queue[candidate]
                             
-                            timestamp_to_beat = int(self.installing_addons_queue[candidate]['request_timestamp'])
-                            should_install_this_addon = candidate
-                    
-                if should_install_this_addon != None:
-                    if self.DEBUG:
-                        print("clock selected a candidate addon to install next: ", candidate, self.installing_addons_queue[candidate])
-                    
-                    self.install_addon(should_install_this_addon)
-            
+                            
+                            if self.installing_addons_queue[candidate]['done_timestamp'] != None:
+                                if int(self.installing_addons_queue[candidate]['done_timestamp']) < time.time() - 3600:
+                                    del self.installing_addons_queue[candidate]
+                                continue
+                            
+                            if self.installing_addons_queue[candidate]['failed_timestamp'] != None:
+                                if int(self.installing_addons_queue[candidate]['failed_timestamp']) < time.time() - 120:
+                                    del self.installing_addons_queue[candidate]
+                                if self.DEBUG:
+                                    print("skipping installation of addon whose installation has already failed: ", candidate)
+                                continue
+                            
+                            if 'request_timestamp' in self.installing_addons_queue[candidate] and int(self.installing_addons_queue[candidate]['request_timestamp']) < timestamp_to_beat:
+                                if self.DEBUG:
+                                    print("this addon installation was requested even earlier: ", candidate)
+                                
+                                if int(self.installing_addons_queue[candidate]['request_timestamp']) < time.time() - (3600 * 2) and 'download_start_timestamp' in self.installing_addons_queue[candidate] and self.installing_addons_queue[candidate]['download_start_timestamp'] == None:
+                                    if self.DEBUG:
+                                        print("this addon installation was requested over two hours ago, and somehow still hasn't started downloading? Removing it: ", candidate)
+                                    del self.installing_addons_queue[candidate]
+                                
+                                timestamp_to_beat = int(self.installing_addons_queue[candidate]['request_timestamp'])
+                                should_install_this_addon = candidate
+                        
+                    if should_install_this_addon != None:
+                        if self.DEBUG:
+                            print("clock selected a candidate addon to install next: ", candidate, self.installing_addons_queue[candidate])
+                        
+                        self.install_addon(should_install_this_addon)
+                
+                except Exception as ex:
+                    print("clock: caught error checking addons_to_install_list: ", ex)
+                
             
 
 
@@ -1099,6 +1102,7 @@ class CandleappstoreAdapter(Adapter):
                 print("install_addon: caught error updating installed_addons list: " + str(ex))
                 
         self.busy_installing_addon = None
+
         return False
 
 

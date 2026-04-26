@@ -789,7 +789,6 @@
 				
 				if(installing_overview_el){
 				
-				
 					let currently_installing_el = installing_overview_el.querySelector('#extension-candleappstore-currently-installing');
 					if(!currently_installing_el){
 						currently_installing_el = document.createElement('div');
@@ -879,7 +878,7 @@
 									addon_progress_bar_el.style.width = '100%';
 									addon_progress_bar_el.style.background = '#060';
 									
-									// Ensure busy-updating class s removed from item on update page if this was an update, and the update is done.
+									// Ensure busy-updating class is removed from item on update page if this was an update, and the update is done.
 									if(typeof details.update == 'boolean' && details.update == true){
 										const update_page_list_item_el = this.view.querySelector('#extension-candleappstore-updates-list .extension-candleappstore-item.extension-candleappstore-busy-updating[data-addon-id="' + addon_id + '"]');
 										if(update_page_list_item_el){
@@ -910,14 +909,18 @@
 												enable_addon_button_el.addEventListener('click', () => {
 													enable_addon_button_el.classList.add('extension-candleappstore-faded');
 													
-													function attempt_enable(addon_id){
+													const attempt_enable = (addon_id) => {
 				                                        window.API.setAddonSetting(addon_id, true)
 				                                        .then((result) => {
-															console.log("attempt_enable: OK, result: ", result);
+															if(this.debug){
+                                                                console.log("candle store debug: attempt_enable: OK, result: ", result);
+                                                            }
 				                                        	window.location.reload(true);
 				                                        })
 														.catch((err) => {
-															console.log("attempt_enable: caught error: ", err);
+															if(this.debug){
+                                                                console.log("candle store debug: attempt_enable: caught error: ", err);
+                                                            }
 															window.location.reload(true);
 														})
 													}
@@ -4287,7 +4290,7 @@
                                         this.request_install(cloud_addon_data.addon_id, cloud_addon_data.download_url, cloud_addon_data.checksum, true); // true = this is an update
                                         
 										
-										console.log("new this.addons_to_update: ", this.addons_to_update);
+										//console.log("new this.addons_to_update: ", this.addons_to_update);
 										
 										const parent_item_el = event.target.closest('.extension-candleappstore-item');
 										if(parent_item_el){
