@@ -1421,6 +1421,9 @@ button.extension-candleappstore-extra-fade,
     )!important;
     animation: extension-candleappstore-bg-sweep-to-right 2s ease infinite;
 }
+.extension-candleappstore-no-pointer-events{
+    pointer-events:none;
+}
 
 @keyframes extension-candleappstore-bg-sweep-to-right {
   0%{background-position:100% 50%}

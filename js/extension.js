@@ -907,7 +907,9 @@
 												enable_addon_button_el.classList.add('text-button');
 												enable_addon_button_el.textContent = 'Start';
 												enable_addon_button_el.addEventListener('click', () => {
-													enable_addon_button_el.classList.add('extension-candleappstore-faded');
+													enable_addon_button_el.classList.add('extension-candleappstore-no-pointer-events');
+                                                    enable_addon_button_el.classList.add('extension-candleappstore-busy-updating');
+                                                    
 													
 													const attempt_enable = (addon_id) => {
 				                                        window.API.setAddonSetting(addon_id, true)
@@ -915,12 +917,20 @@
 															if(this.debug){
                                                                 console.log("candle store debug: attempt_enable: OK, result: ", result);
                                                             }
+                                                            setTimeout(() => {
+                                                                enable_addon_button_el.classList.remove('extension-candleappstore-no-pointer-events');
+                                                                enable_addon_button_el.classList.remove('extension-candleappstore-busy-updating');
+                                                            },5000);
 				                                        	window.location.reload(true);
 				                                        })
 														.catch((err) => {
 															if(this.debug){
                                                                 console.log("candle store debug: attempt_enable: caught error: ", err);
                                                             }
+                                                            setTimeout(() => {
+                                                                enable_addon_button_el.classList.remove('extension-candleappstore-no-pointer-events');
+                                                                enable_addon_button_el.classList.remove('extension-candleappstore-busy-updating');
+                                                            },5000);
 															window.location.reload(true);
 														})
 													}
@@ -941,6 +951,10 @@
 														if(typeof details.has_ui == 'boolean' && details.has_ui == true){
 															this.flash_message('Reloading page to complete addon installation');
 															setTimeout(() => {
+                                                                setTimeout(() => {
+                                                                    enable_addon_button_el.classList.remove('extension-candleappstore-no-pointer-events');
+                                                                    enable_addon_button_el.classList.remove('extension-candleappstore-busy-updating');
+                                                                },5000);
 																window.location.reload(true);
 															},3000);
 														}
