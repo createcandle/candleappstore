@@ -706,21 +706,21 @@ class CandleappstoreAdapter(Adapter):
                     else:
                         #should_install_this_addon = addons_to_install_list[0]
                         for candidate in addons_to_install_list:
-                            #if self.DEBUG:
-                            #    print("candidate addon to install next: ", candidate, self.installing_addons_queue[candidate])
+                            if self.DEBUG:
+                                print("candidate addon to install next: ", str(candidate), self.installing_addons_queue[str(candidate)])
                             
                             if not 'failed_timestamp' in self.installing_addons_queue[candidate]:
                                 if self.DEBUG:
-                                    print("\nERROR, missing failed_timestamp from installing_addons_queue somehow. Candidate: ". candidate)
+                                    print("\nERROR, missing failed_timestamp from installing_addons_queue somehow. Candidate: ", candidate)
                                 del self.installing_addons_queue[candidate]
                             
                             
-                            if self.installing_addons_queue[candidate]['done_timestamp'] != None:
+                            if isinstance(self.installing_addons_queue[candidate]['done_timestamp'],(int, float)):
                                 if int(self.installing_addons_queue[candidate]['done_timestamp']) < time.time() - 3600:
                                     del self.installing_addons_queue[candidate]
                                 continue
                             
-                            if self.installing_addons_queue[candidate]['failed_timestamp'] != None:
+                            if isinstance(self.installing_addons_queue[candidate]['failed_timestamp'],(int, float)):
                                 if int(self.installing_addons_queue[candidate]['failed_timestamp']) < time.time() - 120:
                                     del self.installing_addons_queue[candidate]
                                 if self.DEBUG:
