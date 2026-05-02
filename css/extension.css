@@ -1183,6 +1183,10 @@ button.extension-candleappstore-extra-fade,
 	font-size:2rem;
 }
 
+#extension-candleappstore-content-container.extension-candleappstore-tab-updates #extension-candleappstore-installing-overview-container:not(:empty)::before{
+    content:'Updating';
+}
+
 #extension-candleappstore-currently-installing{
 	position:absolute;
 	top:2rem;
@@ -1432,8 +1436,15 @@ button.extension-candleappstore-extra-fade,
 
 
 
+
 #extension-candleappstore-bottom-button-container{
     margin:2rem 0;
+}
+
+#extension-candleappstore-content-container.extension-candleappstore-tab-shop #extension-candleappstore-installing-overview-container,
+#extension-candleappstore-content-container.extension-candleappstore-tab-updates #extension-candleappstore-installing-overview-container .extension-candleappstore-installing-item:not(.extension-candleappstore-installing-addon-update),
+#extension-candleappstore-content-container:not(.extension-candleappstore-tab-updates) #extension-candleappstore-installing-overview-container .extension-candleappstore-installing-item.extension-candleappstore-installing-addon-update{
+    display:none
 }
 
 

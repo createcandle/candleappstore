@@ -2026,6 +2026,11 @@
 	
 			}
 			
+
+            const content_container_el = this.view.querySelector('#extension-candleappstore-content-container');
+            if(content_container_el){
+                content_container_el.setAttribute('class','extension-candleappstore-tab-installed');
+            }
             
             // TABS
             
@@ -2047,6 +2052,11 @@
                     }
                     this.view.querySelector('#extension-candleappstore-tab-button-' + desired_tab).classList.add('extension-candleappstore-tab-selected'); // show tab
                     this.view.querySelector('#extension-candleappstore-tab-' + desired_tab).classList.remove('extension-candleappstore-hidden'); // show tab
+
+                    if(content_container_el){
+                        content_container_el.setAttribute('class','extension-candleappstore-tab-' + desired_tab);
+                    }
+
                 });
             };
             
