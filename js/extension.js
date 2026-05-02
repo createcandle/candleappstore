@@ -835,11 +835,13 @@
 								
 									// Update complete
 									if(
+                                        typeof details.done_timestamp != 'undefined' &&
+                                        details.done_timestamp != null &&
 										typeof details.update == 'boolean' && 
 										details.update == true && 
 										typeof this.api_addons_data[x].enabled == 'boolean' && 
 										this.api_addons_data[x].enabled == false &&
-										typeof details.restarted_after_update == 'undefined'
+										typeof details.restarted_after_update == 'undefined' 
 									){
 										if(this.debug){
 											console.log("candle store debug: re-enabling addon after update:  addon_id: ", addon_id);

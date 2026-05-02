@@ -693,7 +693,7 @@ class CandleappstoreAdapter(Adapter):
             
             addons_to_install_list = list(self.installing_addons_queue.keys())
             if len(addons_to_install_list) and self.busy_installing_addon == None:
-                print("addons_to_install_list: ", addons_to_install_list)
+                
                 should_install_this_addon = None
                 timestamp_to_beat = time.time()
                 try:
@@ -707,8 +707,7 @@ class CandleappstoreAdapter(Adapter):
                         #should_install_this_addon = addons_to_install_list[0]
                         for candidate in addons_to_install_list:
                             if self.DEBUG:
-                                print("candidate addon to install next: ", str(candidate))
-                                print("details: ", self.installing_addons_queue[str(candidate)])
+                                print("candidate addon to install next: ", str(candidate), self.installing_addons_queue[str(candidate)])
                             
                             if not 'failed_timestamp' in self.installing_addons_queue[candidate]:
                                 if self.DEBUG:
