@@ -27,7 +27,7 @@ mkdir -p lib package
 pip3 install -r requirements.txt -t lib  --prefix "" --no-cache --use-pep517
 
 # Put package together
-cp -r lib pkg LICENSE manifest.json *.py README.md  css images js views  package/
+cp -r lib pkg LICENSE manifest.json *.py README.md web_cache css images js views  package/
 find package -type f -name '*.pyc' -delete
 find package -type f -name '._*' -delete
 find package -type d -empty -delete
