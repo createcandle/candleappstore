@@ -166,7 +166,13 @@ class CandleappstoreAdapter(Adapter):
         
         # Create soft link so that the data/web_cache dir becomes web-accessible
         if os.path.isdir(str(self.web_cache_data_dir_path)):
-            if os.path.isdir(str(self.web_cache_addon_dir_path)):
+            if not os.path.exists(str(self.web_cache_addon_dir_path)):
+                soft_link = 'ln -s ' + str(self.web_cache_data_dir_path) + " " + str(self.web_cache_addon_dir_path)
+                if self.DEBUG:
+                    print("soft link command:\n" + soft_link)
+                os.system(soft_link)
+                
+            elif os.path.isdir(str(self.web_cache_addon_dir_path)):
                 symlink_check = str(run_command('stat ' + str(self.web_cache_addon_dir_path)))
                 if 'symbolic link' in symlink_check:
                     if self.DEBUG:
