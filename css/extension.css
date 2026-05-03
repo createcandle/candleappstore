@@ -1440,8 +1440,9 @@ button.extension-candleappstore-extra-fade,
 #extension-candleappstore-bottom-button-container{
     margin:2rem 0;
 }
-
-#extension-candleappstore-content-container.extension-candleappstore-tab-shop #extension-candleappstore-installing-overview-container,
+/*
+#extension-candleappstore-content-container.extension-candleappstore-tab-shop #extension-candleappstore-installing-overview-container .extension-candleappstore-installing-item.extension-candleappstore-installing-addon-update,
+*/
 #extension-candleappstore-content-container.extension-candleappstore-tab-updates #extension-candleappstore-installing-overview-container .extension-candleappstore-installing-item:not(.extension-candleappstore-installing-addon-update),
 #extension-candleappstore-content-container:not(.extension-candleappstore-tab-updates) #extension-candleappstore-installing-overview-container .extension-candleappstore-installing-item.extension-candleappstore-installing-addon-update{
     display:none
