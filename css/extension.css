@@ -603,10 +603,7 @@ body:not(.developer) .extension-candleappstore-show-if-developer{
     margin: 2rem 0;
     box-sizing:border-box;
 }
-.extension-candleappstore-low-memory-warning > div{
-    max-width:33rem;
-    display:inline-block;
-}
+
 #extension-candleappstore-overview-available-memory:not(:empty),
 #extension-candleappstore-install-available-memory:not(:empty){
     display:block;

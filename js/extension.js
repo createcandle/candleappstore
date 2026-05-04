@@ -794,7 +794,7 @@
 					
 		            window.API.getInstalledAddons()
 					.then((result) => {
-						console.warn("generate_installing_overview: getInstalledAddons: ", result);
+						//console.warn("generate_installing_overview: getInstalledAddons: ", result);
 						
 						result.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1) // sort alphabetically
 						//console.log("sorted result: ", result);
