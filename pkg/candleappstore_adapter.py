@@ -1007,10 +1007,13 @@ class CandleappstoreAdapter(Adapter):
                                                                 self.installing_addons_queue[addon_id]['message'] = 'Making the old version available as a troubleshooting backup'
                                                                 os.system('mv ' + str(self.installing_addons_queue[addon_id]['target_dir']) + '_bak /home/pi/.webthings/backups/addons/' + str(addon_id))
                                                             else:
-                                                                os.system('rm ' + str(self.installing_addons_queue[addon_id]['target_dir']) + '_bak')
+                                                                os.system('rm -rf ' + str(self.installing_addons_queue[addon_id]['target_dir']) + '_bak')
                                                     except Exception as ex:
                                                         if self.DEBUG:
                                                             print("caught error after addon was just installed: ", ex)
+                                                    
+                                                    if os.path.isdir(str(self.installing_addons_queue[addon_id]['target_dir']) + '_bak'):
+                                                        os.system('rm -rf ' + str(self.installing_addons_queue[addon_id]['target_dir']) + '_bak')
                                                     
                                                     time.sleep(1)
                                                     if self.installing_addons_queue[addon_id]['update']:

@@ -1104,7 +1104,7 @@
 													let add_things_button_container_el = document.createElement('div');
 													add_things_button_container_el.classList.add('extension-candleappstore-installing-item-add-things-container');
 													add_things_button_container_el.classList.add('extension-candleappstore-area');
-													add_things_button_container_el.innerHTML = '<div><h3>New things</h3><p>Your new addon seems capable of creating new Things.</p><img src="/extensions/candleappstore/images/add_things.svg" alt="Add Things"></div>';
+													add_things_button_container_el.innerHTML = '<div><h3>New things</h3><p>This addon seems capable of creating new Things.</p><img src="/extensions/candleappstore/images/add_things.svg" alt="Add Things"></div>';
 												
 									            	add_things_button_el = document.createElement('button');
 													add_things_button_el.classList.add('extension-candleappstore-installing-item-add-things-button');
