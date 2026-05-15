@@ -2659,14 +2659,22 @@ body.safe-mode:not(.developer) #extension-candleappstore-tab-button-shop{
 
 @media screen and (max-width: 800px) {
 
+    .extension-candleappstore-installing-item-options-container,
     .extension-candleappstore-item-main{
     	flex-direction:column;
+    }
+
+    .extension-candleappstore-installing-item-options-container > div{
+        width:100%;
+        max-width:100%;
     }
 
 	.extension-candleappstore-basic-info{
 		max-width:50rem;
 		margin-bottom:2rem;
 	}
+
+    
 }
 
 

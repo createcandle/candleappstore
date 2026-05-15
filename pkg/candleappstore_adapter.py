@@ -712,8 +712,8 @@ class CandleappstoreAdapter(Adapter):
                     else:
                         #should_install_this_addon = addons_to_install_list[0]
                         for candidate in addons_to_install_list:
-                            if self.DEBUG:
-                                print("candidate addon to install next: ", str(candidate), self.installing_addons_queue[str(candidate)])
+                            #if self.DEBUG:
+                            #    print("candidate addon to install next: ", str(candidate), self.installing_addons_queue[str(candidate)])
                             
                             if not 'failed_timestamp' in self.installing_addons_queue[candidate]:
                                 if self.DEBUG:
@@ -723,14 +723,19 @@ class CandleappstoreAdapter(Adapter):
                             
                             if isinstance(self.installing_addons_queue[candidate]['done_timestamp'],(int, float)):
                                 if int(self.installing_addons_queue[candidate]['done_timestamp']) < time.time() - 3600:
+                                    if self.DEBUG:
+                                        print("removing item from installing_addons_queue because it was completed over an hour ago: ", candidate)
                                     del self.installing_addons_queue[candidate]
                                 continue
                             
-                            if isinstance(self.installing_addons_queue[candidate]['failed_timestamp'],(int, float)):
+                            if isinstance(self.installing_addons_queue[candidate]['failed_timestamp'],(int, float)) and self.installing_addons_queue[candidate]['failed_timestamp'] != 0:
                                 if int(self.installing_addons_queue[candidate]['failed_timestamp']) < time.time() - 120:
+                                    if self.DEBUG:
+                                        print("removing item from installing_addons_queue that failed over 2 minutes ago")
                                     del self.installing_addons_queue[candidate]
-                                if self.DEBUG:
-                                    print("skipping installation of addon whose installation has already failed: ", candidate)
+                                else:
+                                    if self.DEBUG:
+                                        print("skipping installation of addon whose installation has already failed less than 2 minutes ago: ", candidate, self.installing_addons_queue[candidate])
                                 continue
                             
                             if 'request_timestamp' in self.installing_addons_queue[candidate] and int(self.installing_addons_queue[candidate]['request_timestamp']) < timestamp_to_beat:

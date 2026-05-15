@@ -848,6 +848,11 @@
 										}
 										this.installing_addons_queue[addon_id]['restarted_after_update'] = false;
 										
+                                        // remove the item from the list in the UI
+                                        const updated_item_el = this.view.querySelector('div.extension-candleappstore-item[data-addon-id="' + addon_id + '"]');
+                                        if(updated_item_el){
+                                            updated_item_el.remove();
+                                        }
 										window.API.setAddonSetting( addon_id, true)
                                         .then((result) => {
 											if(this.debug){
@@ -934,7 +939,11 @@
 										if(typeof details.update == 'boolean' && details.update == true){
 											const update_page_list_item_el = this.view.querySelector('#extension-candleappstore-updates-list .extension-candleappstore-item.extension-candleappstore-busy-updating[data-addon-id="' + addon_id + '"]');
 											if(update_page_list_item_el){
-												update_page_list_item_el.classList.remove('extension-candleappstore-busy-updating');
+                                                if(this.debug){
+	                                                console.log("candle store debug: removing item from update list");
+                                                }
+												//update_page_list_item_el.classList.remove('extension-candleappstore-busy-updating');
+                                                update_page_list_item_el.remove();
 											}
 										}
 									
@@ -3571,8 +3580,6 @@
                                     }
                                     
                                 }
-                                
-                                
                                 
                                 t.innerHTML = text;
                                 
