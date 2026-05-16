@@ -52,9 +52,14 @@ https://github.com/createcandle/candle_addons_list
 
 ## Manual installation
 
-The easiest way is to install the SeaShell addon, and then execute this command in it:
+The easiest way is to install the SeaShell addon, and then execute these commands:
 
-`git clone --depth=1 https://github.com/createcandle/candleappstore.git /home/pi/.webthings/addons/candleappstore`
+```
+git clone --depth=1 https://github.com/createcandle/candleappstore.git /home/pi/.webthings/addons/candleappstore`
+cd /home/pi/.webthings/addons/candleappstore
+chmod +x package.sh
+./package.sh
+```
 
 Then reboot your controller and it will show up in the installed addons list, where you can enable it.
 
