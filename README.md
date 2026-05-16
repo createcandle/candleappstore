@@ -44,9 +44,7 @@ Some addons are easy to use by beginners, while others may require more technica
 
 ## Getting your addon into the Candle store
 
-If your addon is already part of the Webthings addons list, then it should automatically show up in this app store too. This may take a while because there is a manual step, so you can create an issue to speed up this process. New addons will initially only be visible if the "beta testers" filter is enabled. If there are a positive reviews for your addon it will become available for lower expertise levels.
-
-If your addon is not being accepted to the Webthings Gateway addons list, then you can ask for inclusion in the Candle store directly:
+Ask for you addon to be included in this list:
 https://github.com/createcandle/candle_addons_list
 
 
