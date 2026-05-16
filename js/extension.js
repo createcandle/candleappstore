@@ -1909,16 +1909,19 @@
 
 		hide() {
 			try{
-                if(document.getElementById('extension-candleappstore-menu-item').classList.contains('selected') == false){
-		            if(this.debug){
-		                console.log("candle store debug: clearing view innerHTML");
-					}
-                    this.view.innerHTML = "";
-					if(this.log_poll_interval){
-						clearInterval(this.log_poll_interval);
-		                this.log_poll_interval == null
-					}
-                }
+                setTimeout(() => {
+                    const menu_item_el = document.getElementById('extension-candleappstore-menu-item');
+                    if(menu_item_el && menu_item_el.classList.contains('selected') == false){
+                        if(this.debug){
+                            console.log("candle store debug: clearing view innerHTML");
+                        }
+                        this.view.innerHTML = "";
+                        if(this.log_poll_interval){
+                            clearInterval(this.log_poll_interval);
+                            this.log_poll_interval == null
+                        }
+                    }
+                },5000);
 			}
             catch(err){
                 console.error("candle store: caught error in hide: ", err);
