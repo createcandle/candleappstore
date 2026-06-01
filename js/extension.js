@@ -3297,17 +3297,31 @@
 				let first_addon_to_update = 'candleappstore';
 				if(typeof this.addons_to_update_full['candleappstore'] == 'undefined'){
 					// ...or a random addon from the list. This ensures that is case an addon can't update properly, at least on a fresh attempt a different addon might get through
-					first_addon_to_update = Math.floor(Math.random() * this.addons_to_update.length);
+					first_addon_to_update = Math.floor(Math.random() * (this.addons_to_update.length - 1));
 				}
-				this.request_install( first_addon_to_update, this.addons_to_update_full[first_addon_to_update]['url'], this.addons_to_update_full[first_addon_to_update]['checksum'], true); // true = this is an update request
-			
+                if(typeof this.addons_to_update_full[first_addon_to_update] == 'undefined'){
+                    first_addon_to_update = 0;
+                }
+                let checksum = null;
+                if(typeof this.addons_to_update_full[first_addon_to_update]['checksum'] == 'string' && this.addons_to_update_full[first_addon_to_update]['checksum'] != ''){
+                    checksum = this.addons_to_update_full[first_addon_to_update]['checksum'];
+                }
+                if(typeof this.addons_to_update_full[first_addon_to_update] != 'undefined' && typeof this.addons_to_update_full[first_addon_to_update]['url'] == 'string'){
+				    this.request_install( first_addon_to_update, this.addons_to_update_full[first_addon_to_update]['url'], checksum, true); // true = this is an update request
+                }
 				// Then request all the rest with one second intervals
 				for( let au = 0; au < this.addons_to_update.length; au++){
-				
-					const next_addon_to_update = this.addons_to_update[au];
+					let next_addon_to_update = this.addons_to_update[au];
 					if(next_addon_to_update != first_addon_to_update){
 						setTimeout(() => {
-							this.request_install(next_addon_to_update, this.addons_to_update_full[next_addon_to_update]['url'], this.addons_to_update_full[next_addon_to_update]['checksum'], true); 
+                            if(typeof this.addons_to_update_full[next_addon_to_update] != 'undefined' && typeof this.addons_to_update_full[next_addon_to_update]['url'] == 'string'){
+                                let another_checksum = null;
+                                if(typeof this.addons_to_update_full[next_addon_to_update]['checksum'] == 'string' == 'string' && typeof this.addons_to_update_full[next_addon_to_update]['checksum'] != ''){
+                                    another_checksum = this.addons_to_update_full[next_addon_to_update]['checksum'];
+                                }
+                                this.request_install(next_addon_to_update, this.addons_to_update_full[next_addon_to_update]['url'], another_checksum, true); 
+                            }
+							
 						},1000 * (au + 1));
 					}
 				}
