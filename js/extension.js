@@ -3299,16 +3299,21 @@
 					// ...or a random addon from the list. This ensures that is case an addon can't update properly, at least on a fresh attempt a different addon might get through
 					first_addon_to_update = Math.floor(Math.random() * (this.addons_to_update.length - 1));
 				}
-                if(typeof this.addons_to_update_full[first_addon_to_update] == 'undefined'){
-                    first_addon_to_update = 0;
+                if(typeof this.addons_to_update_full[first_addon_to_update] != 'undefined'){
+                    let checksum = null;
+                    if(typeof this.addons_to_update_full[first_addon_to_update]['checksum'] == 'string' && this.addons_to_update_full[first_addon_to_update]['checksum'] != ''){
+                        checksum = this.addons_to_update_full[first_addon_to_update]['checksum'];
+                    }
+                    if(typeof this.addons_to_update_full[first_addon_to_update] != 'undefined' && typeof this.addons_to_update_full[first_addon_to_update]['url'] == 'string'){
+                        this.request_install( first_addon_to_update, this.addons_to_update_full[first_addon_to_update]['url'], checksum, true); // true = this is an update request
+                    }
                 }
-                let checksum = null;
-                if(typeof this.addons_to_update_full[first_addon_to_update]['checksum'] == 'string' && this.addons_to_update_full[first_addon_to_update]['checksum'] != ''){
-                    checksum = this.addons_to_update_full[first_addon_to_update]['checksum'];
+                else{
+                    if(this.debug){
+                        console.error("candle store debug: could not find first_addon_to_update in addons_to_update_full.  first_addon_to_update,this.addons_to_update,addons_to_update_full: ", first_addon_to_update, this.addons_to_update, addons_to_update_full);
+                    }
                 }
-                if(typeof this.addons_to_update_full[first_addon_to_update] != 'undefined' && typeof this.addons_to_update_full[first_addon_to_update]['url'] == 'string'){
-				    this.request_install( first_addon_to_update, this.addons_to_update_full[first_addon_to_update]['url'], checksum, true); // true = this is an update request
-                }
+                
 				// Then request all the rest with one second intervals
 				for( let au = 0; au < this.addons_to_update.length; au++){
 					let next_addon_to_update = this.addons_to_update[au];

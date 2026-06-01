@@ -1237,7 +1237,7 @@ button.extension-candleappstore-extra-fade,
 	text-align:center;
 }
 
-.extension-candleappstore-installing-item-is-enabled{
+.extension-candleappstore-tab-installed .extension-candleappstore-installing-item-is-enabled{
 	background-color:#080;
 }
 
