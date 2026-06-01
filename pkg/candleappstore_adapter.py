@@ -441,14 +441,15 @@ class CandleappstoreAdapter(Adapter):
             if 'permissions' not in self.persistent_data:
                 self.persistent_data['permissions'] = {}
                 
-            
-                
             # should be used to find out of the candle webserver has fresh addon updates, but is unfinished
             if 'meta_updated_time' not in self.persistent_data:
                 self.persistent_data['meta_updated_time'] = 0
                 
             if 'previously_installed_versions' not in self.persistent_data:
                 self.persistent_data['previously_installed_versions'] = {}
+                
+            if 'last_controller_restart_time' not in self.persistent_data:
+                self.persistent_data['last_controller_restart_time'] = 0
                 self.save_persistent_data()
                 
         except Exception as ex:
@@ -1025,7 +1026,10 @@ class CandleappstoreAdapter(Adapter):
                                                     self.installing_addons_queue[addon_id]['has_ui'] = self.check_if_addon_has_ui(addon_id)
                                                     self.installing_addons_queue[addon_id]['has_things'] = self.check_if_addon_has_things(addon_id)
                                                     time.sleep(1)
-                                                    if self.installing_addons_queue[addon_id]['update']:
+
+                                                    if addon_id == 'candleappstore':
+                                                        self.installing_addons_queue[addon_id]['message'] = 'Candle store updated - restarting Candle controller...'
+                                                    elif self.installing_addons_queue[addon_id]['update']:
                                                         self.installing_addons_queue[addon_id]['message'] = 'Update complete'
                                                     else:
                                                         self.installing_addons_queue[addon_id]['message'] = 'Installation complete'
@@ -1059,6 +1063,20 @@ class CandleappstoreAdapter(Adapter):
                                                         if self.DEBUG:
                                                             print("this version has been installed before. Not adding it to previously_installed_versions history: ", addon_id)
                                                     
+
+                                                    if addon_id == 'candleappstore':
+                                                        if self.persistent_data['last_controller_restart_time'] < int(time.time()) - 300:
+                                                            self.send_pairing_prompt("Candle store updated, restarting controller")
+                                                            self.persistent_data['last_controller_restart_time'] = int(time.time())
+                                                            self.save_persistent_data()
+                                                            time.sleep(3)
+                                                            os.system('sudo systemctl restart webthings-gateway.service')
+                                                            time.sleep(2)
+                                                        else:
+                                                            print("\n\n\n\nWARNING, LAST ATTEMPT TO REBOOT CONTROLLER TO UPDATE CANDLE STORE WAS LESS THAN 5 MINUTES AGO!\n\n\n\n")
+                                                            if self.DEBUG:
+                                                                self.send_pairing_prompt("WARNING, CANDLE STORE UPDATE CAUSED ATTEMPT TO RESTART TOO FREQUENTLY")
+                                                            time.sleep(3)
                                                     self.installing_addons_queue[addon_id]['done_timestamp'] = time.time()
                                                     self.busy_installing_addon = None
                                                 else:
