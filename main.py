@@ -7,8 +7,10 @@ import signal
 import sys
 import time
 
-sys.path.append(path.join(path.dirname(path.abspath(__file__)), 'lib'))
-
+lib_path = path.join(path.dirname(path.abspath(__file__)), 'lib')
+if lib_path not in sys.path:
+	sys.path.append(lib_path)
+    
 from pkg.candleappstore_adapter import CandleappstoreAdapter  # noqa
 
 _API_VERSION = {
