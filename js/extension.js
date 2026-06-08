@@ -170,7 +170,7 @@
 					//console.log("window.location.search: ", window.location.search);
 					if(window.location.search.indexOf('addon=') != -1){
 						this.jump_to_addon = new URL(location.href).searchParams.get('addon');
-						//console.log("should show this addon: ", this.jump_to_addon);
+						console.log("candle store: should show this addon: ", this.jump_to_addon);
 					}
 					
 	  		  	}
@@ -2913,11 +2913,13 @@
 				}
                 this.generate_overview('installed');
 				if(this.jump_to_addon != ''){
+                    console.log("candle store: this.jump_to_addon: ", this.jump_to_addon);
 					if(this.installed.indexOf(this.jump_to_addon) != -1){
 						if(this.debug){
 							console.warn("candle store debug: that addon is already installed: ", this.jump_to_addon);
 						}
 						this.show_selected_app(this.jump_to_addon);
+                        this.jump_to_addon = '';
 					}
 					else{
 						if(this.debug){
@@ -2931,14 +2933,13 @@
 	                        this.cloud_app_data = response;
 	                        this.received_cloud_data = true;
 							this.show_selected_app(this.jump_to_addon);
+                            this.jump_to_addon = '';
 	                    })
 	                    .catch((err) => {
-							if(this.debug){
-								console.error("candle store debug: caught error getting data for jump_to_addon from url: ", err);
-							}
+							console.error("candle store debug: caught error getting data for jump_to_addon from url: ", err);
 	        			});
 					}
-					this.jump_to_addon = '';
+					
 				}
 				else if(this.jump_to_addon_settings != ''){
 					if(this.debug){
